@@ -84,7 +84,7 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //青龙管理
-        if (msg.trim().equals("青龙测试")){
+        if (msg.trim().equals("qlcs")){
             qingLongGuanLiUtil.handleQingLong(content);
             return;
         }
@@ -135,8 +135,7 @@ public class WxServiceImpl implements WxService {
     public void handleMyUid(JSONObject content){
         //发送人
         String from_wxid = content.getString("from_wxid");
-        String uid = SecureUtil.md5(from_wxid).substring(0,10);
-        weChatUtil.sendTextMsg(uid, content);
+        weChatUtil.sendTextMsg(from_wxid, content);
     }
 
     /**
@@ -369,7 +368,7 @@ public class WxServiceImpl implements WxService {
      */
     @Override
     public void handleWeiBo(JSONObject content) {
-        redis.put("publicKey","微博", DateUnit.SECOND.getMillis() * 60);
+        redis.put("publicKey","微博", DateUnit.SECOND.getMillis() * 60 * 2);
         String result = HttpRequest.get("https://weibo.com/ajax/statuses/hot_band").execute().body();
         if (StringUtils.isEmpty(result)){
             weChatUtil.sendTextMsg("微博接口废拉，赶紧联系管理员维护！！！", content);
@@ -378,7 +377,7 @@ public class WxServiceImpl implements WxService {
         String bandListStr = jsonObject.getJSONObject("data").getString("band_list");
         List<JSONObject> bandLists = JSONArray.parseArray(bandListStr, JSONObject.class);
         //加入缓存
-        redis.put("WbBandLists",bandListStr, DateUnit.SECOND.getMillis() * 60);
+        redis.put("WbBandLists",bandListStr, DateUnit.SECOND.getMillis() * 60 * 2);
         String msg = "微博实时热搜：\r\n\r\n";
         int index = 1;
         for (JSONObject band : bandLists) {

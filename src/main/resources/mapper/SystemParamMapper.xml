@@ -16,7 +16,7 @@
     </insert>
 
     <update id="updateSystemParam" parameterType="systemParam">
-        update systemParam set value=#{value},updated_time={updatedTime}  where code=#{code};
+        update systemParam set value=#{value},updated_time=#{updatedTime} where code=#{code};
     </update>
 
     <delete id="deleteSystemParam" parameterType="string">

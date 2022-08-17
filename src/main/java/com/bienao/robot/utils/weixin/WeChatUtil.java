@@ -123,8 +123,7 @@ public class WeChatUtil {
             sendTextMsg("设置微信管理员 你的uid", content);
             return false;
         }else {
-            String uid = SecureUtil.md5(from_wxid).substring(0,10);
-            if (masters.contains(uid)){
+            if (masters.contains(from_wxid)){
                 return true;
             }else {
                 sendTextMsg("你不是管理员，无法执行该操作", content);

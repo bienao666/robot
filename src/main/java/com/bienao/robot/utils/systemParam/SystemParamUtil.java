@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -76,6 +77,7 @@ public class SystemParamUtil {
             return addSystemParam(systemParam);
         }else {
             systemParam.setValue(value);
+            systemParam.setUpdatedTime(new Date());
             int i = systemParamMapper.updateSystemParam(systemParam);
             if (i==1){
                 sysParamRedis.put(systemParam.getCode(),systemParam.getValue(), DateUnit.DAY.getMillis());
