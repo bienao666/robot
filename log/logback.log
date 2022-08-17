@@ -1,0 +1,15 @@
+2022-08-17 15:05:55.824 default [restartedMain] INFO  com.bienao.robot.RobotApplication - Starting RobotApplication using Java 1.8.0_261 on bienao with PID 14892 (D:\workcode\robot\target\classes started by tiandawei in D:\workcode\robot)
+2022-08-17 15:05:55.826 default [restartedMain] INFO  com.bienao.robot.RobotApplication - No active profile set, falling back to 1 default profile: "default"
+2022-08-17 15:05:55.863 default [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2022-08-17 15:05:55.864 default [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2022-08-17 15:05:56.642 default [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8081 (http)
+2022-08-17 15:05:56.648 default [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2022-08-17 15:05:56.648 default [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.65]
+2022-08-17 15:05:56.709 default [restartedMain] INFO  o.a.c.c.C.[.[.[/robot/apiConstants] - Initializing Spring embedded WebApplicationContext
+2022-08-17 15:05:56.709 default [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 844 ms
+2022-08-17 15:05:57.173 default [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2022-08-17 15:05:57.201 default [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8081 (http) with context path '/robot/apiConstants'
+2022-08-17 15:05:57.211 default [restartedMain] INFO  com.bienao.robot.RobotApplication - Started RobotApplication in 1.777 seconds (JVM running for 2.427)
+2022-08-17 15:23:06.640 default [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2022-08-17 15:23:06.696 default [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2022-08-17 15:23:06.712 default [SpringApplicationShutdownHook] INFO  c.alibaba.druid.pool.DruidDataSource - {dataSource-0} closing ...

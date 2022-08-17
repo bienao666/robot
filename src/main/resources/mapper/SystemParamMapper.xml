@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bienao.robot.mapper.SystemParamMapper">
+    <select id="querySystems" resultType="systemParam">
+        select * from systemParam
+    </select>
+
+    <select id="querySystem" parameterType="string" resultType="systemParam">
+        select * from systemParam where code=#{code}
+    </select>
+
+    <insert id="addSystemParam" parameterType="systemParam">
+        insert into systemParam(code,codeName,value) values (#{code},#{codeName},#{value})
+    </insert>
+
+    <update id="updateSystemParam" parameterType="systemParam">
+        update systemParam set value=#{value},updated_time={updatedTime}  where code=#{code};
+    </update>
+
+    <delete id="deleteSystemParam" parameterType="string">
+        delete from systemParam where code = #{code};
+    </delete>
+
+</mapper>
