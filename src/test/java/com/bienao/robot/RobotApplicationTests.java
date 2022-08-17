@@ -22,17 +22,7 @@ class RobotApplicationTests {
 
     @Test
     public void test(){
-        String resStr = HttpRequest.get("http://121.43.32.165:7012/open/auth/token?client_id=6-A8PgQ3-758&client_secret=X24-F_8ZNaRgvD3AmitHbg7A")
-                .execute().body();
-        JSONObject res = JSONObject.parseObject(resStr);
-        JSONObject data = res.getJSONObject("data");
-        String token_type = data.getString("token_type");
-        String token = data.getString("token");
 
-        resStr = HttpRequest.get("http://121.43.32.165:7012/open/envs")
-                .header("Authorization",token_type + " " + token)
-                .execute().body();
-        System.out.println(resStr);
     }
 
 }
