@@ -12,7 +12,7 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     url: jdbc:mysql://101.34.47.200:10018/robot?useUnicode=true&characterEncoding=utf8&currentSchema=public&useAffectedRows=true&serverTimezone=Asia/Shanghai&allowMultiQueries=true
     username: root
-    password: root
+    password: BIENAO666
 
 mybatis:
   mapper-locations: classpath:mapper/*Mapper.xml
