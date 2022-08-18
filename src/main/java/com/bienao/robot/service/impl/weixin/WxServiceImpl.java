@@ -94,7 +94,12 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //查询我的uid
-        if (msg.trim().equals("我的uid")){
+        if (msg.trim().equals("我的uid")||msg.trim().equals("myuid")){
+            handleMyUid(content);
+            return;
+        }
+        //查询群id
+        if (msg.trim().equals("群号")||msg.trim().equals("groupCode")){
             handleMyUid(content);
             return;
         }
@@ -127,6 +132,17 @@ public class WxServiceImpl implements WxService {
             weChatUtil.sendTextMsg(masters, content);
         }
     }
+
+    /**
+     * 查询群id
+     * @param content
+     */
+    public void handleGroupCode(JSONObject content){
+        //发送人
+        String from_group = content.getString("from_group");
+        weChatUtil.sendTextMsg(from_group, content);
+    }
+
 
     /**
      * 查询我的uid
