@@ -2,22 +2,24 @@ package com.bienao.robot.service.impl.weixin;
 
 import cn.hutool.cache.Cache;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.ChineseDate;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.weixin.WXConstant;
+import com.bienao.robot.entity.Festival;
 import com.bienao.robot.entity.SystemParam;
 import com.bienao.robot.service.weixin.WxService;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import com.bienao.robot.utils.weixin.QingLongGuanLiUtil;
 import com.bienao.robot.utils.weixin.WeChatUtil;
 import com.google.common.collect.EvictingQueue;
+import com.nlf.calendar.Lunar;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,9 +56,9 @@ public class WxServiceImpl implements WxService {
         String from_wxid = content.getString("from_wxid");
 
         //查看当前会话
-        String curSession = redis.get(from_wxid+"curSession");
-        if (StringUtils.isNotEmpty(curSession)){
-            if ("青龙管理".equals(curSession)){
+        String curSession = redis.get(from_wxid + "curSession");
+        if (StringUtils.isNotEmpty(curSession)) {
+            if ("青龙管理".equals(curSession)) {
                 qingLongGuanLiUtil.handleOperate(content);
                 return;
             }
@@ -64,7 +67,7 @@ public class WxServiceImpl implements WxService {
 
         String msg = content.getString("msg");
         //微博
-        if (msg.contains("微博") || msg.contains("热搜") || msg.contains("wb")){
+        if (msg.contains("微博") || msg.contains("热搜") || msg.contains("wb")) {
             handleWeiBo(content);
             return;
         }
@@ -78,42 +81,47 @@ public class WxServiceImpl implements WxService {
             handleMJX(content);
             return;
         }
+        //摸鱼
+        if (msg.trim().contains("my") || msg.trim().contains("摸鱼")) {
+            handleMoYu(content);
+            return;
+        }
         //比价
-        if (msg.contains("item.m.jd.com") || msg.contains("m.tb.cn")){
-            handleGoods(msg,content);
+        if (msg.contains("item.m.jd.com") || msg.contains("m.tb.cn")) {
+            handleGoods(msg, content);
             return;
         }
         //青龙管理
-        if (msg.trim().equals("qlcs")){
+        if (msg.trim().equals("qlcs")) {
             qingLongGuanLiUtil.handleQingLong(content);
             return;
         }
         //设置微信管理员
-        if (msg.contains("设置微信管理员")){
+        if (msg.contains("设置微信管理员")) {
             handleSetWXMasters(content);
             return;
         }
         //查询我的uid
-        if (msg.trim().equals("我的uid")||msg.trim().equals("myuid")){
+        if (msg.trim().equals("我的uid") || msg.trim().equals("myuid")) {
             handleMyUid(content);
             return;
         }
         //查询群id
-        if (msg.trim().equals("群号")||msg.trim().equals("groupCode")){
+        if (msg.trim().equals("群号") || msg.trim().equals("groupCode")) {
             handleMyUid(content);
             return;
         }
         //查询微信管理员
-        if (msg.trim().equals("微信管理员列表")){
+        if (msg.trim().equals("微信管理员列表")) {
             handleQueryWXMasters(content);
             return;
         }
 
-        if (NumberUtil.isInteger(msg)){
+        if (NumberUtil.isInteger(msg)) {
             Integer num = Integer.valueOf(msg);
             String publicKey = redis.get("publicKey");
-            if (num<=50 && StringUtils.isNotEmpty(publicKey)){
-                handleLast(content,num,publicKey);
+            if (num <= 50 && StringUtils.isNotEmpty(publicKey)) {
+                handleLast(content, num, publicKey);
             }
         }
     }
@@ -121,23 +129,24 @@ public class WxServiceImpl implements WxService {
     /**
      * 查询微信管理员
      */
-    public void handleQueryWXMasters(JSONObject content){
+    public void handleQueryWXMasters(JSONObject content) {
         String masters = systemParamUtil.querySystemParam("wxmasters");
-        if (StringUtils.isEmpty(masters)){
+        if (StringUtils.isEmpty(masters)) {
             weChatUtil.sendTextMsg("尚未设置管理员，请先按照以下命令设置,多个请用@隔开", content);
             weChatUtil.sendTextMsg("设置微信管理员 你的uid", content);
         }
         boolean flag = weChatUtil.isMaster(content);
-        if (flag){
+        if (flag) {
             weChatUtil.sendTextMsg(masters, content);
         }
     }
 
     /**
      * 查询群id
+     *
      * @param content
      */
-    public void handleGroupCode(JSONObject content){
+    public void handleGroupCode(JSONObject content) {
         //发送人
         String from_group = content.getString("from_group");
         weChatUtil.sendTextMsg(from_group, content);
@@ -146,9 +155,10 @@ public class WxServiceImpl implements WxService {
 
     /**
      * 查询我的uid
+     *
      * @param content
      */
-    public void handleMyUid(JSONObject content){
+    public void handleMyUid(JSONObject content) {
         //发送人
         String from_wxid = content.getString("from_wxid");
         weChatUtil.sendTextMsg(from_wxid, content);
@@ -156,13 +166,14 @@ public class WxServiceImpl implements WxService {
 
     /**
      * 设置微信管理员
+     *
      * @param content
      */
-    public void handleSetWXMasters(JSONObject content){
+    public void handleSetWXMasters(JSONObject content) {
         //发送人
         String from_wxid = content.getString("from_wxid");
         String masters = systemParamUtil.querySystemParam("wxmasters");
-        if (StringUtils.isEmpty(masters)){
+        if (StringUtils.isEmpty(masters)) {
             //第一次直接设置
             masters = content.getString("msg").replace("设置微信管理员", "").trim();
             SystemParam systemParam = new SystemParam();
@@ -170,76 +181,77 @@ public class WxServiceImpl implements WxService {
             systemParam.setCodeName("微信管理员");
             systemParam.setValue(masters);
             boolean flag = systemParamUtil.addSystemParam(systemParam);
-            if (flag){
+            if (flag) {
                 weChatUtil.sendTextMsg("设置成功", content);
-            }else {
+            } else {
                 weChatUtil.sendTextMsg("设置失败，系统异常", content);
             }
-        }else {
-            String uid = SecureUtil.md5(from_wxid).substring(0,10);
-            if (masters.contains(uid)){
+        } else {
+            String uid = SecureUtil.md5(from_wxid).substring(0, 10);
+            if (masters.contains(uid)) {
                 //添加新的管理员
                 masters = masters + "@" + content.getString("msg").replace("设置微信管理员", "").trim();
-                boolean flag = systemParamUtil.updateSystemParam("wxmasters","微信管理员", masters);
-                if (flag){
+                boolean flag = systemParamUtil.updateSystemParam("wxmasters", "微信管理员", masters);
+                if (flag) {
                     weChatUtil.sendTextMsg("设置成功", content);
-                }else {
+                } else {
                     weChatUtil.sendTextMsg("设置失败，系统异常", content);
                 }
             }
         }
     }
 
-    public void handleLast(JSONObject content,Integer num,String publicKey){
-        if (publicKey.equals("微博")){
-            handleLastWeiBo(content,num);
+    public void handleLast(JSONObject content, Integer num, String publicKey) {
+        if (publicKey.equals("微博")) {
+            handleLastWeiBo(content, num);
         }
 
     }
 
     /**
      * 比价
+     *
      * @param url
      */
-    public void handleGoods(String url,JSONObject content){
+    public void handleGoods(String url, JSONObject content) {
         String resStr = doGetGoods(url);
-        if(StringUtils.isNotEmpty(resStr)){
+        if (StringUtils.isNotEmpty(resStr)) {
             JSONObject res = JSONObject.parseObject(resStr);
             String singleStr = res.getString("single");
-            if (StringUtils.isNotEmpty(singleStr)){
+            if (StringUtils.isNotEmpty(singleStr)) {
                 JSONObject single = JSONObject.parseObject(singleStr);
-                dohandleGoods(single,content);
-            }else {
+                dohandleGoods(single, content);
+            } else {
                 //再尝试一次
                 resStr = doGetGoods(url);
-                if(StringUtils.isNotEmpty(resStr)){
+                if (StringUtils.isNotEmpty(resStr)) {
                     res = JSONObject.parseObject(resStr);
                     singleStr = res.getString("single");
-                    if (StringUtils.isNotEmpty(singleStr)){
+                    if (StringUtils.isNotEmpty(singleStr)) {
                         JSONObject single = JSONObject.parseObject(singleStr);
-                        dohandleGoods(single,content);
-                    }else {
+                        dohandleGoods(single, content);
+                    } else {
                         log.info("比价失败！！！");
                     }
                 }
             }
-        }else {
+        } else {
             //再尝试一次
             resStr = doGetGoods(url);
-            if(StringUtils.isNotEmpty(resStr)){
+            if (StringUtils.isNotEmpty(resStr)) {
                 JSONObject res = JSONObject.parseObject(resStr);
                 String singleStr = res.getString("single");
-                if (StringUtils.isNotEmpty(singleStr)){
+                if (StringUtils.isNotEmpty(singleStr)) {
                     JSONObject single = JSONObject.parseObject(singleStr);
-                    dohandleGoods(single,content);
-                }else {
+                    dohandleGoods(single, content);
+                } else {
                     log.info("比价失败！！！");
                 }
             }
         }
     }
 
-    public void dohandleGoods(JSONObject single,JSONObject content){
+    public void dohandleGoods(JSONObject single, JSONObject content) {
         String result = "";
         //商品名称
         String title = single.getString("title");
@@ -273,7 +285,7 @@ public class WxServiceImpl implements WxService {
         String lowerDate = single.getString("lowerDate");
         Pattern compile = Pattern.compile("/Date\\((\\d+)\\+");
         Matcher matcher = compile.matcher(lowerDate);
-        if(matcher.find()){
+        if (matcher.find()) {
             Date date = new Date(Long.valueOf(matcher.group(1)));
             lowerDate = DateUtil.format(date, "yyyy.MM.dd");
             result += "最低日期：" + lowerDate + "\r\n";
@@ -288,47 +300,48 @@ public class WxServiceImpl implements WxService {
         String price = "";
         for (List<String> object : lists) {
             String p = object.get(3);
-            if (StringUtils.isEmpty(price)){
+            if (StringUtils.isEmpty(price)) {
                 price = p;
                 String raw = object.get(0) + "-" + object.get(1) + "-" + object.get(2) + "：" + price;
                 priceChangeList.add(raw);
-            }else {
+            } else {
                 BigDecimal last = new BigDecimal(price);
                 BigDecimal now = new BigDecimal(p);
-                if (now.compareTo(last)!=0){
+                if (now.compareTo(last) != 0) {
                     price = p;
                     String raw = object.get(0) + "-" + object.get(1) + "-" + object.get(2) + "：" + price;
                     priceChangeList.add(raw);
                 }
             }
         }
-        if (priceChangeList.size()>0){
+        if (priceChangeList.size() > 0) {
             result += "最近20次价格变动如下：\r\n";
             for (String s : priceChangeList) {
                 result += s + "\r\n";
             }
         }
-        weChatUtil.sendImageMsg(bigpic,content);
-        weChatUtil.sendTextMsg(result,content);
+        weChatUtil.sendImageMsg(bigpic, content);
+        weChatUtil.sendTextMsg(result, content);
     }
 
     /**
      * 调查询商品接口
+     *
      * @param url
      * @return
      */
-    public String doGetGoods(String url){
-        url = url.replaceAll("/","%252F").replaceAll("\\?","%253F").replaceAll("=","%253D").replaceAll(":","%253A").replaceAll("&","%26");
-        String body = "c_devid=2C5039AF-99D0-4800-BC36-DEB3654D202C&username=&qs=true&c_engver=1.2.35&c_devtoken=&c_devmodel=iPhone%20SE&c_contype=wifi&t=1537348981671&c_win=w_320_h_568&p_url="+url+"&c_ostype=ios&jsoncallback=%3F&c_ctrl=w_search_trend0_f_content&methodName=getBiJiaInfo_wxsmall&c_devtype=phone&jgzspic=no&c_operator=%E4%B8%AD%E5%9B%BD%E7%A7%BB%E5%8A%A8&c_appver=2.9.0&bj=false&c_dp=2&c_osver=10.3.3";
+    public String doGetGoods(String url) {
+        url = url.replaceAll("/", "%252F").replaceAll("\\?", "%253F").replaceAll("=", "%253D").replaceAll(":", "%253A").replaceAll("&", "%26");
+        String body = "c_devid=2C5039AF-99D0-4800-BC36-DEB3654D202C&username=&qs=true&c_engver=1.2.35&c_devtoken=&c_devmodel=iPhone%20SE&c_contype=wifi&t=1537348981671&c_win=w_320_h_568&p_url=" + url + "&c_ostype=ios&jsoncallback=%3F&c_ctrl=w_search_trend0_f_content&methodName=getBiJiaInfo_wxsmall&c_devtype=phone&jgzspic=no&c_operator=%E4%B8%AD%E5%9B%BD%E7%A7%BB%E5%8A%A8&c_appver=2.9.0&bj=false&c_dp=2&c_osver=10.3.3";
         String resStr = HttpRequest.post("https://apapia.manmanbuy.com/ChromeWidgetServices/WidgetServices.ashx")
-                .header("Host","apapia.manmanbuy.com")
-                .header("Content-Type","application/x-www-form-urlencoded; charset=utf-8")
-                .header("Proxy-Connection","close")
-                .header("Cookie","ASP.NET_SessionId=uwhkmhd023ce0yx22jag2e0o; jjkcpnew111=cp46144734_1171363291_2017/11/25")
-                .header("User-Agent","Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_3 like Mac OS X) AppleWebKit/603.3.8 (KHTML like Gecko) Mobile/14G60 mmbWebBrowse")
-                .header("Content-Length","457")
-                .header("Accept-Encoding","gzip")
-                .header("Connection","close")
+                .header("Host", "apapia.manmanbuy.com")
+                .header("Content-Type", "application/x-www-form-urlencoded; charset=utf-8")
+                .header("Proxy-Connection", "close")
+                .header("Cookie", "ASP.NET_SessionId=uwhkmhd023ce0yx22jag2e0o; jjkcpnew111=cp46144734_1171363291_2017/11/25")
+                .header("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_3 like Mac OS X) AppleWebKit/603.3.8 (KHTML like Gecko) Mobile/14G60 mmbWebBrowse")
+                .header("Content-Length", "457")
+                .header("Accept-Encoding", "gzip")
+                .header("Connection", "close")
                 .body(body)
                 .execute().body();
         return resStr;
@@ -384,41 +397,41 @@ public class WxServiceImpl implements WxService {
      */
     @Override
     public void handleWeiBo(JSONObject content) {
-        redis.put("publicKey","微博", DateUnit.SECOND.getMillis() * 60 * 2);
+        redis.put("publicKey", "微博", DateUnit.SECOND.getMillis() * 60 * 2);
         String result = HttpRequest.get("https://weibo.com/ajax/statuses/hot_band").execute().body();
-        if (StringUtils.isEmpty(result)){
+        if (StringUtils.isEmpty(result)) {
             weChatUtil.sendTextMsg("微博接口废拉，赶紧联系管理员维护！！！", content);
         }
         JSONObject jsonObject = JSONObject.parseObject(result);
         String bandListStr = jsonObject.getJSONObject("data").getString("band_list");
         List<JSONObject> bandLists = JSONArray.parseArray(bandListStr, JSONObject.class);
         //加入缓存
-        redis.put("WbBandLists",bandListStr, DateUnit.SECOND.getMillis() * 60 * 2);
+        redis.put("WbBandLists", bandListStr, DateUnit.SECOND.getMillis() * 60 * 2);
         String msg = "微博实时热搜：\r\n\r\n";
         int index = 1;
         for (JSONObject band : bandLists) {
             String realpos = band.getString("realpos");
-            if (StringUtils.isNotEmpty(realpos)){
+            if (StringUtils.isNotEmpty(realpos)) {
                 msg = msg + index + "." + band.getString("word") + "\r\n";
                 index++;
             }
-            if (index==21){
+            if (index == 21) {
                 break;
             }
         }
         weChatUtil.sendTextMsg(msg, content);
     }
 
-    public void handleLastWeiBo(JSONObject content,Integer num){
+    public void handleLastWeiBo(JSONObject content, Integer num) {
         String bandListStr = redis.get("WbBandLists");
         List<JSONObject> bandLists = JSONArray.parseArray(bandListStr, JSONObject.class);
         int index = 1;
         for (JSONObject band : bandLists) {
             String realpos = band.getString("realpos");
-            if (StringUtils.isNotEmpty(realpos)){
-                if (index==num){
+            if (StringUtils.isNotEmpty(realpos)) {
+                if (index == num) {
                     String word = band.getString("word");
-                    weChatUtil.sendTextMsg(word+"\r\n"+"https://s.weibo.com/weibo?q=%23"+URLEncoder.encode(word)+"%23", content);
+                    weChatUtil.sendTextMsg(word + "\r\n" + "https://s.weibo.com/weibo?q=%23" + URLEncoder.encode(word) + "%23", content);
                     break;
                 }
                 index++;
@@ -426,5 +439,99 @@ public class WxServiceImpl implements WxService {
         }
     }
 
+
+    /**
+     * 摸鱼
+     *
+     * @param content
+     * @return
+     */
+    public void handleMoYu(JSONObject content) {
+        // 获取当前日期
+        Date now = new Date();
+        int year = DateUtil.year(now);
+        // 添加节日
+        List<Festival> festivalList = new ArrayList<>();
+        // 清明节
+        int param = year - 2000;
+        int qingMingDay = (int) (param * 0.2422 + 4.81) - param / 4;
+        festivalList.add(new Festival("清明节", 4, qingMingDay, true, 0L));
+        festivalList.add(new Festival("元旦", 1, 1, false, 0L));
+        festivalList.add(new Festival("春节", 1, 1, true, 0L));
+        festivalList.add(new Festival("劳动节", 5, 1, false, 0L));
+        festivalList.add(new Festival("端午节", 5, 5, true, 0L));
+        festivalList.add(new Festival("中秋节", 8, 15, true, 0L));
+        festivalList.add(new Festival("国庆节", 10, 1, false, 0L));
+        // 获取节日时间差
+        festivalList.forEach(this::getGregorianDayDiff);
+        // 存放周末
+        festivalList.add(new Festival("周末", 10, 1, false, DateUtil.betweenDay(new Date(), DateUtil.endOfWeek(new Date(), false), false)));
+        // 根据时间差排序
+        festivalList.sort((Comparator.comparing(Festival::getDiff)));
+        // 打印文档
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("【摸鱼办】提醒您：").append(DateUtil.format(now, "MM月dd日,")).append(this.timeOfDay(now)).append("好,摸鱼人!\r\n");
+        stringBuffer.append("工作再累，一定不要忘记摸鱼哦！有事没事起身去茶水间， 去厕所， 去廊道走走别老在工位上坐着， 钱是老板的, 但命是自己的!\r\n");
+        festivalList.forEach(festival -> stringBuffer.append("距离").append(festival.getName()).append("还有不到：").append(festival.getDiff()).append("天\r\n"));
+        stringBuffer.append("为了放假加油吧！\n" +
+                "上班是帮老板赚钱，摸鱼是赚老板的钱！\n" +
+                "最后，祝愿天下所有摸鱼人，都能愉快的渡过每一天！\n");
+        // 获取黄历信息
+        Lunar date = new Lunar(year, DateUtil.month(now), DateUtil.dayOfMonth(now));
+        stringBuffer.append("======================\r\n");
+        stringBuffer.append("【今日黄历】 ").append(date.toFullString());
+        weChatUtil.sendTextMsg(stringBuffer.toString(), content);
+    }
+
+    /**
+     * 获取当前日期和节假日的公历日差
+     *
+     * @param festival 节日
+     */
+    private void getGregorianDayDiff(Festival festival) {
+        // 获取当前日期
+        Date now = new Date();
+        int year = DateUtil.year(now);
+        // 如果当前日期大于节日的月份和天数，则年数取下一年
+        if (DateUtil.month(now) > festival.getMonth() && DateUtil.dayOfMonth(now) > festival.getDay()) {
+            year++;
+        }
+        DateTime festivalDay;
+        // 如果节日为农历，则取出对应的公历日
+        if (festival.isChineseDate()) {
+            festivalDay = new DateTime(new ChineseDate(year, festival.getMonth(), festival.getDay()).getGregorianDate().getTime());
+        } else {
+            festivalDay = DateUtil.parse(year + "-" + festival.getMonth() + "-" + festival.getDay());
+        }
+        festival.setDiff(DateUtil.betweenDay(now, festivalDay, false));
+    }
+
+    /**
+     * 获取当前时间的时间段
+     *
+     * @param date 时间
+     * @return
+     */
+    private String timeOfDay(Date date) {
+        SimpleDateFormat df = new SimpleDateFormat("HH");
+        String str = df.format(date);
+        int a = Integer.parseInt(str);
+        if (a >= 0 && a <= 6) {
+            return "凌晨";
+        }
+        if (a > 6 && a <= 11) {
+            return "上午";
+        }
+        if (a > 11 && a <= 13) {
+            return "中午";
+        }
+        if (a > 13 && a <= 18) {
+            return "下午";
+        }
+        if (a > 18 && a <= 24) {
+            return "晚上";
+        }
+        return null;
+    }
 
 }
