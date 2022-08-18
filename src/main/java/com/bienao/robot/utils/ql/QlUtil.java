@@ -1,5 +1,6 @@
 package com.bienao.robot.utils.ql;
 
+import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -15,21 +16,26 @@ public class QlUtil {
 
     //获取用户秘钥
     public JSONObject getToken(String url,String clientId,String clientSecret){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
-        String resStr = HttpRequest.get(url + "open/auth/token?client_id=" + clientId +"&client_secret=" + clientSecret)
-                .execute().body();
-        if (StringUtils.isEmpty(resStr)){
-            log.info("青龙获取用户秘钥失败");
+        try {
+            String resStr = HttpRequest.get(url + "open/auth/token?client_id=" + clientId +"&client_secret=" + clientSecret)
+                    .execute().body();
+            if (StringUtils.isEmpty(resStr)){
+                log.info("青龙获取用户秘钥失败");
+                return null;
+            }
+            JSONObject res = JSONObject.parseObject(resStr);
+            if (!res.getString("code").equals("200")){
+                log.info("青龙获取用户秘钥失败");
+                return null;
+            }
+            return res.getJSONObject("data");
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
-        JSONObject res = JSONObject.parseObject(resStr);
-        if (!res.getString("code").equals("200")){
-            log.info("青龙获取用户秘钥失败");
-            return null;
-        }
-        return res.getJSONObject("data");
     }
 
     /**

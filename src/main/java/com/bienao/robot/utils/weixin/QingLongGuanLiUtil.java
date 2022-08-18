@@ -46,21 +46,20 @@ public class QingLongGuanLiUtil {
     }
 
     public void handleOperate(JSONObject content){
-        boolean flag = false;
         String msg = content.getString("msg");
         //查询当前操作
         String curOperation = redis.get(content.getString("from_wxid") + "curOperation");
         if (StringUtils.isNotEmpty(curOperation)){
-            flag = handle(curOperation, msg, content);
+            handle(curOperation, msg, content);
         }else {
 
             if (msg.contains("-")){
-                flag = handle("deleteQl", msg.replace("-", "").trim(), content);
+                handle("deleteQl", msg.replace("-", "").trim(), content);
             }else if (msg.contains("删除")){
-                flag = handle("deleteQl",msg.replace("删除","").trim(),content);
+                handle("deleteQl",msg.replace("删除","").trim(),content);
             }else {
                 JSONObject choosees = JSONObject.parseObject(redis.get(content.getString("from_wxid") + "operations"));
-                flag = handle(choosees.getString(msg),"",content);
+                handle(choosees.getString(msg),msg,content);
             }
         }
     }
@@ -167,6 +166,8 @@ public class QingLongGuanLiUtil {
                     redis.put(content.getString("from_wxid")+"addql",addql.toJSONString(),DateUnit.SECOND.getMillis() * 60 * 2);
                     //发送青龙
                     sendSingleQl(content,addql);
+                    //删除当前缓存中的操作
+                    redis.remove(content.getString("from_wxid") + "curOperation");
                     //更新下一次操作
                     saveQlOperation(addql,content);
                     //更新缓存时间
@@ -179,7 +180,7 @@ public class QingLongGuanLiUtil {
                     qlgl = JSONObject.parseObject(redis.get(content.getString("from_wxid")+"qlgl"));
                     qls = JSONArray.parseArray(qlgl.getString("qls"), JSONObject.class);
                     qls.add(addql);
-                    qlgl.put("qls",qlgl.toJSONString());
+                    qlgl.put("qls",qls.toString());
                     redis.put(content.getString("from_wxid")+"qlgl",qlgl.toJSONString(),DateUnit.SECOND.getMillis() * 60 * 2);
                     sendQlglMsg(content);
                     saveQlglOperation(qls,content);
@@ -193,6 +194,7 @@ public class QingLongGuanLiUtil {
                     redis.remove(content.getString("from_wxid") + "addql");
                     redis.remove(content.getString("from_wxid") + "curOperation");
                     redis.remove(content.getString("from_wxid") + "operations");
+                    weChatUtil.sendTextMsg("已退出",content);
                     break;
                 case "saveQl":
                     //青龙-保存
@@ -384,8 +386,8 @@ public class QingLongGuanLiUtil {
                     qlgl = JSONObject.parseObject(redis.get(content.getString("from_wxid")+"qlgl"));
                     qls = JSON.parseArray(qlgl.getString("qls"), JSONObject.class);
                     if (StringUtils.isNotEmpty(param) && NumberUtil.isInteger(param)){
-                        Integer id = Integer.getInteger(param);
-                        if (id>0 && id<qls.size()){
+                        Integer id = Integer.parseInt(param);
+                        if (id>0 && id<=qls.size()){
                             JSONObject ql = qls.get(id - 1);
                             //发送信息
                             sendSingleQl(content,ql);
@@ -485,7 +487,7 @@ public class QingLongGuanLiUtil {
         choosees.put("保存","saveQlgl");
         choosees.put("wq","saveQlgl");
         for (int i = 0; i < qls.size(); i++) {
-            choosees.put(String.valueOf(i),"queryQl");
+            choosees.put(String.valueOf(i+1),"queryQl");
         }
         choosees.put("a","preSetBigHead");
         choosees.put("b","preSetBigNail");
@@ -560,7 +562,7 @@ public class QingLongGuanLiUtil {
         String bigNail = qlgl.getString("bigNail");
         msg += StringUtils.isEmpty(bigNail)? "a.大钉子\r\n" : "a.大钉子(1)\r\n";
         msg += "\r\n警告：60s内未操作则断开此次会话";
-        qlgl.put("qls","qls");
+        qlgl.put("qls",qls);
         //添加到缓存中
         redis.put(content.getString("from_wxid")+"qlgl",qlgl.toJSONString(), DateUnit.SECOND.getMillis() * 60 * 2);
         saveQlglOperation(qls,content);

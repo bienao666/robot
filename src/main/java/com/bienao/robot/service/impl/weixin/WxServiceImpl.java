@@ -82,7 +82,7 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //摸鱼
-        if (msg.trim().contains("my") || msg.trim().contains("摸鱼")) {
+        if (msg.trim().equals("my") || msg.trim().equals("摸鱼")) {
             handleMoYu(content);
             return;
         }
@@ -173,9 +173,10 @@ public class WxServiceImpl implements WxService {
         //发送人
         String from_wxid = content.getString("from_wxid");
         String masters = systemParamUtil.querySystemParam("wxmasters");
+        String newMaster = content.getString("msg").replace("设置微信管理员", "").trim();
         if (StringUtils.isEmpty(masters)) {
             //第一次直接设置
-            masters = content.getString("msg").replace("设置微信管理员", "").trim();
+            masters = newMaster;
             SystemParam systemParam = new SystemParam();
             systemParam.setCode("wxmasters");
             systemParam.setCodeName("微信管理员");
@@ -187,8 +188,7 @@ public class WxServiceImpl implements WxService {
                 weChatUtil.sendTextMsg("设置失败，系统异常", content);
             }
         } else {
-            String uid = SecureUtil.md5(from_wxid).substring(0, 10);
-            if (masters.contains(uid)) {
+           if (!masters.contains(newMaster)) {
                 //添加新的管理员
                 masters = masters + "@" + content.getString("msg").replace("设置微信管理员", "").trim();
                 boolean flag = systemParamUtil.updateSystemParam("wxmasters", "微信管理员", masters);
@@ -197,7 +197,10 @@ public class WxServiceImpl implements WxService {
                 } else {
                     weChatUtil.sendTextMsg("设置失败，系统异常", content);
                 }
-            }
+            }else {
+               //已设置
+               weChatUtil.sendTextMsg("设置成功", content);
+           }
         }
     }
 
