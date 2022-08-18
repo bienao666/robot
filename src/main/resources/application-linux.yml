@@ -1,0 +1,29 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /robot/api
+  tomcat:
+    max-swallow-size: -1 # 关闭内置tomcat对上传文件大小的限制
+  shutdown: graceful
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://101.34.47.200:10018/robot?useUnicode=true&characterEncoding=utf8&currentSchema=public&useAffectedRows=true&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    username: root
+    password: BIENAO666
+
+mybatis:
+  mapper-locations: classpath:mapper/*Mapper.xml
+  type-aliases-package: com.bienao.robot.entity
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    mapUnderscoreToCamelCase: true
+
+logging:
+  config: classpath:logback-spring.xml
+
+vlw:
+  token: bienaoccc
+  url: http://101.34.47.200:10006/
