@@ -1,0 +1,27 @@
+server:
+  # 服务端口
+  port: 8081
+  servlet:
+    context-path: /robot/api
+  tomcat:
+    max-swallow-size: -1
+  shutdown: graceful
+
+spring:
+  datasource:
+    url: jdbc:sqlite:D:/robot/db.sqlite
+    driver-class-name: org.sqlite.JDBC
+  sql:
+    init:
+      schema-locations: classpath:db/schema.sql
+      mode: always
+      continue-on-error: true
+
+vlw:
+  #vlm token
+  token: bienaoccc
+  #vlm 地址
+  url: http://101.34.47.200:10006/
+
+logging:
+  config: classpath:logback-win.xml
