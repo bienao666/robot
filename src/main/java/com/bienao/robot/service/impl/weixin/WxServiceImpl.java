@@ -92,7 +92,7 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //青龙管理
-        if (msg.trim().equals("qlcs")) {
+        if (msg.trim().equals("青龙测试")) {
             qingLongGuanLiUtil.handleQingLong(content);
             return;
         }
