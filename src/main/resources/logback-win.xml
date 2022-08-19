@@ -5,7 +5,7 @@
     debug:当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。-->
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
     <!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径 -->
-    <property name="LOG_HOME" value="./log" />
+    <property name="LOG_HOME" value="D:/robot/log" />
 
     <!--控制台输出，直接引用springboot默认的配置，name="CONSOLE"  -->
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />

@@ -9,7 +9,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:sqlite:/root/robot/db.sqlite
+    url: jdbc:sqlite:D:/robot/db.sqlite
     driver-class-name: org.sqlite.JDBC
   sql:
     init:
@@ -24,4 +24,4 @@ vlw:
   url: http://101.34.47.200:10006/
 
 logging:
-  config: classpath:logback-linux.xml
+  config: classpath:logback-win.xml

@@ -1,28 +1,9 @@
-server:
-  port: 8081
-  servlet:
-    context-path: /robot/api
-  tomcat:
-    max-swallow-size: -1 # 关闭内置tomcat对上传文件大小的限制
-  shutdown: graceful
-
 spring:
-  datasource:
-    # url最容易出错，如果使用相对于项目的相对地址，那么填入 jdbc:sqlite::resource:sqlit数据库所在位置
-    # 注：
-    # :resource: 指向项目的 resources 路径（resource前后两个 `:` 不能省略）
-    url: jdbc:sqlite:D:/db.sqlite
-    driver-class-name: org.sqlite.JDBC
-    # username: 选用 sqlite 数据库不需要配置此项
-    # password: 选用 sqlite 数据库不需要配置此项
-    # DDL建表语句
-    # DML添加数据
-    # data: classpath:db/data.sql
-  sql:
-    init:
-      schema-locations: classpath:db/schema.sql
-      mode: always
-      continue-on-error: true
+  profiles:
+    active: win
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
 
 mybatis:
   mapper-locations: classpath:mapper/*Mapper.xml
@@ -30,10 +11,3 @@ mybatis:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     mapUnderscoreToCamelCase: true
-
-logging:
-  config: classpath:logback-spring.xml
-
-vlw:
-  token: bienaoccc
-  url: http://101.34.47.200:10006/

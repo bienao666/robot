@@ -456,6 +456,8 @@ public class WxServiceImpl implements WxService {
         // 添加节日
         List<Festival> festivalList = new ArrayList<>();
         // 清明节
+        // 注意清明的需要进行计算的，21世纪的公式为：[Y*D+C]-L
+        // 公式解读：Y=年数后2位，D=0.2422，L=闰年数，21世纪C=4.81，20世纪=5.59.
         int param = year - 2000;
         int qingMingDay = (int) (param * 0.2422 + 4.81) - param / 4;
         festivalList.add(new Festival("清明节", 4, qingMingDay, true, 0L));
@@ -465,10 +467,13 @@ public class WxServiceImpl implements WxService {
         festivalList.add(new Festival("端午节", 5, 5, true, 0L));
         festivalList.add(new Festival("中秋节", 8, 15, true, 0L));
         festivalList.add(new Festival("国庆节", 10, 1, false, 0L));
+        festivalList.add(new Festival("七夕节", 7, 7, true, 0L));
+        festivalList.add(new Festival("情人节", 2, 14, false, 0L));
+        festivalList.add(new Festival("重阳节", 9, 9, true, 0L));
         // 获取节日时间差
         festivalList.forEach(this::getGregorianDayDiff);
-        // 存放周末
-        festivalList.add(new Festival("周末", 10, 1, false, DateUtil.betweenDay(new Date(), DateUtil.endOfWeek(new Date(), false), false)));
+        // 存放周末 【不剔除法定调休】【周末无需关心月/日】
+        festivalList.add(new Festival("周末", 0, 0, false, DateUtil.betweenDay(new Date(), DateUtil.endOfWeek(new Date(), false), false)));
         // 根据时间差排序
         festivalList.sort((Comparator.comparing(Festival::getDiff)));
         // 打印文档
@@ -506,6 +511,7 @@ public class WxServiceImpl implements WxService {
         } else {
             festivalDay = DateUtil.parse(year + "-" + festival.getMonth() + "-" + festival.getDay());
         }
+        // 计算当前日期和节日（公历日）的天数差 并保存
         festival.setDiff(DateUtil.betweenDay(now, festivalDay, false));
     }
 
