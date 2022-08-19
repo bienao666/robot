@@ -500,8 +500,8 @@ public class WxServiceImpl implements WxService {
         // 获取当前日期
         Date now = new Date();
         int year = DateUtil.year(now);
-        // 如果当前日期大于节日的月份和天数，则年数取下一年
-        if (DateUtil.month(now) > festival.getMonth() && DateUtil.dayOfMonth(now) > festival.getDay()) {
+        // 如果当前日期大于等于节日的月份和天数，则年数取下一年
+        if (DateUtil.month(now) >= festival.getMonth() && DateUtil.dayOfMonth(now) >= festival.getDay()) {
             year++;
         }
         DateTime festivalDay;
