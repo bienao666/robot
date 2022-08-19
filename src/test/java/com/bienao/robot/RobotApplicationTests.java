@@ -11,14 +11,4 @@ class RobotApplicationTests {
     @Autowired
     private SystemParamUtil systemParamUtil;
 
-    @Test
-    void contextLoads() {
-
-    }
-
-    @Test
-    public void test() {
-
-    }
-
 }
