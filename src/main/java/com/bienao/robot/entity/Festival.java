@@ -14,15 +14,15 @@ public class Festival {
      */
     private String name;
     /**
-     * 月份
+     * 月份（阴历节日写阴历月份）
      */
     private int month;
     /**
-     * 日期
+     * 日期（阴历节日写阴历日期）
      */
     private int day;
     /**
-     * 是否阴历
+     * 是否阴历节日
      */
     private boolean chineseDate;
     /**
