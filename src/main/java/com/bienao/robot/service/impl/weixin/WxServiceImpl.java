@@ -7,7 +7,6 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
-import cn.hutool.crypto.SecureUtil;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -15,6 +14,7 @@ import com.bienao.robot.Constants.weixin.WXConstant;
 import com.bienao.robot.entity.Festival;
 import com.bienao.robot.entity.SystemParam;
 import com.bienao.robot.service.weixin.WxService;
+import com.bienao.robot.utils.HeFengWeatherUtil;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import com.bienao.robot.utils.weixin.QingLongGuanLiUtil;
 import com.bienao.robot.utils.weixin.WeChatUtil;
@@ -84,6 +84,11 @@ public class WxServiceImpl implements WxService {
         //摸鱼
         if (msg.trim().equals("my") || msg.trim().equals("摸鱼")) {
             handleMoYu(content);
+            return;
+        }
+        //天气
+        if (msg.trim().contains("天气")) {
+            handleWeather(content);
             return;
         }
         //比价
@@ -188,7 +193,7 @@ public class WxServiceImpl implements WxService {
                 weChatUtil.sendTextMsg("设置失败，系统异常", content);
             }
         } else {
-           if (!masters.contains(newMaster)) {
+            if (!masters.contains(newMaster)) {
                 //添加新的管理员
                 masters = masters + "@" + content.getString("msg").replace("设置微信管理员", "").trim();
                 boolean flag = systemParamUtil.updateSystemParam("wxmasters", "微信管理员", masters);
@@ -197,10 +202,10 @@ public class WxServiceImpl implements WxService {
                 } else {
                     weChatUtil.sendTextMsg("设置失败，系统异常", content);
                 }
-            }else {
-               //已设置
-               weChatUtil.sendTextMsg("设置成功", content);
-           }
+            } else {
+                //已设置
+                weChatUtil.sendTextMsg("设置成功", content);
+            }
         }
     }
 
@@ -543,4 +548,47 @@ public class WxServiceImpl implements WxService {
         return null;
     }
 
+
+    /**
+     * 天气
+     * 传递对应的城市名 南京
+     * 如存在重复名称。则传递上级行政单位名称
+     * -- 规则：上级城市名称 查询城市名称
+     * -- 说明：以空格分隔 例：【南京 鼓楼】【西安 鼓楼】
+     *
+     * @param content content
+     */
+    public void handleWeather(JSONObject content) {
+        StringBuilder result = new StringBuilder();
+        try {
+            String msg = content.getString("msg");
+            String cityName = msg.replace("天气", "");
+            String[] split = cityName.split(" ");
+            JSONObject city = HeFengWeatherUtil.getCity(split[split.length - 1], split.length > 1 ? split[0] : "");
+            JSONObject now = HeFengWeatherUtil.now(city.getInteger("id"));
+            JSONObject warningNow = HeFengWeatherUtil.warningNow(city.getInteger("id"));
+            String name = "";
+            if (!city.getString("name").equals(city.getString("adm2"))) {
+                name = city.getString("adm2") + " " + city.getString("name");
+            } else {
+                name = city.getString("name");
+            }
+            result.append(name).append("\r\n")
+                    .append("温度：").append(now.getString("temp")).append("℃\r\n")
+                    .append("体感：").append(now.getString("feelsLike")).append("℃\r\n")
+                    .append("湿度：").append(now.getString("humidity")).append("%\r\n")
+                    .append("能见度：").append(now.getString("vis")).append("KM\r\n")
+                    .append("天气：").append(now.getString("text")).append("\r\n")
+                    .append("风向：").append(now.getString("windDir")).append("\r\n")
+                    .append("风力：").append(now.getString("windScale")).append("级\r\n")
+                    .append("降雨量：").append(now.getString("precip")).append("毫升\r\n");
+            if (Objects.nonNull(warningNow)) {
+                result.append("预警信息：").append(warningNow.getString("text")).append("\r\n");
+            }
+
+        } catch (Exception e) {
+            result.append(e.getMessage());
+        }
+        weChatUtil.sendTextMsg(result.toString(), content);
+    }
 }
