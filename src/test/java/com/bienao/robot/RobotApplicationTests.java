@@ -19,13 +19,7 @@ class RobotApplicationTests {
 
     @Test
     public void test1() throws Exception {
-        JSONObject content = new JSONObject();
-        content.put("robot_wxid", "wxid_eyo76pqzpsvz12");
-        content.put("from_wxid", "zhaochuanzheng521");
-        content.put("msg", "北京 密云天气");
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("content",content);
-        wxService.handleMessage(jsonObject);
+
     }
 
 }
