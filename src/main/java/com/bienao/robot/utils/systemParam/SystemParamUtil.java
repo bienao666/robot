@@ -67,24 +67,17 @@ public class SystemParamUtil {
      * @param value
      * @return
      */
-    public boolean updateSystemParam(String code,String codeName,String value){
-        SystemParam systemParam = systemParamMapper.querySystem(code);
-        if (systemParam==null){
-            systemParam = new SystemParam();
-            systemParam.setCode(code);
-            systemParam.setCodeName(codeName);
-            systemParam.setValue(value);
-            return addSystemParam(systemParam);
+    public boolean updateSystemParam(String code,String value){
+        SystemParam systemParam = new SystemParam();
+        systemParam.setCode(code);
+        systemParam.setValue(value);
+        systemParam.setUpdatedTime(new Date());
+        int i = systemParamMapper.updateSystemParam(systemParam);
+        if (i==1){
+            sysParamRedis.put(code,value);
+            return true;
         }else {
-            systemParam.setValue(value);
-            systemParam.setUpdatedTime(new Date());
-            int i = systemParamMapper.updateSystemParam(systemParam);
-            if (i==1){
-                sysParamRedis.put(systemParam.getCode(),systemParam.getValue(), DateUnit.DAY.getMillis());
-                return true;
-            }else {
-                return false;
-            }
+            return false;
         }
     }
 

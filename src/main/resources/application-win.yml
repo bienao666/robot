@@ -11,11 +11,6 @@ spring:
   datasource:
     url: jdbc:sqlite:D:/robot/db.sqlite
     driver-class-name: org.sqlite.JDBC
-  sql:
-    init:
-      schema-locations: classpath:db/schema.sql
-      mode: always
-      continue-on-error: true
 
 vlw:
   #vlm token

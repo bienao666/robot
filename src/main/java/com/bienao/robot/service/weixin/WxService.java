@@ -9,4 +9,8 @@ public interface WxService {
     void timeHandleELM(JSONObject content);
 
     void handleWeiBo(JSONObject content);
+
+    void handleMoYu(JSONObject content);
+
+    void handleWater();
 }

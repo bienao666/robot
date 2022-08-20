@@ -117,7 +117,7 @@ public class WeChatUtil {
         //发送人
         String from_wxid = content.getString("from_wxid");
         //判断是否为管理员
-        String masters = systemParamUtil.querySystemParam("wxmasters");
+        String masters = systemParamUtil.querySystemParam("WXMASTERS");
         if (StringUtils.isEmpty(masters)){
             sendTextMsg("尚未设置管理员，请先按照以下命令设置,多个请用@隔开", content);
             sendTextMsg("设置微信管理员 你的uid", content);

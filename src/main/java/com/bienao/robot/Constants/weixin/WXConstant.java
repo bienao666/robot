@@ -14,5 +14,5 @@ public class WXConstant {
     /**
      * 缓存
      */
-    public static Cache<String,String> redis =  CacheUtil.newFIFOCache(100);
+    public static Cache<String,String> redis =  CacheUtil.newFIFOCache(500);
 }

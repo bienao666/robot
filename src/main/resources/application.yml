@@ -4,6 +4,12 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
+  sql:
+    init:
+      schema-locations: classpath:db/schema.sql
+      mode: always
+      continue-on-error: true
+      data-locations: classpath:db/data.sql
 
 mybatis:
   mapper-locations: classpath:mapper/*Mapper.xml

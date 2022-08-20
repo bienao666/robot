@@ -3,7 +3,7 @@
 -- ----------------------------
 create table if not exists systemParam (
                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                           code varchar,
+                                           code varchar UNIQUE,
                                            codeName varchar,
                                            value varchar,
                                            created_time datetime DEFAULT CURRENT_TIMESTAMP,

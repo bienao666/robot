@@ -54,6 +54,11 @@ public class WxServiceImpl implements WxService {
         JSONObject content = message.getJSONObject("content");
         //发送人
         String from_wxid = content.getString("from_wxid");
+        //机器人
+        String robortwxid = systemParamUtil.querySystemParam("ROBORTWXID");
+        if (StringUtils.isEmpty(robortwxid)){
+            systemParamUtil.updateSystemParam("ROBORTWXID",content.getString("robot_wxid"));
+        }
 
         //查看当前会话
         String curSession = redis.get(from_wxid + "curSession");
@@ -66,8 +71,16 @@ public class WxServiceImpl implements WxService {
         }
 
         String msg = content.getString("msg");
+        //系统参数
+        if (msg.startsWith("设置") || msg.startsWith("启用") || msg.startsWith("关闭")){
+            handleSetSysParam(content);
+        }
+        //功能列表
+        if (msg.equals("功能列表")){
+            handleFunctionList(content);
+        }
         //微博
-        if (msg.contains("微博") || msg.contains("热搜") || msg.contains("wb")) {
+        if (msg.contains("微博")  || msg.contains("wb")) {
             handleWeiBo(content);
             return;
         }
@@ -97,13 +110,8 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //青龙管理
-        if (msg.trim().equals("青龙测试")) {
+        if (msg.trim().equals("青龙")) {
             qingLongGuanLiUtil.handleQingLong(content);
-            return;
-        }
-        //设置微信管理员
-        if (msg.contains("设置微信管理员")) {
-            handleSetWXMasters(content);
             return;
         }
         //查询我的uid
@@ -132,10 +140,60 @@ public class WxServiceImpl implements WxService {
     }
 
     /**
+     * 功能列表
+     * @param content
+     */
+    private void handleFunctionList(JSONObject content) {
+        String str = redis.get("functionList");
+        TreeMap treeMap = JSONObject.parseObject(str, TreeMap.class);
+        for (Object o : treeMap.entrySet()) {
+            //todo
+        }
+    }
+
+    /**
+     * 设置系统参数
+     * @param content
+     */
+    private void handleSetSysParam(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag) {
+            String msg = content.getString("msg").replace("设置", "").replace("启用", "").replace("关闭", "");
+            String[] split = msg.split(" ");
+            if (split.length>1){
+                switch (split[0]){
+                    case "微信管理员":
+                        handleSetParam("WXMASTERS",split[1],content);
+                        break;
+                    case "天行key":
+                        systemParamUtil.updateSystemParam("TIANXINGKEY",split[1]);
+                        weChatUtil.sendTextMsg("设置成功", content);
+                        break;
+                    case "喝水提醒":
+                        systemParamUtil.updateSystemParam("ISSENDWATER",split[1]);
+                        weChatUtil.sendTextMsg("设置成功", content);
+                        break;
+                    case "喝水提醒推送":
+                        handleSetParam("SENDWATERLIST",split[1],content);
+                        break;
+                    case "微博推送":
+                        handleSetParam("SENDWEIBOLIST",split[1],content);
+                        break;
+                    case "摸鱼推送":
+                        handleSetParam("SENDMOYULIST",split[1],content);
+                        break;
+                }
+            }else {
+                weChatUtil.sendTextMsg("参数有误", content);
+            }
+        }
+    }
+
+    /**
      * 查询微信管理员
      */
     public void handleQueryWXMasters(JSONObject content) {
-        String masters = systemParamUtil.querySystemParam("wxmasters");
+        String masters = systemParamUtil.querySystemParam("WXMASTERS");
         if (StringUtils.isEmpty(masters)) {
             weChatUtil.sendTextMsg("尚未设置管理员，请先按照以下命令设置,多个请用@隔开", content);
             weChatUtil.sendTextMsg("设置微信管理员 你的uid", content);
@@ -170,42 +228,24 @@ public class WxServiceImpl implements WxService {
     }
 
     /**
-     * 设置微信管理员
-     *
+     * 设置参数有多值
      * @param content
      */
-    public void handleSetWXMasters(JSONObject content) {
+    public void handleSetParam(String code,String value,JSONObject content) {
         //发送人
-        String from_wxid = content.getString("from_wxid");
-        String masters = systemParamUtil.querySystemParam("wxmasters");
-        String newMaster = content.getString("msg").replace("设置微信管理员", "").trim();
-        if (StringUtils.isEmpty(masters)) {
-            //第一次直接设置
-            masters = newMaster;
-            SystemParam systemParam = new SystemParam();
-            systemParam.setCode("wxmasters");
-            systemParam.setCodeName("微信管理员");
-            systemParam.setValue(masters);
-            boolean flag = systemParamUtil.addSystemParam(systemParam);
+        String oldValue = systemParamUtil.querySystemParam(code);
+        if (!oldValue.contains(value)) {
+            //添加新的管理员
+            oldValue = oldValue + "#" + value;
+            boolean flag = systemParamUtil.updateSystemParam(code, oldValue);
             if (flag) {
                 weChatUtil.sendTextMsg("设置成功", content);
             } else {
                 weChatUtil.sendTextMsg("设置失败，系统异常", content);
             }
         } else {
-            if (!masters.contains(newMaster)) {
-                //添加新的管理员
-                masters = masters + "@" + content.getString("msg").replace("设置微信管理员", "").trim();
-                boolean flag = systemParamUtil.updateSystemParam("wxmasters", "微信管理员", masters);
-                if (flag) {
-                    weChatUtil.sendTextMsg("设置成功", content);
-                } else {
-                    weChatUtil.sendTextMsg("设置失败，系统异常", content);
-                }
-            } else {
-                //已设置
-                weChatUtil.sendTextMsg("设置成功", content);
-            }
+            //已设置
+            weChatUtil.sendTextMsg("设置成功", content);
         }
     }
 
@@ -431,7 +471,7 @@ public class WxServiceImpl implements WxService {
     }
 
     public void handleLastWeiBo(JSONObject content, Integer num) {
-        String bandListStr = redis.get("WbBandLists");
+        String bandListStr = systemParamUtil.querySystemParam("WbBandLists");
         List<JSONObject> bandLists = JSONArray.parseArray(bandListStr, JSONObject.class);
         int index = 1;
         for (JSONObject band : bandLists) {
@@ -590,5 +630,25 @@ public class WxServiceImpl implements WxService {
             result.append(e.getMessage());
         }
         weChatUtil.sendTextMsg(result.toString(), content);
+    }
+
+    /**
+     * 喝水
+     */
+    public void handleWater(){
+        String issendwater = systemParamUtil.querySystemParam("ISSENDWATER");
+        if ("1".equals(issendwater)){
+            String robortwxid = systemParamUtil.querySystemParam("ROBORTWXID");
+            String SENDWATERLIST = systemParamUtil.querySystemParam("SENDWATERLIST");
+            String msg = "亲爱的宝，记得多喝水喔，爱你喔";
+            String[] list = SENDWATERLIST.split("#");
+            for (int i = 0; i < list.length; i++) {
+                String from_wxid = list[i];
+                JSONObject content = new JSONObject();
+                content.put("robot_wxid",robortwxid);
+                content.put("from_wxid",from_wxid);
+                weChatUtil.sendTextMsg(msg, content);
+            }
+        }
     }
 }
