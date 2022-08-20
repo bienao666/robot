@@ -156,36 +156,41 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleSetSysParam(JSONObject content) {
-        boolean flag = weChatUtil.isMaster(content);
-        if (flag) {
-            String msg = content.getString("msg").replace("设置", "").replace("启用", "").replace("关闭", "");
-            String[] split = msg.split(" ");
-            if (split.length>1){
-                switch (split[0]){
-                    case "微信管理员":
-                        handleSetParam("WXMASTERS",split[1],content);
-                        break;
-                    case "天行key":
-                        systemParamUtil.updateSystemParam("TIANXINGKEY",split[1]);
-                        weChatUtil.sendTextMsg("设置成功", content);
-                        break;
-                    case "喝水提醒":
-                        systemParamUtil.updateSystemParam("ISSENDWATER",split[1]);
-                        weChatUtil.sendTextMsg("设置成功", content);
-                        break;
-                    case "喝水提醒推送":
-                        handleSetParam("SENDWATERLIST",split[1],content);
-                        break;
-                    case "微博推送":
-                        handleSetParam("SENDWEIBOLIST",split[1],content);
-                        break;
-                    case "摸鱼推送":
-                        handleSetParam("SENDMOYULIST",split[1],content);
-                        break;
-                }
+        String msg = content.getString("msg").replace("设置", "").replace("启用", "").replace("关闭", "").trim();
+        String[] split = msg.split(" ");
+        if (split.length>1){
+            if (StringUtils.isEmpty(systemParamUtil.querySystemParam("WXMASTERS"))&&split[0].equals("微信管理员")){
+                //第一次设置管理员
+                handleSetParam("WXMASTERS", split[1], content);
             }else {
-                weChatUtil.sendTextMsg("参数有误", content);
+                boolean flag = weChatUtil.isMaster(content);
+                if (flag) {
+                    switch (split[0]) {
+                        case "微信管理员":
+                            handleSetParam("WXMASTERS", split[1], content);
+                            break;
+                        case "天行key":
+                            systemParamUtil.updateSystemParam("TIANXINGKEY", split[1]);
+                            weChatUtil.sendTextMsg("设置成功", content);
+                            break;
+                        case "喝水提醒":
+                            systemParamUtil.updateSystemParam("ISSENDWATER", split[1]);
+                            weChatUtil.sendTextMsg("设置成功", content);
+                            break;
+                        case "喝水提醒推送":
+                            handleSetParam("SENDWATERLIST", split[1], content);
+                            break;
+                        case "微博推送":
+                            handleSetParam("SENDWEIBOLIST", split[1], content);
+                            break;
+                        case "摸鱼推送":
+                            handleSetParam("SENDMOYULIST", split[1], content);
+                            break;
+                    }
+                }
             }
+        }else {
+            weChatUtil.sendTextMsg("参数有误", content);
         }
     }
 
@@ -236,7 +241,11 @@ public class WxServiceImpl implements WxService {
         String oldValue = systemParamUtil.querySystemParam(code);
         if (!oldValue.contains(value)) {
             //添加新的管理员
-            oldValue = oldValue + "#" + value;
+            if (StringUtils.isEmpty(oldValue)){
+                oldValue = value;
+            }else {
+                oldValue = oldValue + "#" + value;
+            }
             boolean flag = systemParamUtil.updateSystemParam(code, oldValue);
             if (flag) {
                 weChatUtil.sendTextMsg("设置成功", content);
