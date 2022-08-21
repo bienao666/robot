@@ -80,7 +80,7 @@ public class WxServiceImpl implements WxService {
             handleFunctionList(content);
         }
         //微博
-        if (msg.contains("微博")  || msg.contains("wb")) {
+        if (msg.trim().equals("微博")  || msg.trim().equals("wb")) {
             handleWeiBo(content);
             return;
         }
