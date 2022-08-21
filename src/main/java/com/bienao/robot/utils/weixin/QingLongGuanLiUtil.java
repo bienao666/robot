@@ -43,6 +43,8 @@ public class QingLongGuanLiUtil {
         if (flag) {
             sendQlglMsg(content);
             updateRedisTime(content);
+        }else {
+            weChatUtil.sendTextMsg("非管理员无法操作",content);
         }
     }
 

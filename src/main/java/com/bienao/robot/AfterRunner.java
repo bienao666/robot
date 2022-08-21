@@ -1,6 +1,7 @@
 package com.bienao.robot;
 
 import cn.hutool.cache.Cache;
+import cn.hutool.core.date.DateUnit;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.weixin.WXConstant;
 import com.bienao.robot.service.weixin.WxService;
@@ -11,6 +12,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 @Component
@@ -41,14 +43,15 @@ public class AfterRunner implements ApplicationRunner {
             }
         }).start();
         //添加功能列表
-        TreeMap<Integer, String> functionList = new TreeMap<>();
-        functionList.put(1,"比价");
-        functionList.put(2,"青龙");
-        functionList.put(3,"摸鱼");
-        functionList.put(4,"微博");
-        functionList.put(5,"举牌");
-        functionList.put(6,"天气");
-        functionList.put(7,"买家秀");
-        redis.put("functionList",JSONObject.toJSONString(functionList));
+        String msg = "功能列表：\r\n";
+        msg += "————青龙区————\r\n";
+        msg += "           青龙        \r\n";
+        msg += "————商品区————\r\n";
+        msg += "           比价        \r\n";
+        msg += "————娱乐区————\r\n";
+        msg += "           摸鱼  |  微博  \r\n";
+        msg += "           举牌  |  天气  \r\n";
+        msg += "           买家秀     \r\n";
+        redis.put("functionList",msg);
     }
 }

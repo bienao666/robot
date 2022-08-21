@@ -76,7 +76,7 @@ public class WxServiceImpl implements WxService {
             handleSetSysParam(content);
         }
         //功能列表
-        if (msg.equals("功能列表")){
+        if (msg.equals("功能")){
             handleFunctionList(content);
         }
         //微博
@@ -105,6 +105,9 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //比价
+        if (msg.equals("比价")){
+            weChatUtil.sendTextMsg("请直接发送商品连接，我会自动识别",content);
+        }
         if (msg.contains("item.m.jd.com") || msg.contains("m.tb.cn")) {
             handleGoods(msg, content);
             return;
@@ -144,11 +147,7 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleFunctionList(JSONObject content) {
-        String str = redis.get("functionList");
-        TreeMap treeMap = JSONObject.parseObject(str, TreeMap.class);
-        for (Object o : treeMap.entrySet()) {
-            //todo
-        }
+        weChatUtil.sendTextMsg(redis.get("functionList"),content);
     }
 
     /**
@@ -441,7 +440,7 @@ public class WxServiceImpl implements WxService {
         String msg = content.getString("msg");
         msg = msg.replace("举牌", "").replace(" ", "");
         if (StringUtils.isEmpty(msg)) {
-            weChatUtil.sendTextMsg("你要举牌啥啊。。。举牌空气嘛\r\n\r\n正确命令是：举牌 要举牌的内容", content);
+            weChatUtil.sendTextMsg("正确命令是：举牌 要举牌的内容", content);
         } else {
             weChatUtil.sendImageMsg("http://lkaa.top/API/pai/?msg=" + URLEncoder.encode(msg), content);
         }
