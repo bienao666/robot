@@ -46,6 +46,9 @@ public class WxServiceImpl implements WxService {
     @Autowired
     private QingLongGuanLiUtil qingLongGuanLiUtil;
 
+    @Autowired
+    private HeFengWeatherUtil heFengWeatherUtil;
+
     private Cache<String, String> redis = WXConstant.redis;
 
     @Async
@@ -170,6 +173,10 @@ public class WxServiceImpl implements WxService {
                             break;
                         case "天行key":
                             systemParamUtil.updateSystemParam("TIANXINGKEY", split[1]);
+                            weChatUtil.sendTextMsg("设置成功", content);
+                            break;
+                        case "和风key":
+                            systemParamUtil.updateSystemParam("HEFENGKEY", split[1]);
                             weChatUtil.sendTextMsg("设置成功", content);
                             break;
                         case "喝水提醒":
@@ -608,13 +615,18 @@ public class WxServiceImpl implements WxService {
      */
     public void handleWeather(JSONObject content) {
         StringBuilder result = new StringBuilder();
+        String key = systemParamUtil.querySystemParam("HEFENGKEY");
+        if (StringUtils.isEmpty(key)){
+            weChatUtil.sendTextMsg("请先去 https://dev.qweather.com 网站注册申请key，对机器人发送：设置 和风key 你的key", content);
+            return;
+        }
         try {
             String msg = content.getString("msg");
             String cityName = msg.replace("天气", "");
             String[] split = cityName.split(" ");
-            JSONObject city = HeFengWeatherUtil.getCity(split[split.length - 1], split.length > 1 ? split[0] : "");
-            JSONObject now = HeFengWeatherUtil.now(city.getInteger("id"));
-            JSONObject warningNow = HeFengWeatherUtil.warningNow(city.getInteger("id"));
+            JSONObject city = heFengWeatherUtil.getCity(split[split.length - 1], split.length > 1 ? split[0] : "",key);
+            JSONObject now = heFengWeatherUtil.now(city.getInteger("id"),key);
+            JSONObject warningNow = heFengWeatherUtil.warningNow(city.getInteger("id"),key);
             String name = "";
             if (!city.getString("name").equals(city.getString("adm2"))) {
                 name = city.getString("adm2") + " " + city.getString("name");

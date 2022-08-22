@@ -3,17 +3,16 @@ package com.bienao.robot.utils;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.utils.systemParam.SystemParamUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 /**
  * 和风天气util
  */
+@Component
 public class HeFengWeatherUtil {
-    /**
-     * 秘钥
-     */
-    public static final String SECRET_KEY = "cabf568dafb443df917484ba0b631a6a";
-
     /**
      * 获取城市信息
      *
@@ -21,8 +20,8 @@ public class HeFengWeatherUtil {
      * @param adm  城市的上级行政区划
      * @return
      */
-    public static JSONObject getCity(String name, String adm) {
-        String url = "https://geoapi.qweather.com/v2/city/lookup?location=" + name + "&adm=" + adm + "&key=" + SECRET_KEY;
+    public JSONObject getCity(String name, String adm, String key) {
+        String url = "https://geoapi.qweather.com/v2/city/lookup?location=" + name + "&adm=" + adm + "&key=" + key;
         String res = HttpUtil.get(url);
         System.out.println(res);
         JSONObject jsonObject = JSONObject.parseObject(res);
@@ -44,8 +43,8 @@ public class HeFengWeatherUtil {
      * @param city 城市code
      * @return
      */
-    public static JSONObject now(Integer city) {
-        String url = "https://devapi.qweather.com/v7/weather/now?location=" + city + "&key=" + SECRET_KEY;
+    public JSONObject now(Integer city, String key) {
+        String url = "https://devapi.qweather.com/v7/weather/now?location=" + city + "&key=" + key;
         String res = HttpUtil.get(url);
         JSONObject jsonObject = JSONObject.parseObject(res);
         if (jsonObject.getInteger("code") != 200) {
@@ -59,8 +58,8 @@ public class HeFengWeatherUtil {
      *
      * @return
      */
-    public static JSONObject warningNow(Integer cityCode) {
-        String url = "https://devapi.qweather.com/v7/warning/now?location=" + cityCode + "&key=" + SECRET_KEY;
+    public JSONObject warningNow(Integer cityCode, String key) {
+        String url = "https://devapi.qweather.com/v7/warning/now?location=" + cityCode + "&key=" + key;
         String res = HttpUtil.get(url);
         JSONObject jsonObject = JSONObject.parseObject(res);
         if (jsonObject.getInteger("code") != 200) {

@@ -7,5 +7,6 @@ INSERT INTO systemParam (code,codeName,value) VALUES ('SENDWEIBOLIST', '微博�
 INSERT INTO systemParam (code,codeName,value) VALUES ('SENDMOYULIST', '摸鱼推送列表','');
 INSERT INTO systemParam (code,codeName,value) VALUES ('SENDELMLIST', '饿了么推送列表','');
 INSERT INTO systemParam (code,codeName,value) VALUES ('TIANXINGKEY', '天行key','');
+INSERT INTO systemParam (code,codeName,value) VALUES ('HEFENGKEY', '和风key','');
 INSERT INTO systemParam (code,codeName,value) VALUES ('ISSENDWATER', '是否推送喝水提醒','1');
 INSERT INTO systemParam (code,codeName,value) VALUES ('SENDWATERLIST', '喝水提醒推送列表','');
