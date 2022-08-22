@@ -166,16 +166,12 @@ public class JiankongImpl implements Jiankong {
             msg += "价格:" + price + suffix + "\r\n";
             msg += "渠道:" + channel + "\r\n";
             msg += "连接:" + url + "\r\n";
-
-            String jkmtyhgroup = redis.get("jkmtyhgroup");
-            if (StringUtils.isEmpty(jkmtyhgroup)){
-                List<Group> groups = groupMapper.queryGroupByFunctionType(FunctionType.mtyhjk);
-                for (Group group : groups) {
-                    JSONObject content = new JSONObject();
-                    content.put("from_group", group.getGroupid());
-                    content.put("robot_wxid", systemParamUtil.querySystemParam("ROBORTWXID"));
-                    weChatUtil.sendTextMsg(msg, content);
-                }
+            List<Group> groups = groupMapper.queryGroupByFunctionType(FunctionType.mtyhjk);
+            for (Group group : groups) {
+                JSONObject content = new JSONObject();
+                content.put("from_group", group.getGroupid());
+                content.put("robot_wxid", systemParamUtil.querySystemParam("ROBORTWXID"));
+                weChatUtil.sendTextMsg(msg, content);
             }
         }
     }

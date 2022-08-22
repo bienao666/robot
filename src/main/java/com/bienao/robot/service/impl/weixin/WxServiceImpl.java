@@ -89,6 +89,10 @@ public class WxServiceImpl implements WxService {
         if (msg.equals("菜单")){
             handleFunctionList(content);
         }
+        //饿了么
+        if (msg.trim().equals("饿了么") || msg.trim().equals("elm")){
+            handleELM(content);
+        }
         //微博
         if (msg.trim().equals("微博")  || msg.trim().equals("wb")) {
             handleWeiBo(content);
@@ -102,6 +106,16 @@ public class WxServiceImpl implements WxService {
         //取消茅台洋河监控
         if (msg.trim().equals("取消茅台洋河监控")) {
             handleQxMtYhJk(content);
+            return;
+        }
+        //饿了么推送
+        if (msg.trim().equals("饿了么推送")) {
+            handleElmTs(content);
+            return;
+        }
+        //取消饿了么推送
+        if (msg.trim().equals("取消饿了么推送")) {
+            handleQxElmTs(content);
             return;
         }
         //举牌
@@ -168,6 +182,53 @@ public class WxServiceImpl implements WxService {
     }
 
     /**
+     * 取消饿了么推送
+     * @param content
+     */
+    private void handleQxElmTs(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag) {
+            //获取微信群号
+            String from_group = content.getString("from_group");
+            int i = groupMapper.deleteGroupByGroupIdAndFunctionType(from_group, FunctionType.elmts);
+            if (i>0) {
+                weChatUtil.sendTextMsg("取消饿了么推送成功", content);
+            }else {
+                weChatUtil.sendTextMsg("此群并未设置茅台洋河监控，无法取消", content);
+            }
+        }
+    }
+
+    /**
+     * 饿了么推送
+     * @param content
+     */
+    private void handleElmTs(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag) {
+            //获取微信群号
+            String from_group = content.getString("from_group");
+            if (StringUtils.isNotEmpty(from_group)) {
+                Group group = groupMapper.queryGroupByGroupIdAndFunctionType(from_group, FunctionType.elmts);
+                if (group != null) {
+                    weChatUtil.sendTextMsg("已开启饿了么推送", content);
+                } else {
+                    group = new Group();
+                    group.setGroupid(from_group);
+                    group.setGroupName(content.getString("from_group_name"));
+                    group.setFunctionType(FunctionType.mtyhjk);
+                    int i = groupMapper.addGroup(group);
+                    if (i == 0) {
+                        weChatUtil.sendTextMsg("开启推送失败", content);
+                    } else {
+                        weChatUtil.sendTextMsg("开启推送成功", content);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * 取消茅台洋河监控
      * @param content
      */
@@ -211,8 +272,6 @@ public class WxServiceImpl implements WxService {
                     }
                 }
             }
-        }else {
-            weChatUtil.sendTextMsg("非管理员无操作权限", content);
         }
     }
 
@@ -301,6 +360,10 @@ public class WxServiceImpl implements WxService {
                             break;
                         case "摸鱼推送":
                             handleSetParam("SENDMOYULIST", split[1], content);
+                            break;
+                        case "饿了么图片":
+                            systemParamUtil.updateSystemParam("ELMURL", split[1]);
+                            weChatUtil.sendTextMsg("设置成功", content);
                             break;
                     }
                 }
@@ -522,12 +585,20 @@ public class WxServiceImpl implements WxService {
 
     /**
      * 饿了么定时
-     *
-     * @param content
      */
-    public void timeHandleELM(JSONObject content) {
-        weChatUtil.sendTextMsg("到饭点啦，饿了么扫码领大额红包！！！", content);
-        weChatUtil.sendImageMsg("http://i.imgtg.com/2022/08/09/AEf1U.jpg", content);
+    public void timeHandleELM() {
+        String elmurl = systemParamUtil.querySystemParam("ELMURL");
+        if (StringUtils.isNotEmpty(elmurl)){
+            List<Group> groups = groupMapper.queryGroupByFunctionType(FunctionType.elmts);
+            for (Group group : groups) {
+                JSONObject content = new JSONObject();
+                content.put("from_group", group.getGroupid());
+                content.put("robot_wxid", systemParamUtil.querySystemParam("ROBORTWXID"));
+                weChatUtil.sendTextMsg("到饭点啦，饿了么扫码领大额红包！！！",content);
+                weChatUtil.sendImageMsg(elmurl, content);
+            }
+
+        }
     }
 
     /**
@@ -536,7 +607,12 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleELM(JSONObject content) {
-        weChatUtil.sendImageMsg("https://img2.baidu.com/it/u=2624834020,3993605127&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1660150800&t=e8768caa35dc64bcf383764c7d9ec691", content);
+        String elmurl = systemParamUtil.querySystemParam("ELMURL");
+        if (StringUtils.isEmpty(elmurl)){
+            weChatUtil.sendTextMsg("请先设置饿了么推广图片 设置 饿了么图片 你的饿了么图片地址",content);
+        }else {
+            weChatUtil.sendImageMsg(elmurl, content);
+        }
     }
 
     /**

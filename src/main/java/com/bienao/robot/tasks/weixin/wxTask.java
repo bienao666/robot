@@ -70,11 +70,8 @@ public class wxTask {
     /**
      * 饿了么定时推送
      */
-    /*@Scheduled(cron = "0 40 10 * * ?")
+    @Scheduled(cron = "0 40 10,17 * * ?")
     public void timeHandleELM() {
-        JSONObject content = new JSONObject();
-        content.put("from_group",systemParamUtil.querySystemParam("SENDELMLIST"));
-        content.put("robot_wxid",systemParamUtil.querySystemParam("ROBORTWXID"));
-        wxServicel.timeHandleELM(content);
-    }*/
+        wxServicel.timeHandleELM();
+    }
 }

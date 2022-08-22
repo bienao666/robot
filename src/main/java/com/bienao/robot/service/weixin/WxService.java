@@ -6,7 +6,7 @@ public interface WxService {
 
     void handleMessage(JSONObject jsonObject);
 
-    void timeHandleELM(JSONObject content);
+    void timeHandleELM();
 
     void handleWeiBo(JSONObject content);
 
