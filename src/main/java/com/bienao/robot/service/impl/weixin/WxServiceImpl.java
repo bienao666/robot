@@ -11,9 +11,12 @@ import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.Constants.FunctionType;
 import com.bienao.robot.Constants.weixin.WXConstant;
 import com.bienao.robot.entity.Festival;
+import com.bienao.robot.entity.Group;
 import com.bienao.robot.entity.SystemParam;
+import com.bienao.robot.mapper.GroupMapper;
 import com.bienao.robot.service.weixin.WxService;
 import com.bienao.robot.utils.HeFengWeatherUtil;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
@@ -49,6 +52,9 @@ public class WxServiceImpl implements WxService {
 
     @Autowired
     private HeFengWeatherUtil heFengWeatherUtil;
+
+    @Autowired
+    private GroupMapper groupMapper;
 
     private Cache<String, String> redis = WXConstant.redis;
 
@@ -86,6 +92,16 @@ public class WxServiceImpl implements WxService {
         //微博
         if (msg.trim().equals("微博")  || msg.trim().equals("wb")) {
             handleWeiBo(content);
+            return;
+        }
+        //监控茅台洋河
+        if (msg.trim().equals("监控茅台洋河")) {
+            handleJkMtYh(content);
+            return;
+        }
+        //取消茅台洋河监控
+        if (msg.trim().equals("取消茅台洋河监控")) {
+            handleQxMtYhJk(content);
             return;
         }
         //举牌
@@ -148,6 +164,57 @@ public class WxServiceImpl implements WxService {
             if (num <= 50 && StringUtils.isNotEmpty(publicKey)) {
                 handleLast(content, num, publicKey);
             }
+        }
+    }
+
+    /**
+     * 取消茅台洋河监控
+     * @param content
+     */
+    private void handleQxMtYhJk(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag) {
+            //获取微信群号
+            String from_group = content.getString("from_group");
+            int i = groupMapper.deleteGroupByGroupIdAndFunctionType(from_group, FunctionType.mtyhjk);
+            if (i>0) {
+                weChatUtil.sendTextMsg("取消茅台洋河监控成功", content);
+            }else {
+                weChatUtil.sendTextMsg("此群并未设置茅台洋河监控，无法取消", content);
+            }
+        }else {
+            weChatUtil.sendTextMsg("非管理员无操作权限", content);
+        }
+    }
+
+    /**
+     * 监控茅台洋河
+     * @param content
+     */
+    private void handleJkMtYh(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag) {
+            //获取微信群号
+            String from_group = content.getString("from_group");
+            if (StringUtils.isNotEmpty(from_group)) {
+                Group group = groupMapper.queryGroupByGroupIdAndFunctionType(from_group, FunctionType.mtyhjk);
+                if (group != null) {
+                    weChatUtil.sendTextMsg("已开启茅台洋河监控", content);
+                } else {
+                    group = new Group();
+                    group.setGroupid(from_group);
+                    group.setGroupName(content.getString("from_group_name"));
+                    group.setFunctionType(FunctionType.mtyhjk);
+                    int i = groupMapper.addGroup(group);
+                    if (i == 0) {
+                        weChatUtil.sendTextMsg("监控失败", content);
+                    } else {
+                        weChatUtil.sendTextMsg("监控成功", content);
+                    }
+                }
+            }
+        }else {
+            weChatUtil.sendTextMsg("非管理员无操作权限", content);
         }
     }
 
@@ -716,4 +783,13 @@ public class WxServiceImpl implements WxService {
             }
         }
     }
+
+    /**
+     * 早上好
+     */
+    public void handleGoodMorning(){
+
+    }
+
+
 }

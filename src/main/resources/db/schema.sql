@@ -9,3 +9,21 @@ create table if not exists systemParam (
                                            created_time datetime DEFAULT CURRENT_TIMESTAMP,
                                            updated_time datetime DEFAULT CURRENT_TIMESTAMP
 );
+create table if not exists user (
+                                           id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                           wxid varchar,
+                                           wxName varchar,
+                                           city varchar,
+                                           ip varchar,
+                                           functionType INTEGER,
+                                           created_time datetime DEFAULT CURRENT_TIMESTAMP,
+                                           updated_time datetime DEFAULT CURRENT_TIMESTAMP
+);
+create table if not exists `group` (
+                                       id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                       groupid varchar,
+                                       groupName varchar,
+                                       functionType INTEGER,
+                                       created_time datetime DEFAULT CURRENT_TIMESTAMP,
+                                       updated_time datetime DEFAULT CURRENT_TIMESTAMP
+);

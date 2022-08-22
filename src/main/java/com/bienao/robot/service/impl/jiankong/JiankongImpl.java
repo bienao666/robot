@@ -1,9 +1,15 @@
 package com.bienao.robot.service.impl.jiankong;
 
+import cn.hutool.cache.Cache;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.Constants.FunctionType;
 import com.bienao.robot.Constants.jiankong.JKConstant;
+import com.bienao.robot.Constants.weixin.WXConstant;
+import com.bienao.robot.entity.Group;
+import com.bienao.robot.mapper.GroupMapper;
 import com.bienao.robot.service.jiankong.Jiankong;
+import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import com.bienao.robot.utils.weixin.WeChatUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +28,14 @@ import java.util.List;
 public class JiankongImpl implements Jiankong {
 
     private HashSet<String> jiankong = JKConstant.set;
+
+    private Cache<String, String> redis = WXConstant.redis;
+
+    @Autowired
+    private SystemParamUtil systemParamUtil;
+
+    @Autowired
+    private GroupMapper groupMapper;
 
     @Autowired
     private WeChatUtil weChatUtil;
@@ -152,10 +166,17 @@ public class JiankongImpl implements Jiankong {
             msg += "价格:" + price + suffix + "\r\n";
             msg += "渠道:" + channel + "\r\n";
             msg += "连接:" + url + "\r\n";
-            JSONObject content = new JSONObject();
-            content.put("from_group", "19182654912@chatroom");
-            content.put("robot_wxid", "wxid_eyo76pqzpsvz12");
-            weChatUtil.sendTextMsg(msg, content);
+
+            String jkmtyhgroup = redis.get("jkmtyhgroup");
+            if (StringUtils.isEmpty(jkmtyhgroup)){
+                List<Group> groups = groupMapper.queryGroupByFunctionType(FunctionType.mtyhjk);
+                for (Group group : groups) {
+                    JSONObject content = new JSONObject();
+                    content.put("from_group", group.getGroupid());
+                    content.put("robot_wxid", systemParamUtil.querySystemParam("ROBORTWXID"));
+                    weChatUtil.sendTextMsg(msg, content);
+                }
+            }
         }
     }
 

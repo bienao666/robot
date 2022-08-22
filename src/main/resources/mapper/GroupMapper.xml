@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bienao.robot.mapper.GroupMapper">
+
+    <insert id="addGroup">
+        insert into `group`(groupid,groupName,functionType) values (#{groupid},#{groupName},#{functionType})
+    </insert>
+
+    <select id="queryGroupByGroupIdAndFunctionType" resultType="group">
+        select * from `group` where groupid=#{groupid} and functionType=#{functionType}
+    </select>
+
+    <delete id="deleteGroupByGroupIdAndFunctionType">
+        delete from `group` where groupid=#{groupid} and functionType=#{functionType}
+    </delete>
+</mapper>
