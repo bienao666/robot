@@ -79,7 +79,7 @@ public class WxServiceImpl implements WxService {
             handleSetSysParam(content);
         }
         //功能列表
-        if (msg.equals("功能")){
+        if (msg.equals("菜单")){
             handleFunctionList(content);
         }
         //微博
