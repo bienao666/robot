@@ -43,11 +43,12 @@ public class AfterRunner implements ApplicationRunner {
             }
         }).start();
         //添加功能列表
-        String msg = "功能列表：\r\n";
+        String msg = "菜单列表：\r\n";
         msg += "————青龙区————\r\n";
         msg += "           青龙        \r\n";
-        msg += "————商品区————\r\n";
-        msg += "           比价        \r\n";
+        msg += "————功能区————\r\n";
+        msg += "           比价  |  油价  \r\n";
+        msg += "           监控茅台洋河    \r\n";
         msg += "————娱乐区————\r\n";
         msg += "           摸鱼  |  微博  \r\n";
         msg += "           举牌  |  天气  \r\n";
