@@ -182,8 +182,6 @@ public class WxServiceImpl implements WxService {
             }else {
                 weChatUtil.sendTextMsg("此群并未设置茅台洋河监控，无法取消", content);
             }
-        }else {
-            weChatUtil.sendTextMsg("非管理员无操作权限", content);
         }
     }
 
