@@ -22,10 +22,6 @@ class RobotApplicationTests {
 
     @Test
     public void test1() throws Exception {
-        JSONObject content = new JSONObject();
-        content.put("robot_wxid","wxid_eyo76pqzpsvz12");
-        content.put("from_wxid","wxid_hwzi277usnv522");
-        weChatUtil.sendImageMsg("http://i.imgtg.com/2022/08/09/AEf1U.jpg", content);
     }
 
 }
