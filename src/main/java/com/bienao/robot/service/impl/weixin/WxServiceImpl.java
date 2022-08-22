@@ -8,6 +8,7 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.http.HttpRequest;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.weixin.WXConstant;
@@ -92,6 +93,11 @@ public class WxServiceImpl implements WxService {
             handleJuPai(content);
             return;
         }
+        //油价
+        if (msg.endsWith("油价")) {
+            handleYouJia(content);
+            return;
+        }
         //买家秀
         if (msg.trim().contains("mjx") || msg.trim().contains("买家秀")) {
             handleMJX(content);
@@ -142,6 +148,45 @@ public class WxServiceImpl implements WxService {
             if (num <= 50 && StringUtils.isNotEmpty(publicKey)) {
                 handleLast(content, num, publicKey);
             }
+        }
+    }
+
+    /**
+     * 油价
+     * @param content
+     */
+    private void handleYouJia(JSONObject content) {
+        String city = content.getString("msg").replace("油价", "").trim();
+        if (StringUtils.isEmpty(city)){
+            weChatUtil.sendTextMsg("未输入需要查询的城市",content);
+        }
+        String key = systemParamUtil.querySystemParam("TIANXINGKEY");
+        if (StringUtils.isEmpty(key)){
+            weChatUtil.sendTextMsg("请先去 https://www.tianapi.com 网站注册申请key，对机器人发送：设置天行key 你的key", content);
+            return;
+        }
+        String resStr = HttpRequest.get("http://api.tianapi.com/oilprice/index?key=" + key + "&prov=" + city).execute().body();
+        if (StringUtils.isEmpty(resStr)){
+            weChatUtil.sendTextMsg("接口异常，请尽快维护",content);
+        }else {
+            JSONObject res = JSONObject.parseObject(resStr);
+            String newslist = res.getString("newslist");
+            if (StringUtils.isEmpty(newslist)){
+                weChatUtil.sendTextMsg("未查到该城市油价,仅能查询省份油价",content);
+            }
+            List<JSONObject> jsonObjects = JSON.parseArray(newslist, JSONObject.class);
+            if (jsonObjects.size()==0){
+                weChatUtil.sendTextMsg("未查到该城市油价,仅能查询省份油价",content);
+            }
+            JSONObject jsonObject = jsonObjects.get(0);
+            String msg = "城市：" + jsonObject.getString("prov") + "\r\n";
+            msg += "p0：" + jsonObject.getString("p0") + "\r\n";
+            msg += "p89：" + jsonObject.getString("p89") + "\r\n";
+            msg += "p92：" + jsonObject.getString("p92") + "\r\n";
+            msg += "p95：" + jsonObject.getString("p95") + "\r\n";
+            msg += "p98：" + jsonObject.getString("p98") + "\r\n";
+            msg += "更新时间：" + jsonObject.getString("time");
+            weChatUtil.sendTextMsg(msg,content);
         }
     }
 
