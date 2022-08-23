@@ -65,8 +65,7 @@ public class WxServiceImpl implements WxService {
         //发送人
         String from_wxid = content.getString("from_wxid");
         //机器人
-//        String robortwxid = systemParamUtil.querySystemParam("ROBORTWXID");
-        String robortwxid = null;
+        String robortwxid = systemParamUtil.querySystemParam("ROBORTWXID");
         if (StringUtils.isEmpty(robortwxid)) {
             systemParamUtil.updateSystemParam("ROBORTWXID", content.getString("robot_wxid"));
         }
@@ -762,7 +761,6 @@ public class WxServiceImpl implements WxService {
      */
     private void getGregorianDayDiff(Festival festival) {
         // 获取当前日期
-//        Date now = new Date();
         Date now = new Date();
         int year = DateUtil.year(now);
         // 如果当前日期大于等于节日的月份和天数，则年数取下一年
