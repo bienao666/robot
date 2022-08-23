@@ -111,6 +111,43 @@ public class WeChatUtil {
     }
 
     /**
+     * 邀请好友入群_直接拉
+     * @return
+     */
+    public boolean InviteInGroup(JSONObject content){
+        JSONObject body = new JSONObject();
+        //密钥
+        body.put("token",vlmToken);
+        //API名
+        body.put("api","InviteInGroup");
+        //机器人ID
+        body.put("robot_wxid",content.getString("robot_wxid"));
+        //群id
+        body.put("group_wxid","");
+        String from_group = content.getString("from_group");
+        //对象WXID（好友ID/群ID/公众号ID）
+        body.put("to_wxid",content.getString("from_wxid"));
+        String result = HttpRequest.post(vlwUrl)
+                .header("User-Agent", "apifox/1.0.0 (https://www.apifox.cn)")
+                .header("Content-Type", "application/json")
+                .body(body.toJSONString())
+                .execute().body();
+        if (StringUtils.isEmpty(result)){
+            log.info("发送图片消息接口调用失败");
+            log.info("{}信息发送失败",body.toJSONString());
+        }else {
+            JSONObject jsonObject = JSONObject.parseObject(result);
+            if ("200".equals(jsonObject.getString("Code"))){
+                log.info("发送图片消息接口调用失败");
+                log.info("{}信息发送失败",body.toJSONString());
+            }else {
+                log.info("发送图片消息成功");
+            }
+        }
+        return true;
+    }
+
+    /**
      * 是否为管理员
      */
     public boolean isMaster(JSONObject content){

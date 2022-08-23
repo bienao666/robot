@@ -8,6 +8,10 @@
         insert into `group`(groupid,groupName,functionType) values (#{groupid},#{groupName},#{functionType})
     </insert>
 
+    <select id="queryGroupByFunctionType" resultType="group">
+        select * from `group` where functionType=#{functionType}
+    </select>
+
     <select id="queryGroupByGroupIdAndFunctionType" resultType="group">
         select * from `group` where groupid=#{groupid} and functionType=#{functionType}
     </select>
