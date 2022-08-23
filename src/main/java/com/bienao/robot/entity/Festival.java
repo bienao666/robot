@@ -7,7 +7,6 @@ import lombok.Data;
  * 节假日
  */
 @Data
-@AllArgsConstructor
 public class Festival {
     /**
      * 名称
@@ -29,5 +28,17 @@ public class Festival {
      * 天数
      */
     private Long diff;
+    /**
+     * 是否今日
+     */
+    private Boolean today;
+
+    public Festival(String name, int month, int day, boolean chineseDate, Long diff) {
+        this.name = name;
+        this.month = month;
+        this.day = day;
+        this.chineseDate = chineseDate;
+        this.diff = diff;
+    }
 }
 

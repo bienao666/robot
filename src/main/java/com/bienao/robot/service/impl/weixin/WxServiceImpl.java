@@ -65,9 +65,10 @@ public class WxServiceImpl implements WxService {
         //发送人
         String from_wxid = content.getString("from_wxid");
         //机器人
-        String robortwxid = systemParamUtil.querySystemParam("ROBORTWXID");
-        if (StringUtils.isEmpty(robortwxid)){
-            systemParamUtil.updateSystemParam("ROBORTWXID",content.getString("robot_wxid"));
+//        String robortwxid = systemParamUtil.querySystemParam("ROBORTWXID");
+        String robortwxid = null;
+        if (StringUtils.isEmpty(robortwxid)) {
+            systemParamUtil.updateSystemParam("ROBORTWXID", content.getString("robot_wxid"));
         }
 
         //查看当前会话
@@ -82,19 +83,19 @@ public class WxServiceImpl implements WxService {
 
         String msg = content.getString("msg");
         //系统参数
-        if (msg.startsWith("设置") || msg.startsWith("启用") || msg.startsWith("关闭")){
+        if (msg.startsWith("设置") || msg.startsWith("启用") || msg.startsWith("关闭")) {
             handleSetSysParam(content);
         }
         //功能列表
-        if (msg.equals("菜单")){
+        if (msg.equals("菜单")) {
             handleFunctionList(content);
         }
         //饿了么
-        if (msg.trim().equals("饿了么") || msg.trim().equals("elm")){
+        if (msg.trim().equals("饿了么") || msg.trim().equals("elm")) {
             handleELM(content);
         }
         //微博
-        if (msg.trim().equals("微博")  || msg.trim().equals("wb")) {
+        if (msg.trim().equals("微博") || msg.trim().equals("wb")) {
             handleWeiBo(content);
             return;
         }
@@ -144,8 +145,8 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //比价
-        if (msg.equals("比价")){
-            weChatUtil.sendTextMsg("请直接发送商品连接，我会自动识别",content);
+        if (msg.equals("比价")) {
+            weChatUtil.sendTextMsg("请直接发送商品连接，我会自动识别", content);
         }
         if (msg.contains("item.m.jd.com") || msg.contains("m.tb.cn")) {
             handleGoods(msg, content);
@@ -183,6 +184,7 @@ public class WxServiceImpl implements WxService {
 
     /**
      * 取消饿了么推送
+     *
      * @param content
      */
     private void handleQxElmTs(JSONObject content) {
@@ -191,9 +193,9 @@ public class WxServiceImpl implements WxService {
             //获取微信群号
             String from_group = content.getString("from_group");
             int i = groupMapper.deleteGroupByGroupIdAndFunctionType(from_group, FunctionType.elmts);
-            if (i>0) {
+            if (i > 0) {
                 weChatUtil.sendTextMsg("取消饿了么推送成功", content);
-            }else {
+            } else {
                 weChatUtil.sendTextMsg("此群并未设置茅台洋河监控，无法取消", content);
             }
         }
@@ -201,6 +203,7 @@ public class WxServiceImpl implements WxService {
 
     /**
      * 饿了么推送
+     *
      * @param content
      */
     private void handleElmTs(JSONObject content) {
@@ -230,6 +233,7 @@ public class WxServiceImpl implements WxService {
 
     /**
      * 取消茅台洋河监控
+     *
      * @param content
      */
     private void handleQxMtYhJk(JSONObject content) {
@@ -238,9 +242,9 @@ public class WxServiceImpl implements WxService {
             //获取微信群号
             String from_group = content.getString("from_group");
             int i = groupMapper.deleteGroupByGroupIdAndFunctionType(from_group, FunctionType.mtyhjk);
-            if (i>0) {
+            if (i > 0) {
                 weChatUtil.sendTextMsg("取消茅台洋河监控成功", content);
-            }else {
+            } else {
                 weChatUtil.sendTextMsg("此群并未设置茅台洋河监控，无法取消", content);
             }
         }
@@ -248,6 +252,7 @@ public class WxServiceImpl implements WxService {
 
     /**
      * 监控茅台洋河
+     *
      * @param content
      */
     private void handleJkMtYh(JSONObject content) {
@@ -277,30 +282,31 @@ public class WxServiceImpl implements WxService {
 
     /**
      * 油价
+     *
      * @param content
      */
     private void handleYouJia(JSONObject content) {
         String city = content.getString("msg").replace("油价", "").trim();
-        if (StringUtils.isEmpty(city)){
-            weChatUtil.sendTextMsg("未输入需要查询的城市",content);
+        if (StringUtils.isEmpty(city)) {
+            weChatUtil.sendTextMsg("未输入需要查询的城市", content);
         }
         String key = systemParamUtil.querySystemParam("TIANXINGKEY");
-        if (StringUtils.isEmpty(key)){
+        if (StringUtils.isEmpty(key)) {
             weChatUtil.sendTextMsg("请先去 https://www.tianapi.com 网站注册申请key，对机器人发送：设置天行key 你的key", content);
             return;
         }
         String resStr = HttpRequest.get("http://api.tianapi.com/oilprice/index?key=" + key + "&prov=" + city).execute().body();
-        if (StringUtils.isEmpty(resStr)){
-            weChatUtil.sendTextMsg("接口异常，请尽快维护",content);
-        }else {
+        if (StringUtils.isEmpty(resStr)) {
+            weChatUtil.sendTextMsg("接口异常，请尽快维护", content);
+        } else {
             JSONObject res = JSONObject.parseObject(resStr);
             String newslist = res.getString("newslist");
-            if (StringUtils.isEmpty(newslist)){
-                weChatUtil.sendTextMsg("未查到该城市油价,仅能查询省份油价",content);
+            if (StringUtils.isEmpty(newslist)) {
+                weChatUtil.sendTextMsg("未查到该城市油价,仅能查询省份油价", content);
             }
             List<JSONObject> jsonObjects = JSON.parseArray(newslist, JSONObject.class);
-            if (jsonObjects.size()==0){
-                weChatUtil.sendTextMsg("未查到该城市油价,仅能查询省份油价",content);
+            if (jsonObjects.size() == 0) {
+                weChatUtil.sendTextMsg("未查到该城市油价,仅能查询省份油价", content);
             }
             JSONObject jsonObject = jsonObjects.get(0);
             String msg = "城市：" + jsonObject.getString("prov") + "\r\n";
@@ -310,30 +316,32 @@ public class WxServiceImpl implements WxService {
             msg += "p95：" + jsonObject.getString("p95") + "\r\n";
             msg += "p98：" + jsonObject.getString("p98") + "\r\n";
             msg += "更新时间：" + jsonObject.getString("time");
-            weChatUtil.sendTextMsg(msg,content);
+            weChatUtil.sendTextMsg(msg, content);
         }
     }
 
     /**
      * 功能列表
+     *
      * @param content
      */
     private void handleFunctionList(JSONObject content) {
-        weChatUtil.sendTextMsg(redis.get("functionList"),content);
+        weChatUtil.sendTextMsg(redis.get("functionList"), content);
     }
 
     /**
      * 设置系统参数
+     *
      * @param content
      */
     private void handleSetSysParam(JSONObject content) {
         String msg = content.getString("msg").replace("设置", "").replace("启用", "").replace("关闭", "").trim();
         String[] split = msg.split(" ");
-        if (split.length>1){
-            if (StringUtils.isEmpty(systemParamUtil.querySystemParam("WXMASTERS"))&&split[0].equals("微信管理员")){
+        if (split.length > 1) {
+            if (StringUtils.isEmpty(systemParamUtil.querySystemParam("WXMASTERS")) && split[0].equals("微信管理员")) {
                 //第一次设置管理员
                 handleSetParam("WXMASTERS", split[1], content);
-            }else {
+            } else {
                 boolean flag = weChatUtil.isMaster(content);
                 if (flag) {
                     switch (split[0]) {
@@ -368,7 +376,7 @@ public class WxServiceImpl implements WxService {
                     }
                 }
             }
-        }else {
+        } else {
             weChatUtil.sendTextMsg("参数有误", content);
         }
     }
@@ -413,16 +421,17 @@ public class WxServiceImpl implements WxService {
 
     /**
      * 设置参数有多值
+     *
      * @param content
      */
-    public void handleSetParam(String code,String value,JSONObject content) {
+    public void handleSetParam(String code, String value, JSONObject content) {
         //发送人
         String oldValue = systemParamUtil.querySystemParam(code);
         if (!oldValue.contains(value)) {
             //添加新的管理员
-            if (StringUtils.isEmpty(oldValue)){
+            if (StringUtils.isEmpty(oldValue)) {
                 oldValue = value;
-            }else {
+            } else {
                 oldValue = oldValue + "#" + value;
             }
             boolean flag = systemParamUtil.updateSystemParam(code, oldValue);
@@ -588,13 +597,13 @@ public class WxServiceImpl implements WxService {
      */
     public void timeHandleELM() {
         String elmurl = systemParamUtil.querySystemParam("ELMURL");
-        if (StringUtils.isNotEmpty(elmurl)){
+        if (StringUtils.isNotEmpty(elmurl)) {
             List<Group> groups = groupMapper.queryGroupByFunctionType(FunctionType.elmts);
             for (Group group : groups) {
                 JSONObject content = new JSONObject();
                 content.put("from_group", group.getGroupid());
                 content.put("robot_wxid", systemParamUtil.querySystemParam("ROBORTWXID"));
-                weChatUtil.sendTextMsg("到饭点啦，饿了么扫码领大额红包！！！",content);
+                weChatUtil.sendTextMsg("到饭点啦，饿了么扫码领大额红包！！！", content);
                 weChatUtil.sendImageMsg(elmurl, content);
             }
 
@@ -608,9 +617,9 @@ public class WxServiceImpl implements WxService {
      */
     private void handleELM(JSONObject content) {
         String elmurl = systemParamUtil.querySystemParam("ELMURL");
-        if (StringUtils.isEmpty(elmurl)){
-            weChatUtil.sendTextMsg("请先设置饿了么推广图片 设置 饿了么图片 你的饿了么图片地址",content);
-        }else {
+        if (StringUtils.isEmpty(elmurl)) {
+            weChatUtil.sendTextMsg("请先设置饿了么推广图片 设置 饿了么图片 你的饿了么图片地址", content);
+        } else {
             weChatUtil.sendImageMsg(elmurl, content);
         }
     }
@@ -701,12 +710,12 @@ public class WxServiceImpl implements WxService {
         int year = DateUtil.year(now);
         // 添加节日
         List<Festival> festivalList = new ArrayList<>();
-        // 清明节
+        // 清明节[计算后的日期为公历日]
         // 注意清明的需要进行计算的，21世纪的公式为：[Y*D+C]-L
         // 公式解读：Y=年数后2位，D=0.2422，L=闰年数，21世纪C=4.81，20世纪=5.59.
         int param = year - 2000;
         int qingMingDay = (int) (param * 0.2422 + 4.81) - param / 4;
-        festivalList.add(new Festival("清明节", 4, qingMingDay, true, 0L));
+        festivalList.add(new Festival("清明节", 4, qingMingDay, false, 0L));
         festivalList.add(new Festival("元旦", 1, 1, false, 0L));
         festivalList.add(new Festival("春节", 1, 1, true, 0L));
         festivalList.add(new Festival("劳动节", 5, 1, false, 0L));
@@ -719,14 +728,23 @@ public class WxServiceImpl implements WxService {
         // 获取节日时间差
         festivalList.forEach(this::getGregorianDayDiff);
         // 存放周末 【不剔除法定调休】【周末无需关心月/日】
-        festivalList.add(new Festival("周末", 0, 0, false, DateUtil.betweenDay(new Date(), DateUtil.endOfWeek(new Date(), false), false)));
-        // 根据时间差排序
+        Festival weekend = new Festival("周末", 0, 0, false, DateUtil.betweenDay(new Date(), DateUtil.endOfWeek(new Date(), false), false));
+        // 判断今天是不是周六、周日
+        weekend.setToday(DateUtil.betweenDay(new Date(), DateUtil.endOfWeek(new Date(), false), false) == 0
+        || DateUtil.betweenDay(new Date(), DateUtil.endOfWeek(new Date(), true), false) == 0);
+        festivalList.add(weekend);
+        // 根据时间差排序【正序】
         festivalList.sort((Comparator.comparing(Festival::getDiff)));
         // 打印文档
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("【摸鱼办】提醒您：").append(DateUtil.format(now, "MM月dd日,")).append(this.timeOfDay(now)).append("好,摸鱼人!\r\n");
         stringBuffer.append("工作再累，一定不要忘记摸鱼哦！有事没事起身去茶水间， 去厕所， 去廊道走走别老在工位上坐着， 钱是老板的, 但命是自己的!\r\n");
-        festivalList.forEach(festival -> stringBuffer.append("距离").append(festival.getName()).append("还有不到：").append(festival.getDiff()).append("天\r\n"));
+        festivalList.forEach(festival -> {
+            if (!festival.getToday())
+                stringBuffer.append("距离").append(festival.getName()).append("还有不到：").append(festival.getDiff()).append("天\r\n");
+            else
+                stringBuffer.append("今天是").append(festival.getName()).append("，好好享受吧！\r\n");
+        });
         stringBuffer.append("为了放假加油吧！\n" +
                 "上班是帮老板赚钱，摸鱼是赚老板的钱！\n" +
                 "最后，祝愿天下所有摸鱼人，都能愉快的渡过每一天！\n");
@@ -744,6 +762,7 @@ public class WxServiceImpl implements WxService {
      */
     private void getGregorianDayDiff(Festival festival) {
         // 获取当前日期
+//        Date now = new Date();
         Date now = new Date();
         int year = DateUtil.year(now);
         // 如果当前日期大于等于节日的月份和天数，则年数取下一年
@@ -759,6 +778,7 @@ public class WxServiceImpl implements WxService {
         }
         // 计算当前日期和节日（公历日）的天数差 并保存
         festival.setDiff(DateUtil.betweenDay(now, festivalDay, false));
+        festival.setToday(DateUtil.isSameDay(now, festivalDay));
     }
 
     /**
@@ -795,14 +815,14 @@ public class WxServiceImpl implements WxService {
      * 传递对应的城市名 南京
      * 如存在重复名称。则传递上级行政单位名称
      * -- 规则：上级城市名称 查询城市名称
-     * -- 说明：以空格分隔 例：【南京 鼓楼】【西安 鼓楼】
+     * -- 说明：以空格分隔 例：【南京 鼓楼】【徐州 鼓楼】
      *
      * @param content content
      */
     public void handleWeather(JSONObject content) {
         StringBuilder result = new StringBuilder();
         String key = systemParamUtil.querySystemParam("HEFENGKEY");
-        if (StringUtils.isEmpty(key)){
+        if (StringUtils.isEmpty(key)) {
             weChatUtil.sendTextMsg("请先去 https://dev.qweather.com 网站注册申请key，对机器人发送：设置 和风key 你的key", content);
             return;
         }
@@ -810,9 +830,9 @@ public class WxServiceImpl implements WxService {
             String msg = content.getString("msg");
             String cityName = msg.replace("天气", "");
             String[] split = cityName.split(" ");
-            JSONObject city = heFengWeatherUtil.getCity(split[split.length - 1], split.length > 1 ? split[0] : "",key);
-            JSONObject now = heFengWeatherUtil.now(city.getInteger("id"),key);
-            JSONObject warningNow = heFengWeatherUtil.warningNow(city.getInteger("id"),key);
+            JSONObject city = heFengWeatherUtil.getCity(split[split.length - 1], split.length > 1 ? split[0] : "", key);
+            JSONObject now = heFengWeatherUtil.now(city.getInteger("id"), key);
+            JSONObject warningNow = heFengWeatherUtil.warningNow(city.getInteger("id"), key);
             String name = "";
             if (!city.getString("name").equals(city.getString("adm2"))) {
                 name = city.getString("adm2") + " " + city.getString("name");
@@ -841,9 +861,9 @@ public class WxServiceImpl implements WxService {
     /**
      * 喝水
      */
-    public void handleWater(){
+    public void handleWater() {
         String issendwater = systemParamUtil.querySystemParam("ISSENDWATER");
-        if ("1".equals(issendwater)){
+        if ("1".equals(issendwater)) {
             String robortwxid = systemParamUtil.querySystemParam("ROBORTWXID");
             String SENDWATERLIST = systemParamUtil.querySystemParam("SENDWATERLIST");
             String msg = "亲爱的宝，记得多喝水喔，爱你喔";
@@ -851,8 +871,8 @@ public class WxServiceImpl implements WxService {
             for (int i = 0; i < list.length; i++) {
                 String from_wxid = list[i];
                 JSONObject content = new JSONObject();
-                content.put("robot_wxid",robortwxid);
-                content.put("from_wxid",from_wxid);
+                content.put("robot_wxid", robortwxid);
+                content.put("from_wxid", from_wxid);
                 weChatUtil.sendTextMsg(msg, content);
             }
         }
@@ -861,7 +881,7 @@ public class WxServiceImpl implements WxService {
     /**
      * 早上好
      */
-    public void handleGoodMorning(){
+    public void handleGoodMorning() {
 
     }
 
