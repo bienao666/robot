@@ -64,10 +64,60 @@ public class WxServiceImpl implements WxService {
         JSONObject content = message.getJSONObject("content");
         //发送人
         String from_wxid = content.getString("from_wxid");
+        String msg = content.getString("msg");
+
         //机器人
         String robortwxid = systemParamUtil.querySystemParam("ROBORTWXID");
         if (StringUtils.isEmpty(robortwxid)) {
             systemParamUtil.updateSystemParam("ROBORTWXID", content.getString("robot_wxid"));
+        }
+
+        //获取微信群号
+        String from_group = content.getString("from_group");
+
+        //监听群
+        if (msg.trim().equals("监听") && StringUtils.isNotEmpty(from_group) && weChatUtil.isMaster(content)){
+            Group group = groupMapper.queryGroupByGroupIdAndFunctionType(from_group, FunctionType.wxqjk);
+            if (group==null){
+                group = new Group();
+                group.setGroupid(from_group);
+                group.setGroupName(content.getString("from_group_name"));
+                group.setFunctionType(FunctionType.wxqjk);
+                int i = groupMapper.addGroup(group);
+                if (i == 0) {
+                    weChatUtil.sendTextMsg("监听失败", content);
+                } else {
+                    weChatUtil.sendTextMsg("开始监听", content);
+                    redis.remove("validGroups");
+                }
+            }else {
+                weChatUtil.sendTextMsg("开始监听",content);
+            }
+        }
+
+        //取消监听群
+        if (msg.trim().equals("取消监听") && StringUtils.isNotEmpty(from_group) && weChatUtil.isMaster(content)){
+            int i = groupMapper.deleteGroupByGroupIdAndFunctionType(from_group, FunctionType.wxqjk);
+            if (i > 0) {
+                weChatUtil.sendTextMsg("取消监听成功", content);
+                redis.remove("validGroups");
+            } else {
+                weChatUtil.sendTextMsg("未监听此群，无法取消", content);
+            }
+        }
+
+        if (StringUtils.isNotEmpty(from_group)){
+            //获取所有监听群号
+            String validGroups = redis.get("validGroups");
+            if (StringUtils.isEmpty(validGroups)){
+                List<Group> groups = groupMapper.queryGroupByFunctionType(FunctionType.wxqjk);
+                validGroups = StringUtils.join(groups,"#");
+                redis.put("validGroups",validGroups);
+            }
+            if (validGroups == null || !validGroups.contains(from_group)){
+                //此群不在监听范围内
+                return;
+            }
         }
 
         //查看当前会话
@@ -80,7 +130,6 @@ public class WxServiceImpl implements WxService {
 
         }
 
-        String msg = content.getString("msg");
         //系统参数
         if (msg.startsWith("设置") || msg.startsWith("启用") || msg.startsWith("关闭")) {
             handleSetSysParam(content);
@@ -88,6 +137,10 @@ public class WxServiceImpl implements WxService {
         //功能列表
         if (msg.equals("菜单")) {
             handleFunctionList(content);
+        }
+        //加群
+        if (msg.equals("加群") || msg.equals("进群")) {
+            handleAddGroup(content);
         }
         //饿了么
         if (msg.trim().equals("饿了么") || msg.trim().equals("elm")) {
@@ -179,6 +232,14 @@ public class WxServiceImpl implements WxService {
                 handleLast(content, num, publicKey);
             }
         }
+    }
+
+    /**
+     * 加群
+     * @param content
+     */
+    private void handleAddGroup(JSONObject content) {
+        weChatUtil.InviteInGroup(content);
     }
 
     /**
@@ -336,7 +397,7 @@ public class WxServiceImpl implements WxService {
     private void handleSetSysParam(JSONObject content) {
         String msg = content.getString("msg").replace("设置", "").replace("启用", "").replace("关闭", "").trim();
         String[] split = msg.split(" ");
-        if (split.length > 1) {
+        if (split.length >= 1) {
             if (StringUtils.isEmpty(systemParamUtil.querySystemParam("WXMASTERS")) && split[0].equals("微信管理员")) {
                 //第一次设置管理员
                 handleSetParam("WXMASTERS", split[1], content);
@@ -370,6 +431,10 @@ public class WxServiceImpl implements WxService {
                             break;
                         case "饿了么图片":
                             systemParamUtil.updateSystemParam("ELMURL", split[1]);
+                            weChatUtil.sendTextMsg("设置成功", content);
+                            break;
+                        case "官方群":
+                            systemParamUtil.updateSystemParam("OFFICIALGROUP", content.getString("from_group"));
                             weChatUtil.sendTextMsg("设置成功", content);
                             break;
                     }

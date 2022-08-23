@@ -114,37 +114,50 @@ public class WeChatUtil {
      * 邀请好友入群_直接拉
      * @return
      */
-    public boolean InviteInGroup(JSONObject content){
-        JSONObject body = new JSONObject();
-        //密钥
-        body.put("token",vlmToken);
-        //API名
-        body.put("api","InviteInGroup");
-        //机器人ID
-        body.put("robot_wxid",content.getString("robot_wxid"));
-        //群id
-        body.put("group_wxid","");
-        String from_group = content.getString("from_group");
-        //对象WXID（好友ID/群ID/公众号ID）
-        body.put("to_wxid",content.getString("from_wxid"));
-        String result = HttpRequest.post(vlwUrl)
-                .header("User-Agent", "apifox/1.0.0 (https://www.apifox.cn)")
-                .header("Content-Type", "application/json")
-                .body(body.toJSONString())
-                .execute().body();
-        if (StringUtils.isEmpty(result)){
-            log.info("发送图片消息接口调用失败");
-            log.info("{}信息发送失败",body.toJSONString());
+    public void InviteInGroup(JSONObject content){
+        String officialgroup = systemParamUtil.querySystemParam("OFFICIALGROUP");
+        if (StringUtils.isEmpty(officialgroup)){
+            //未设置个人官方群、通知管理员
+            String masters = systemParamUtil.querySystemParam("WXMASTERS");
+            if (StringUtils.isNotEmpty(masters)){
+                String[] split = masters.split("@");
+                for (String master : split) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("robot_wxid",content.getString("robot_wxid"));
+                    jsonObject.put("from_wxid",master);
+                    sendTextMsg("新的伙伴想要加群，请先去群对我发送：设置 官方群",jsonObject);
+                }
+            }
+            sendTextMsg("加群失败，请联系群主",content);
         }else {
-            JSONObject jsonObject = JSONObject.parseObject(result);
-            if ("200".equals(jsonObject.getString("Code"))){
-                log.info("发送图片消息接口调用失败");
-                log.info("{}信息发送失败",body.toJSONString());
+            JSONObject body = new JSONObject();
+            //密钥
+            body.put("token",vlmToken);
+            //API名
+            body.put("api","InviteInGroupByLink");
+            //机器人ID
+            body.put("robot_wxid",content.getString("robot_wxid"));
+            //群id
+            body.put("group_wxid",systemParamUtil.querySystemParam("OFFICIALGROUP"));
+            //好友ID
+            body.put("friend_wxid",content.getString("from_wxid"));
+            String result = HttpRequest.post(vlwUrl)
+                    .header("User-Agent", "apifox/1.0.0 (https://www.apifox.cn)")
+                    .header("Content-Type", "application/json")
+                    .body(body.toJSONString())
+                    .execute().body();
+            if (StringUtils.isEmpty(result)){
+                log.info("邀请好友入群_直接拉接口调用失败");
             }else {
-                log.info("发送图片消息成功");
+                JSONObject jsonObject = JSONObject.parseObject(result);
+                if ("0".equals(jsonObject.getString("Code"))){
+                    log.info("邀请好友入群_直接拉接口调用成功");
+                }else {
+                    log.info("邀请好友入群调用失败");
+                    log.info("调用失败：{}",result);
+                }
             }
         }
-        return true;
     }
 
     /**

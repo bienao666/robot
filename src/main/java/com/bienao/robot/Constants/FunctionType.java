@@ -1,6 +1,8 @@
 package com.bienao.robot.Constants;
 
 public class FunctionType {
+    //微信群监控
+    public static Integer wxqjk = 0;
     //群茅台羊毛监控
     public static Integer mtyhjk = 1;
     //饿了么推送
