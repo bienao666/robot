@@ -13,14 +13,23 @@ import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.weixin.WXConstant;
 import com.bienao.robot.entity.Festival;
 import com.bienao.robot.entity.SystemParam;
+import com.bienao.robot.entity.Weather;
 import com.bienao.robot.service.weixin.WxService;
+import com.bienao.robot.utils.CaiHongPiUtils;
 import com.bienao.robot.utils.HeFengWeatherUtil;
+import com.bienao.robot.utils.JiNianRiUtils;
+import com.bienao.robot.utils.WeatherUtils;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import com.bienao.robot.utils.weixin.QingLongGuanLiUtil;
 import com.bienao.robot.utils.weixin.WeChatUtil;
 import com.google.common.collect.EvictingQueue;
 import com.nlf.calendar.Lunar;
 import lombok.extern.slf4j.Slf4j;
+import me.chanjar.weixin.mp.api.WxMpInMemoryConfigStorage;
+import me.chanjar.weixin.mp.api.WxMpService;
+import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
+import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
+import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -643,6 +652,7 @@ public class WxServiceImpl implements WxService {
     /**
      * 喝水
      */
+    @Override
     public void handleWater(){
         String issendwater = systemParamUtil.querySystemParam("ISSENDWATER");
         if ("1".equals(issendwater)){
@@ -657,6 +667,58 @@ public class WxServiceImpl implements WxService {
                 content.put("from_wxid",from_wxid);
                 weChatUtil.sendTextMsg(msg, content);
             }
+        }
+    }
+
+    /**
+     * 早上好
+     */
+    public void goodMorning(){
+        //1，配置
+        WxMpInMemoryConfigStorage wxStorage = new WxMpInMemoryConfigStorage();
+        wxStorage.setAppId("");
+        wxStorage.setSecret("");
+        WxMpService wxMpService = new WxMpServiceImpl();
+        wxMpService.setWxMpConfigStorage(wxStorage);
+        //2,推送消息
+        WxMpTemplateMessage templateMessage = WxMpTemplateMessage.builder()
+                .toUser("用户微信id")
+                .templateId("消息模板id")
+                .build();
+        //3,如果是正式版发送模版消息，这里需要配置你的信息
+        Weather weather = WeatherUtils.getWeather();
+        Map<String, String> map = CaiHongPiUtils.getEnsentence();
+        templateMessage.addData(new WxMpTemplateData("riqi",weather.getDate() + "  "+ weather.getWeek(),"#00BFFF"));
+        templateMessage.addData(new WxMpTemplateData("tianqi",weather.getText_now(),"#00FFFF"));
+        templateMessage.addData(new WxMpTemplateData("low",weather.getLow() + "","#173177"));
+        templateMessage.addData(new WxMpTemplateData("temp",weather.getTemp() + "","#EE212D"));
+        templateMessage.addData(new WxMpTemplateData("high",weather.getHigh()+ "","#FF6347" ));
+        templateMessage.addData(new WxMpTemplateData("windclass",weather.getWind_class()+ "","#42B857" ));
+        templateMessage.addData(new WxMpTemplateData("winddir",weather.getWind_dir()+ "","#B95EA3" ));
+        templateMessage.addData(new WxMpTemplateData("caihongpi",CaiHongPiUtils.getCaiHongPi(),"#FF69B4"));
+        templateMessage.addData(new WxMpTemplateData("lianai", JiNianRiUtils.getLianAi()+"","#FF1493"));
+        templateMessage.addData(new WxMpTemplateData("shengri1",JiNianRiUtils.getBirthday_Jo()+"","#FFA500"));
+        templateMessage.addData(new WxMpTemplateData("shengri2",JiNianRiUtils.getBirthday_Hui()+"","#FFA500"));
+        templateMessage.addData(new WxMpTemplateData("en",map.get("en") +"","#C71585"));
+        templateMessage.addData(new WxMpTemplateData("zh",map.get("zh") +"","#C71585"));
+        String beizhu = "❤";
+        if(JiNianRiUtils.getLianAi() % 365 == 0){
+            beizhu = "今天是恋爱" + (JiNianRiUtils.getLianAi() / 365) + "周年纪念日！";
+        }
+        if(JiNianRiUtils.getBirthday_Jo()  == 0){
+            beizhu = "今天是生日，生日快乐呀！";
+        }
+        if(JiNianRiUtils.getBirthday_Hui()  == 0){
+            beizhu = "今天是生日，生日快乐呀！";
+        }
+        templateMessage.addData(new WxMpTemplateData("beizhu",beizhu,"#FF0000"));
+
+        try {
+            System.out.println(templateMessage.toJson());
+            System.out.println(wxMpService.getTemplateMsgService().sendTemplateMsg(templateMessage));
+        } catch (Exception e) {
+            System.out.println("推送失败：" + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
