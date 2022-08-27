@@ -142,6 +142,10 @@ public class WxServiceImpl implements WxService {
         if (msg.equals("加群") || msg.equals("进群")) {
             handleAddGroup(content);
         }
+        //登陆
+        if (msg.equals("登陆") || msg.equals("登录"))  {
+            handleJdLogin(content);
+        }
         //饿了么
         if (msg.trim().equals("饿了么") || msg.trim().equals("elm")) {
             handleELM(content);
@@ -231,6 +235,19 @@ public class WxServiceImpl implements WxService {
             if (num <= 50 && StringUtils.isNotEmpty(publicKey)) {
                 handleLast(content, num, publicKey);
             }
+        }
+    }
+
+    /**
+     * 京东登陆
+     * @param content
+     */
+    private void handleJdLogin(JSONObject content) {
+        String jdlonginurl = systemParamUtil.querySystemParam("JDLONGINURL");
+        if (StringUtils.isEmpty(jdlonginurl)){
+            weChatUtil.sendTextMsg("尚未设置京东登陆地址",content);
+        }else {
+            weChatUtil.sendTextMsg(jdlonginurl,content);
         }
     }
 
@@ -435,6 +452,14 @@ public class WxServiceImpl implements WxService {
                             break;
                         case "官方群":
                             systemParamUtil.updateSystemParam("OFFICIALGROUP", content.getString("from_group"));
+                            weChatUtil.sendTextMsg("设置成功", content);
+                            break;
+                        case "京东登陆":
+                            systemParamUtil.updateSystemParam("JDLONGINURL", split[1]);
+                            weChatUtil.sendTextMsg("设置成功", content);
+                            break;
+                        case "京东登录":
+                            systemParamUtil.updateSystemParam("JDLONGINURL", split[1]);
                             weChatUtil.sendTextMsg("设置成功", content);
                             break;
                     }
