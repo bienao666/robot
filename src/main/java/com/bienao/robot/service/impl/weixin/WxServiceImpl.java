@@ -745,7 +745,7 @@ public class WxServiceImpl implements WxService {
     }
 
     public void handleLastWeiBo(JSONObject content, Integer num) {
-        String bandListStr = systemParamUtil.querySystemParam("WbBandLists");
+        String bandListStr = redis.get("WbBandLists");
         List<JSONObject> bandLists = JSONArray.parseArray(bandListStr, JSONObject.class);
         int index = 1;
         for (JSONObject band : bandLists) {
