@@ -693,6 +693,7 @@ public class WxServiceImpl implements WxService {
     /**
      * 饿了么定时
      */
+    @Override
     public void timeHandleELM() {
         String elmurl = systemParamUtil.querySystemParam("ELMURL");
         if (StringUtils.isNotEmpty(elmurl)) {
@@ -958,6 +959,7 @@ public class WxServiceImpl implements WxService {
     /**
      * 喝水
      */
+    @Override
     public void handleWater(){
         String issendwater = systemParamUtil.querySystemParam("ISSENDWATER");
         if ("1".equals(issendwater)) {

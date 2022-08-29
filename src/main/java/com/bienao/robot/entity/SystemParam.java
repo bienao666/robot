@@ -2,11 +2,13 @@ package com.bienao.robot.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class SystemParam {
     //序号
     private Integer id;
