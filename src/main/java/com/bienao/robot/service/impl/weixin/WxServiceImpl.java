@@ -677,7 +677,7 @@ public class WxServiceImpl implements WxService {
         //1，配置
         WxMpInMemoryConfigStorage wxStorage = new WxMpInMemoryConfigStorage();
         wxStorage.setAppId("");
-        wxStorage.setSecret("");
+        wxStorage.setSecret(" ");
         WxMpService wxMpService = new WxMpServiceImpl();
         wxMpService.setWxMpConfigStorage(wxStorage);
         //2,推送消息
