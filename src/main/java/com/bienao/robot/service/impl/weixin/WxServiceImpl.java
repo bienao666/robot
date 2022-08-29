@@ -682,7 +682,7 @@ public class WxServiceImpl implements WxService {
         wxMpService.setWxMpConfigStorage(wxStorage);
         //2,推送消息
         WxMpTemplateMessage templateMessage = WxMpTemplateMessage.builder()
-                .toUser("用户微信id")
+                .toUser("用户 微信id")
                 .templateId("消息模板id")
                 .build();
         //3,如果是正式版发送模版消息，这里需要配置你的信息
