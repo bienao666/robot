@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bienao.robot.mapper.QlMapper">
+
+    <insert id="addQl" parameterType="com.alibaba.fastjson.JSONObject">
+        insert into ql(url,clientID,clientSecret) values (#{url},#{clientID},#{clientSecret})
+    </insert>
+
+    <select id="queryQl" parameterType="string" resultType="com.alibaba.fastjson.JSONObject">
+        select * from ql where id=#{id}
+    </select>
+
+    <select id="queryQlByUrl" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.alibaba.fastjson.JSONObject">
+        select * from ql where url=#{url}
+    </select>
+
+    <select id="queryQls" resultType="java.util.List">
+        select * from ql
+    </select>
+
+    <update id="updateQl" parameterType="com.alibaba.fastjson.JSONObject">
+        update ql
+        <set>
+            <if test="url !=null and url !=''">
+                url=#{url},
+            </if>
+            <if test="clientID !=null and clientID !=''">
+                clientID=#{clientID},
+            </if>
+            <if test="clientSecret !=null and clientSecret !=''">
+                clientSecret=#{clientSecret},
+            </if>
+            <if test="updatedTime !=null">
+                updated_time=#{updatedTime},
+            </if>
+
+        </set>
+        where id=#{id};
+    </update>
+
+
+</mapper>
