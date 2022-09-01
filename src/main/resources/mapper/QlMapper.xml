@@ -17,7 +17,10 @@
     </select>
 
     <select id="queryQls" resultType="java.util.List">
-        select * from ql
+        select * from ql where 1=1
+        <if test="id !=null and id !=''">
+            and id=#{id}
+        </if>
     </select>
 
     <update id="updateQl" parameterType="com.alibaba.fastjson.JSONObject">

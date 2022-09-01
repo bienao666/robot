@@ -93,8 +93,8 @@ public class QlServiceImpl implements QlService {
      * @return
      */
     @Override
-    public Result queryQls(){
-        List<JSONObject> qls = qlMapper.queryQls();
+    public Result queryQls(String id){
+        List<JSONObject> qls = qlMapper.queryQls(id);
         for (JSONObject ql : qls) {
             JSONObject jsonObject = qlUtil.getToken(ql.getString("url"), ql.getString("clientID"), ql.getString("clientSecret"));
             if (jsonObject == null) {
@@ -104,20 +104,6 @@ public class QlServiceImpl implements QlService {
             }
         }
         return Result.success(qls);
-    }
-
-    /**
-     * 查询青龙
-     * @return
-     */
-    @Override
-    public Result queryQl(String id){
-        JSONObject ql = qlMapper.queryQl(id);
-        if (ql==null){
-            return Result.error(ErrorCodeConstant.QINGLONG_NOT_EXSIT_ERROR,"青龙不存在");
-        }else {
-            return Result.success(ql);
-        }
     }
 
     /**

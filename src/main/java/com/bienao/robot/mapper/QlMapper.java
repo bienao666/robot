@@ -18,13 +18,6 @@ public interface QlMapper {
 
     /**
      * 查询青龙
-     * @param id
-     * @return
-     */
-    JSONObject queryQl(String id);
-
-    /**
-     * 查询青龙
      * @param url
      * @return
      */
@@ -34,7 +27,7 @@ public interface QlMapper {
      * 查询青龙
      * @return
      */
-    List<JSONObject> queryQls();
+    List<JSONObject> queryQls(String id);
 
     /**
      * 修改青龙

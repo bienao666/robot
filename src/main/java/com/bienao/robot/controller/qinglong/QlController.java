@@ -31,21 +31,12 @@ public class QlController {
     }
 
     /**
-     * 查询所有青龙
-     * @return
-     */
-    @GetMapping("/queryQls")
-    public Result queryQls(){
-        return qlService.queryQls();
-    }
-
-    /**
      * 查询青龙
      * @return
      */
-    @GetMapping("/queryQl")
-    public Result queryQl(@RequestParam String url){
-        return qlService.queryQl(url);
+    @GetMapping("/queryQls")
+    public Result queryQls(@RequestParam(value = "id",required = false) String id){
+        return qlService.queryQls(id);
     }
 
     /**

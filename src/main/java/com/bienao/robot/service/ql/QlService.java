@@ -22,14 +22,7 @@ public interface QlService {
      * 查询所有青龙
      * @return
      */
-    Result queryQls();
-
-    /**
-     * 查询青龙
-     * @param url
-     * @return
-     */
-    Result queryQl(String url);
+    Result queryQls(String id);
 
     /**
      * 更新青龙
