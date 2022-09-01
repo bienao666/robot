@@ -47,4 +47,13 @@ public class QlController {
     public Result updateQl(@RequestBody JSONObject jsonObject){
         return qlService.updateQl(jsonObject);
     }
+
+    /**
+     * 查询脚本
+     * @return
+     */
+    @GetMapping("/queryScripts")
+    public Result queryScripts(@RequestBody JSONObject jsonObject){
+        return qlService.queryScripts();
+    }
 }

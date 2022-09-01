@@ -29,4 +29,10 @@ public interface QlService {
      * @param ql
      */
     Result updateQl(JSONObject ql);
+
+    /**
+     * 查询脚本
+     * @return
+     */
+    Result queryScripts();
 }

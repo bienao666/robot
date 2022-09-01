@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -149,5 +150,28 @@ public class QlServiceImpl implements QlService {
         }else {
             return Result.error(ErrorCodeConstant.QINGLONG_UPDATE_ERROR,"青龙修改失败");
         }
+    }
+
+    /**
+     * 查询脚本
+     * @return
+     */
+    public Result queryScripts(){
+        HashSet<JSONObject> scripts = new HashSet<>();
+        List<JSONObject> qls = qlMapper.queryQls(null);
+        for (JSONObject ql : qls) {
+            try {
+                String url = ql.getString("url");
+                String clientId = ql.getString("clientId");
+                String clientSecret = ql.getString("clientSecret");
+                JSONObject tokenJson = qlUtil.getToken(url, clientId, clientSecret);
+                String token = tokenJson.getString("token");
+                String tokenType = tokenJson.getString("token_type");
+                List<JSONObject> crons = qlUtil.getCrons(url, tokenType, token);
+            } catch (Exception e) {
+                log.error("查询脚本失败",e);
+            }
+        }
+        return Result.success();
     }
 }
