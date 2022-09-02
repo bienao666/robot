@@ -32,6 +32,8 @@ create table if not exists `ql` (
                                        url varchar UNIQUE,
                                        clientID varchar,
                                        clientSecret INTEGER,
+                                       head varchar,
+                                       remark varchar,
                                        created_time datetime DEFAULT CURRENT_TIMESTAMP,
                                        updated_time datetime DEFAULT CURRENT_TIMESTAMP
 );

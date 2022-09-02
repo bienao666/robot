@@ -50,10 +50,18 @@ public final class ErrorCodeConstant {
     public static final String QINGLONG_UPDATE_ERROR="30005";
 
     /**
+     *青龙修改失败
+     */
+    public static final String QINGLONG_DELETE_ERROR="30005";
+
+    /**
      *接口调用失败
      */
     public static final String INTERFACE_CALL_ERROR="30005";
 
-
+    /**
+     *系统参数操作失败
+     */
+    public static final String SYSTEMPARAM_ERROR="30006";
 
 }

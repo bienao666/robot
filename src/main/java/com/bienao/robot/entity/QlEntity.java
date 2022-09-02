@@ -23,6 +23,12 @@ public class QlEntity {
     //clientSecret
     private String clientSecret;
 
+    //车头
+    private String head;
+
+    //备注
+    private String remark;
+
     //青龙状态
     private String status;
 

@@ -238,7 +238,7 @@ public class QingLongGuanLiUtil {
                     addql = JSONObject.parseObject(addqlStr);
                     qls.add(addql);
                     qlgl.put("qls", qls);
-                    flag = systemParamUtil.updateSystemParam("qlConfig", qlgl.toJSONString());
+                    flag = systemParamUtil.updateSystemParam("qlConfig","青龙配置", qlgl.toJSONString());
                     if (flag) {
                         weChatUtil.sendTextMsg("保存成功", content);
                     } else {
@@ -253,7 +253,7 @@ public class QingLongGuanLiUtil {
                 case "saveQlgl":
                     //青龙-保存
                     qlglStr = redis.get(content.getString("from_wxid") + "qlgl");
-                    flag = systemParamUtil.updateSystemParam("qlConfig", qlglStr);
+                    flag = systemParamUtil.updateSystemParam("qlConfig","青龙配置", qlglStr);
                     if (flag) {
                         weChatUtil.sendTextMsg("保存成功", content);
                     } else {

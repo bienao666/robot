@@ -27,7 +27,7 @@ public class SystemParamUtil {
      */
     public String querySystemParam(String code){
         if (sysParamRedis.size()==0){
-            List<SystemParam> systemParams = systemParamMapper.querySystems();
+            List<SystemParam> systemParams = systemParamMapper.querySystems(null);
             for (SystemParam systemParam : systemParams) {
                 sysParamRedis.put(systemParam.getCode(),systemParam.getValue(), DateUnit.DAY.getMillis());
             }
@@ -44,6 +44,15 @@ public class SystemParamUtil {
                 return null;
             }
         }
+    }
+
+    /**
+     * 查询系统参数
+     * @param code
+     * @return
+     */
+    public List<SystemParam> querySystemParams(String code){
+        return systemParamMapper.querySystems(code);
     }
 
     /**
@@ -67,9 +76,10 @@ public class SystemParamUtil {
      * @param value
      * @return
      */
-    public boolean updateSystemParam(String code,String value){
+    public boolean updateSystemParam(String code,String codeName,String value){
         SystemParam systemParam = new SystemParam();
         systemParam.setCode(code);
+        systemParam.setCodeName(codeName);
         systemParam.setValue(value);
         systemParam.setUpdatedTime(new Date());
         int i = systemParamMapper.updateSystemParam(systemParam);

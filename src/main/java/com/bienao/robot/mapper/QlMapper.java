@@ -28,7 +28,7 @@ public interface QlMapper {
      * 查询青龙
      * @return
      */
-    List<QlEntity> queryQls(String id);
+    List<QlEntity> queryQls(List<Integer> ids);
 
     /**
      * 修改青龙
@@ -36,5 +36,11 @@ public interface QlMapper {
      * @return
      */
     int updateQl(QlEntity ql);
+
+    /**
+     * 删除青龙
+     * @return
+     */
+    int deleteQls(List<Integer> ids);
 
 }

@@ -5,7 +5,7 @@
 <mapper namespace="com.bienao.robot.mapper.QlMapper">
 
     <insert id="addQl" parameterType="qlEntity">
-        insert into ql(url,clientID,clientSecret) values (#{url},#{clientID},#{clientSecret})
+        insert into ql(url,clientID,clientSecret,head,remark) values (#{url},#{clientID},#{clientSecret},#{head},#{remark})
     </insert>
 
     <select id="queryQl" parameterType="string" resultType="qlEntity">
@@ -18,10 +18,21 @@
 
     <select id="queryQls" resultType="qlEntity">
         select * from ql where 1=1
-        <if test="id !=null and id !=''">
-            and id=#{id}
+        <if test="ids !=null and ids.size()>0">
+            and id in
+            <foreach collection="list" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
         </if>
+        order by id
     </select>
+
+    <delete id="deleteQls">
+        delete from ql where 1=1 and id in
+            <foreach collection="list" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+    </delete>
 
     <update id="updateQl" parameterType="qlEntity">
         update ql
@@ -34,6 +45,12 @@
             </if>
             <if test="clientSecret !=null and clientSecret !=''">
                 clientSecret=#{clientSecret},
+            </if>
+            <if test="head !=null and head !=''">
+                head=#{head},
+            </if>
+            <if test="remark !=null and remark !=''">
+                remark=#{remark},
             </if>
             <if test="updatedTime !=null">
                 updated_time=#{updatedTime},

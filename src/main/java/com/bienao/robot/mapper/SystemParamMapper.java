@@ -9,10 +9,10 @@ import java.util.List;
 public interface SystemParamMapper {
 
     /**
-     * 查询所有的参数
+     * 查询参数
      * @return
      */
-    List<SystemParam> querySystems();
+    List<SystemParam> querySystems(String code);
 
     /**
      * 查询参数

@@ -4,7 +4,11 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bienao.robot.mapper.SystemParamMapper">
     <select id="querySystems" resultType="systemParam">
-        select * from systemParam
+        select * from systemParam where 1=1
+        <if test="code !=null and code !=''">
+            code=#{code}
+        </if>
+        order by id
     </select>
 
     <select id="querySystem" parameterType="string" resultType="systemParam">
@@ -16,7 +20,19 @@
     </insert>
 
     <update id="updateSystemParam" parameterType="systemParam">
-        update systemParam set value=#{value},updated_time=#{updatedTime} where code=#{code};
+        update systemParam
+        <set>
+            <if test="value !=null">
+                value=#{value},
+            </if>
+            <if test="codeName !=null and codeName !=''">
+                codeName=#{codeName},
+            </if>
+            <if test="updatedTime !=null">
+                updated_time=#{updatedTime},
+            </if>
+        </set>
+        where code=#{code};
     </update>
 
     <delete id="deleteSystemParam" parameterType="string">

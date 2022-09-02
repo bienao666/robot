@@ -5,6 +5,8 @@ import com.bienao.robot.entity.QlEntity;
 import com.bienao.robot.result.Result;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
+
 public interface QlService {
 
     /**
@@ -23,7 +25,7 @@ public interface QlService {
      * 查询所有青龙
      * @return
      */
-    Result queryQls(String id);
+    Result queryQls(List<Integer> ids);
 
     /**
      * 更新青龙
@@ -35,5 +37,19 @@ public interface QlService {
      * 查询脚本
      * @return
      */
-    Result queryScripts();
+    Result queryScripts(String key);
+
+    /**
+     * 执行脚本
+     * @param command
+     * @return
+     */
+    Result runScript(String command, List<Integer> ids);
+
+    /**
+     * 删除青龙
+     * @param ids
+     * @return
+     */
+    Result deleteQls(List<Integer> ids);
 }

@@ -78,7 +78,7 @@ public class WxServiceImpl implements WxService {
         //机器人
         String robortwxid = systemParamUtil.querySystemParam("ROBORTWXID");
         if (StringUtils.isEmpty(robortwxid)) {
-            systemParamUtil.updateSystemParam("ROBORTWXID", content.getString("robot_wxid"));
+            systemParamUtil.updateSystemParam("ROBORTWXID","机器人", content.getString("robot_wxid"));
         }
 
         //获取微信群号
@@ -426,49 +426,45 @@ public class WxServiceImpl implements WxService {
         if (split.length >= 1) {
             if (StringUtils.isEmpty(systemParamUtil.querySystemParam("WXMASTERS")) && split[0].equals("微信管理员")) {
                 //第一次设置管理员
-                handleSetParam("WXMASTERS", split[1], content);
+                handleSetParam("WXMASTERS", "微信管理员", split[1], content);
             } else {
                 boolean flag = weChatUtil.isMaster(content);
                 if (flag) {
                     switch (split[0]) {
                         case "微信管理员":
-                            handleSetParam("WXMASTERS", split[1], content);
+                            handleSetParam("WXMASTERS","微信管理员", split[1], content);
                             break;
                         case "天行key":
-                            systemParamUtil.updateSystemParam("TIANXINGKEY", split[1]);
+                            systemParamUtil.updateSystemParam("TIANXINGKEY","天行key", split[1]);
                             weChatUtil.sendTextMsg("设置成功", content);
                             break;
                         case "和风key":
-                            systemParamUtil.updateSystemParam("HEFENGKEY", split[1]);
+                            systemParamUtil.updateSystemParam("HEFENGKEY","和风key", split[1]);
                             weChatUtil.sendTextMsg("设置成功", content);
                             break;
                         case "喝水提醒":
-                            systemParamUtil.updateSystemParam("ISSENDWATER", split[1]);
+                            systemParamUtil.updateSystemParam("ISSENDWATER","喝水提醒", split[1]);
                             weChatUtil.sendTextMsg("设置成功", content);
                             break;
                         case "喝水提醒推送":
-                            handleSetParam("SENDWATERLIST", split[1], content);
+                            handleSetParam("SENDWATERLIST","喝水提醒推送", split[1], content);
                             break;
                         case "微博推送":
-                            handleSetParam("SENDWEIBOLIST", split[1], content);
+                            handleSetParam("SENDWEIBOLIST","微博推送", split[1], content);
                             break;
                         case "摸鱼推送":
-                            handleSetParam("SENDMOYULIST", split[1], content);
+                            handleSetParam("SENDMOYULIST","摸鱼推送", split[1], content);
                             break;
                         case "饿了么图片":
-                            systemParamUtil.updateSystemParam("ELMURL", split[1]);
+                            systemParamUtil.updateSystemParam("ELMURL","饿了么图片", split[1]);
                             weChatUtil.sendTextMsg("设置成功", content);
                             break;
                         case "官方群":
-                            systemParamUtil.updateSystemParam("OFFICIALGROUP", content.getString("from_group"));
+                            systemParamUtil.updateSystemParam("OFFICIALGROUP","官方群", content.getString("from_group"));
                             weChatUtil.sendTextMsg("设置成功", content);
                             break;
                         case "京东登陆":
-                            systemParamUtil.updateSystemParam("JDLONGINURL", split[1]);
-                            weChatUtil.sendTextMsg("设置成功", content);
-                            break;
-                        case "京东登录":
-                            systemParamUtil.updateSystemParam("JDLONGINURL", split[1]);
+                            systemParamUtil.updateSystemParam("JDLONGINURL","京东登陆", split[1]);
                             weChatUtil.sendTextMsg("设置成功", content);
                             break;
                     }
@@ -522,7 +518,7 @@ public class WxServiceImpl implements WxService {
      *
      * @param content
      */
-    public void handleSetParam(String code, String value, JSONObject content) {
+    public void handleSetParam(String code,String name, String value, JSONObject content) {
         //发送人
         String oldValue = systemParamUtil.querySystemParam(code);
         if (!oldValue.contains(value)) {
@@ -532,7 +528,7 @@ public class WxServiceImpl implements WxService {
             } else {
                 oldValue = oldValue + "#" + value;
             }
-            boolean flag = systemParamUtil.updateSystemParam(code, oldValue);
+            boolean flag = systemParamUtil.updateSystemParam(code, name, oldValue);
             if (flag) {
                 weChatUtil.sendTextMsg("设置成功", content);
             } else {

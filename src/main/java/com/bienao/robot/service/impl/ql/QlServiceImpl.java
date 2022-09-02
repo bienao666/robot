@@ -76,6 +76,14 @@ public class QlServiceImpl implements QlService {
         if (clientSecret.length()>50){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"clientSecret长度异常");
         }
+        String remark = ql.getRemark();
+        if (remark.length()>50){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"remark长度异常");
+        }
+        String head = ql.getHead();
+        if (head.length()>20){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"head长度异常");
+        }
 
         QlEntity result = qlMapper.queryQlByUrl(url);
         if (result == null){
@@ -95,8 +103,8 @@ public class QlServiceImpl implements QlService {
      * @return
      */
     @Override
-    public Result queryQls(String id){
-        List<QlEntity> qls = qlMapper.queryQls(id);
+    public Result queryQls(List<Integer> ids){
+        List<QlEntity> qls = qlMapper.queryQls(ids);
         for (QlEntity ql : qls) {
             JSONObject jsonObject = qlUtil.getToken(ql.getUrl(), ql.getClientID(), ql.getClientSecret());
             if (jsonObject == null) {
@@ -139,6 +147,14 @@ public class QlServiceImpl implements QlService {
         if (clientSecret.length()>50){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"clientSecret长度异常");
         }
+        String remark = ql.getRemark();
+        if (remark.length()>50){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"remark长度异常");
+        }
+        String head = ql.getHead();
+        if (head.length()>20){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"head长度异常");
+        }
 
         ql.setUpdatedTime(new Date());
 
@@ -151,11 +167,25 @@ public class QlServiceImpl implements QlService {
     }
 
     /**
+     * 删除青龙
+     * @param ids
+     * @return
+     */
+    public Result deleteQls(List<Integer> ids){
+        int i = qlMapper.deleteQls(ids);
+        if (i==0){
+            return Result.error(ErrorCodeConstant.QINGLONG_DELETE_ERROR,"青龙删除异常");
+        }else {
+            return Result.success("删除成功");
+        }
+    }
+
+    /**
      * 查询脚本
      * @return
      */
     @Override
-    public Result queryScripts(){
+    public Result queryScripts(String key){
         HashSet<JSONObject> scripts = new HashSet<>();
         List<QlEntity> qls = qlMapper.queryQls(null);
         for (QlEntity ql : qls) {
@@ -172,18 +202,67 @@ public class QlServiceImpl implements QlService {
                 }
                 for (JSONObject cron : crons) {
                     JSONObject script = new JSONObject();
-                    script.put("name",cron.getString("name"));
+                    String name = cron.getString("name");
+                    script.put("name",name);
                     String command = cron.getString("command").replace("task ","");
-                    if (command.contains("/")){
-                        command = command.split("/")[1];
-                    }
                     script.put("command",command);
-                    scripts.add(script);
+                    if (StringUtils.isNotEmpty(key)){
+                        if (name.contains(key)||command.contains(key)){
+                            scripts.add(script);
+                        }
+                    }else {
+                        scripts.add(script);
+                    }
                 }
             } catch (Exception e) {
                 log.error("查询脚本失败",e);
             }
         }
         return Result.success(scripts);
+    }
+
+    /**
+     * 执行脚本
+     * @param command
+     * @return
+     */
+    @Override
+    public Result runScript(String command, List<Integer> ids) {
+        ArrayList<String> list = new ArrayList<>();
+        List<QlEntity> qls = qlMapper.queryQls(ids);
+        for (QlEntity ql : qls) {
+            String remark = ql.getRemark();
+            String url = ql.getUrl();
+            try {
+                JSONObject tokenJson = qlUtil.getToken(url, ql.getClientID(), ql.getClientSecret());
+                String token = tokenJson.getString("token");
+                String tokenType = tokenJson.getString("token_type");
+                List<JSONObject> crons = qlUtil.getCrons(url, tokenType, token);
+                Integer old = list.size();
+                for (JSONObject cron : crons) {
+                    String name = cron.getString("name");
+                    if (cron.getString("command").contains(command)){
+                        Integer id = cron.getInteger("id");
+                        List<Integer> cronIds = new ArrayList<>();
+                        cronIds.add(id);
+                        boolean flag = qlUtil.runCron(url, tokenType, token, cronIds);
+                        if (flag){
+                            list.add(url + "(" + remark + ")" + " 执行" + command + "(" + name + ")" + " 成功");
+                        }else {
+                            list.add(url + "(" + remark + ")" + " 执行" + command + "(" + name + ")" + " 失败");
+                        }
+                        break;
+                    }
+                }
+                Integer now = list.size();
+                if (now==old){
+                    list.add(url + "(" + remark + ")" + command + " 脚本不存在");
+                }
+            } catch (Exception e) {
+                list.add(url + "(" + remark + ")" + " 执行" +  command + " 失败："+e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return Result.success(list);
     }
 }
