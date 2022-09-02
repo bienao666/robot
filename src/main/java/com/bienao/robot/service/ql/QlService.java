@@ -1,6 +1,7 @@
 package com.bienao.robot.service.ql;
 
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.entity.QlEntity;
 import com.bienao.robot.result.Result;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -16,7 +17,7 @@ public interface QlService {
      * 添加青龙
      * @param ql
      */
-    Result addQl(JSONObject ql);
+    Result addQl(QlEntity ql);
 
     /**
      * 查询所有青龙
@@ -28,7 +29,7 @@ public interface QlService {
      * 更新青龙
      * @param ql
      */
-    Result updateQl(JSONObject ql);
+    Result updateQl(QlEntity ql);
 
     /**
      * 查询脚本

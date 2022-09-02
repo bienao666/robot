@@ -53,7 +53,7 @@ public class QlUtil {
      * @return
      */
     public List<JSONObject> getEnvs(String url,String tokenType,String token){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -88,7 +88,7 @@ public class QlUtil {
      * @return
      */
     public boolean addEnvs(String url,String tokenType,String token,String name,String value,String remarks){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -129,7 +129,7 @@ public class QlUtil {
      * @return
      */
     public boolean updateEnvs(String url,String tokenType,String token,String name,String value,String remarks){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -168,7 +168,7 @@ public class QlUtil {
      * @return
      */
     public boolean deleteEnvs(String url,String tokenType,String token,List<Integer> ids){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -201,7 +201,7 @@ public class QlUtil {
      * @return
      */
     public JSONObject getEnvById(String url,String tokenType,String token,String id){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -236,7 +236,7 @@ public class QlUtil {
      * @return
      */
     public JSONObject moveEnv(String url,String tokenType,String token,String id,Integer fromIndex,Integer toIndex){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -273,7 +273,7 @@ public class QlUtil {
      * @return
      */
     public boolean disableEnv(String url,String tokenType,String token,List<Integer> ids){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -306,7 +306,7 @@ public class QlUtil {
      * @return
      */
     public boolean enableEnv(String url,String tokenType,String token,List<Integer> ids){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -338,7 +338,7 @@ public class QlUtil {
      * @return
      */
     public List<JSONObject> getFiles(String url,String tokenType,String token){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -371,7 +371,7 @@ public class QlUtil {
      * @return
      */
     public JSONObject getFile(String url,String tokenType,String token,String file){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -405,7 +405,7 @@ public class QlUtil {
      * @return
      */
     public JSONObject saveFile(String url,String tokenType,String token,String name,String content){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -441,7 +441,7 @@ public class QlUtil {
      * @return
      */
     public List<JSONObject> getLogs(String url, String tokenType, String token){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -475,7 +475,7 @@ public class QlUtil {
      * @return
      */
     public JSONObject getLog(String url, String tokenType, String token,String dir,String file){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -508,7 +508,7 @@ public class QlUtil {
      * @return
      */
     public JSONObject getLog(String url, String tokenType, String token,String file){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -540,7 +540,7 @@ public class QlUtil {
      * @return
      */
     public List<JSONObject> getCrons(String url, String tokenType, String token){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -576,7 +576,7 @@ public class QlUtil {
      * @return
      */
     public boolean addCron(String url, String tokenType, String token,String command,String schedule,String name,String labels){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -618,7 +618,7 @@ public class QlUtil {
      * @return
      */
     public boolean updateCron(String url, String tokenType, String token,String command,String schedule,String name,String labels,Integer id){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -657,7 +657,7 @@ public class QlUtil {
      * @return
      */
     public boolean deleteCron(String url, String tokenType, String token,List<Integer> ids){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -690,7 +690,7 @@ public class QlUtil {
      * @return
      */
     public JSONObject deleteCron(String url, String tokenType, String token,Integer id){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -723,7 +723,7 @@ public class QlUtil {
      * @return
      */
     public boolean runCron(String url, String tokenType, String token,List<Integer> ids){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -756,7 +756,7 @@ public class QlUtil {
      * @return
      */
     public boolean stopCron(String url, String tokenType, String token,List<Integer> ids){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -790,7 +790,7 @@ public class QlUtil {
      * @return
      */
     public boolean addLabels(String url, String tokenType, String token,Integer id,String label){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -827,7 +827,7 @@ public class QlUtil {
      * @return
      */
     public boolean deleteLabels(String url, String tokenType, String token,Integer id,String label){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -863,7 +863,7 @@ public class QlUtil {
      * @return
      */
     public boolean disableCrons(String url, String tokenType, String token,List<Integer> ids){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -896,7 +896,7 @@ public class QlUtil {
      * @return
      */
     public boolean enableCrons(String url, String tokenType, String token,List<Integer> ids){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -929,7 +929,7 @@ public class QlUtil {
      * @return
      */
     public boolean pinCrons(String url, String tokenType, String token,List<Integer> ids){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -962,7 +962,7 @@ public class QlUtil {
      * @return
      */
     public boolean unpinCrons(String url, String tokenType, String token,List<Integer> ids){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -994,7 +994,7 @@ public class QlUtil {
      * @return
      */
     public List<JSONObject> getScripts(String url, String tokenType, String token){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -1030,7 +1030,7 @@ public class QlUtil {
      * @return
      */
     public boolean addScript(String url, String tokenType, String token,String filename,String path,String content,String originFilename){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -1070,7 +1070,7 @@ public class QlUtil {
      * @return
      */
     public boolean updateScript(String url, String tokenType, String token,String filename,String path,String content){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -1108,7 +1108,7 @@ public class QlUtil {
      * @return
      */
     public boolean deleteScript(String url, String tokenType, String token,String filename,String path){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -1144,7 +1144,7 @@ public class QlUtil {
      * @return
      */
     public boolean downloadScript(String url, String tokenType, String token,String filename){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -1180,7 +1180,7 @@ public class QlUtil {
      * @return
      */
     public boolean runScript(String url, String tokenType, String token,String filename,String path){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -1217,7 +1217,7 @@ public class QlUtil {
      * @return
      */
     public boolean stopScript(String url, String tokenType, String token,String filename,String path){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -1252,7 +1252,7 @@ public class QlUtil {
      * @return
      */
     public List<JSONObject> getDependencies(String url, String tokenType, String token){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -1287,7 +1287,7 @@ public class QlUtil {
      * @return
      */
     public boolean addDependencies(String url, String tokenType, String token,String name,Integer type,String remark){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -1326,7 +1326,7 @@ public class QlUtil {
      * @return
      */
     public boolean deleteDependencies(String url, String tokenType, String token,List<Integer> ids){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -1359,7 +1359,7 @@ public class QlUtil {
      * @return
      */
     public boolean deleteForceDependencies(String url, String tokenType, String token,List<Integer> ids){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -1392,7 +1392,7 @@ public class QlUtil {
      * @return
      */
     public boolean reinstallDependencies(String url, String tokenType, String token,List<Integer> ids){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -1424,7 +1424,7 @@ public class QlUtil {
      * @return
      */
     public JSONObject getRemoveLogTimes(String url, String tokenType, String token){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
@@ -1457,7 +1457,7 @@ public class QlUtil {
      * @return
      */
     public boolean updateRemoveLogTimes(String url, String tokenType, String token,Integer frequency){
-        if (url.endsWith("/")){
+        if (!url.endsWith("/")){
             url = url+"/";
         }
         try {

@@ -1,6 +1,7 @@
 package com.bienao.robot.mapper;
 
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.entity.QlEntity;
 import com.bienao.robot.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -14,26 +15,26 @@ public interface QlMapper {
      * @param ql
      * @return
      */
-    int addQl(JSONObject ql);
+    int addQl(QlEntity ql);
 
     /**
      * 查询青龙
      * @param url
      * @return
      */
-    JSONObject queryQlByUrl(String url);
+    QlEntity queryQlByUrl(String url);
 
     /**
      * 查询青龙
      * @return
      */
-    List<JSONObject> queryQls(String id);
+    List<QlEntity> queryQls(String id);
 
     /**
      * 修改青龙
      * @param ql
      * @return
      */
-    int updateQl(JSONObject ql);
+    int updateQl(QlEntity ql);
 
 }

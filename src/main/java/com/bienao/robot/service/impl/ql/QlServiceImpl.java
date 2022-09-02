@@ -4,6 +4,7 @@ import cn.hutool.cache.Cache;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.weixin.WXConstant;
+import com.bienao.robot.entity.QlEntity;
 import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.mapper.QlMapper;
 import com.bienao.robot.result.Result;
@@ -53,30 +54,30 @@ public class QlServiceImpl implements QlService {
      * @param ql
      */
     @Override
-    public Result addQl(JSONObject ql){
-        String url = ql.getString("url");
+    public Result addQl(QlEntity ql){
+        String url = ql.getUrl();
         if (StringUtils.isEmpty(url)){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"地址不能为空");
         }
-        if (url.length()>20){
+        if (url.length()>50){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"地址长度异常");
         }
-        String clientID = ql.getString("clientID");
+        String clientID = ql.getClientID();
         if (StringUtils.isEmpty(clientID)){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"clientID不能为空");
         }
-        if (clientID.length()>20){
+        if (clientID.length()>50){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"clientID长度异常");
         }
-        String clientSecret = ql.getString("clientSecret");
+        String clientSecret = ql.getClientSecret();
         if (StringUtils.isEmpty(clientSecret)){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"clientSecret不能为空");
         }
-        if (clientSecret.length()>20){
+        if (clientSecret.length()>50){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"clientSecret长度异常");
         }
 
-        JSONObject result = qlMapper.queryQlByUrl(url);
+        QlEntity result = qlMapper.queryQlByUrl(url);
         if (result == null){
             int i = qlMapper.addQl(ql);
             if (i==1){
@@ -95,13 +96,13 @@ public class QlServiceImpl implements QlService {
      */
     @Override
     public Result queryQls(String id){
-        List<JSONObject> qls = qlMapper.queryQls(id);
-        for (JSONObject ql : qls) {
-            JSONObject jsonObject = qlUtil.getToken(ql.getString("url"), ql.getString("clientID"), ql.getString("clientSecret"));
+        List<QlEntity> qls = qlMapper.queryQls(id);
+        for (QlEntity ql : qls) {
+            JSONObject jsonObject = qlUtil.getToken(ql.getUrl(), ql.getClientID(), ql.getClientSecret());
             if (jsonObject == null) {
-                ql.put("status","异常");
+                ql.setStatus("异常");
             }else {
-                ql.put("status","正常");
+                ql.setStatus("正常");
             }
         }
         return Result.success(qls);
@@ -112,37 +113,34 @@ public class QlServiceImpl implements QlService {
      * @return
      */
     @Override
-    public Result updateQl(JSONObject ql){
-        String id = ql.getString("id");
-        if (StringUtils.isEmpty(id)){
+    public Result updateQl(QlEntity ql){
+        Integer id = ql.getId();
+        if (id == null){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"id不能为空");
         }
-        if (id.length()>20){
-            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"id长度异常");
-        }
-        String url = ql.getString("url");
+        String url = ql.getUrl();
         if (StringUtils.isEmpty(url)){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"地址不能为空");
         }
-        if (url.length()>20){
+        if (url.length()>50){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"地址长度异常");
         }
-        String clientID = ql.getString("clientID");
+        String clientID = ql.getClientID();
         if (StringUtils.isEmpty(clientID)){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"clientID不能为空");
         }
-        if (clientID.length()>20){
+        if (clientID.length()>50){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"clientID长度异常");
         }
-        String clientSecret = ql.getString("clientSecret");
+        String clientSecret = ql.getClientSecret();
         if (StringUtils.isEmpty(clientSecret)){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"clientSecret不能为空");
         }
-        if (clientSecret.length()>20){
+        if (clientSecret.length()>50){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"clientSecret长度异常");
         }
 
-        ql.put("updatedTime",new Date());
+        ql.setUpdatedTime(new Date());
 
         int i = qlMapper.updateQl(ql);
         if (i==1){
@@ -159,20 +157,27 @@ public class QlServiceImpl implements QlService {
     @Override
     public Result queryScripts(){
         HashSet<JSONObject> scripts = new HashSet<>();
-        List<JSONObject> qls = qlMapper.queryQls(null);
-        for (JSONObject ql : qls) {
+        List<QlEntity> qls = qlMapper.queryQls(null);
+        for (QlEntity ql : qls) {
             try {
-                String url = ql.getString("url");
-                String clientId = ql.getString("clientId");
-                String clientSecret = ql.getString("clientSecret");
+                String url = ql.getUrl();
+                String clientId = ql.getClientID();
+                String clientSecret = ql.getClientSecret();
                 JSONObject tokenJson = qlUtil.getToken(url, clientId, clientSecret);
                 String token = tokenJson.getString("token");
                 String tokenType = tokenJson.getString("token_type");
                 List<JSONObject> crons = qlUtil.getCrons(url, tokenType, token);
+                if (crons==null){
+                    return Result.error(ErrorCodeConstant.INTERFACE_CALL_ERROR,"接口调用失败");
+                }
                 for (JSONObject cron : crons) {
                     JSONObject script = new JSONObject();
                     script.put("name",cron.getString("name"));
-                    script.put("command",cron.getString("command"));
+                    String command = cron.getString("command").replace("task ","");
+                    if (command.contains("/")){
+                        command = command.split("/")[1];
+                    }
+                    script.put("command",command);
                     scripts.add(script);
                 }
             } catch (Exception e) {

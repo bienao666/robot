@@ -4,26 +4,26 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bienao.robot.mapper.QlMapper">
 
-    <insert id="addQl" parameterType="com.alibaba.fastjson.JSONObject">
+    <insert id="addQl" parameterType="qlEntity">
         insert into ql(url,clientID,clientSecret) values (#{url},#{clientID},#{clientSecret})
     </insert>
 
-    <select id="queryQl" parameterType="string" resultType="com.alibaba.fastjson.JSONObject">
+    <select id="queryQl" parameterType="string" resultType="qlEntity">
         select * from ql where id=#{id}
     </select>
 
-    <select id="queryQlByUrl" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.alibaba.fastjson.JSONObject">
+    <select id="queryQlByUrl" parameterType="string" resultType="qlEntity">
         select * from ql where url=#{url}
     </select>
 
-    <select id="queryQls" resultType="java.util.List">
+    <select id="queryQls" resultType="qlEntity">
         select * from ql where 1=1
         <if test="id !=null and id !=''">
             and id=#{id}
         </if>
     </select>
 
-    <update id="updateQl" parameterType="com.alibaba.fastjson.JSONObject">
+    <update id="updateQl" parameterType="qlEntity">
         update ql
         <set>
             <if test="url !=null and url !=''">

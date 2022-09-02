@@ -1,6 +1,7 @@
 package com.bienao.robot.controller.qinglong;
 
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.entity.QlEntity;
 import com.bienao.robot.result.Result;
 import com.bienao.robot.service.ql.QlService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,11 +24,11 @@ public class QlController {
 
     /**
      * 添加青龙
-     * @param jsonObject
+     * @param ql
      */
     @PostMapping("/addQl")
-    public Result addQl(@RequestBody JSONObject jsonObject){
-        return qlService.addQl(jsonObject);
+    public Result addQl(@RequestBody QlEntity ql){
+        return qlService.addQl(ql);
     }
 
     /**
@@ -43,9 +44,9 @@ public class QlController {
      * 更新青龙
      * @return
      */
-    @GetMapping("/updateQl")
-    public Result updateQl(@RequestBody JSONObject jsonObject){
-        return qlService.updateQl(jsonObject);
+    @PostMapping("/updateQl")
+    public Result updateQl(@RequestBody QlEntity ql){
+        return qlService.updateQl(ql);
     }
 
     /**
@@ -53,7 +54,7 @@ public class QlController {
      * @return
      */
     @GetMapping("/queryScripts")
-    public Result queryScripts(@RequestBody JSONObject jsonObject){
+    public Result queryScripts(){
         return qlService.queryScripts();
     }
 }

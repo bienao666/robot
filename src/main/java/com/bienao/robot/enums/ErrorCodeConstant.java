@@ -49,6 +49,11 @@ public final class ErrorCodeConstant {
      */
     public static final String QINGLONG_UPDATE_ERROR="30005";
 
+    /**
+     *接口调用失败
+     */
+    public static final String INTERFACE_CALL_ERROR="30005";
+
 
 
 }
