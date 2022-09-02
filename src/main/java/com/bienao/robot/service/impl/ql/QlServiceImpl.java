@@ -156,6 +156,7 @@ public class QlServiceImpl implements QlService {
      * 查询脚本
      * @return
      */
+    @Override
     public Result queryScripts(){
         HashSet<JSONObject> scripts = new HashSet<>();
         List<JSONObject> qls = qlMapper.queryQls(null);
@@ -168,10 +169,16 @@ public class QlServiceImpl implements QlService {
                 String token = tokenJson.getString("token");
                 String tokenType = tokenJson.getString("token_type");
                 List<JSONObject> crons = qlUtil.getCrons(url, tokenType, token);
+                for (JSONObject cron : crons) {
+                    JSONObject script = new JSONObject();
+                    script.put("name",cron.getString("name"));
+                    script.put("command",cron.getString("command"));
+                    scripts.add(script);
+                }
             } catch (Exception e) {
                 log.error("查询脚本失败",e);
             }
         }
-        return Result.success();
+        return Result.success(scripts);
     }
 }
