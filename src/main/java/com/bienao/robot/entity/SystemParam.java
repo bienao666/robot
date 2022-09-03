@@ -22,6 +22,9 @@ public class SystemParam {
     //参数值
     private String value;
 
+    //是否展示
+    private Integer isShow;
+
     //新增时间
     private Date createdTime;
 

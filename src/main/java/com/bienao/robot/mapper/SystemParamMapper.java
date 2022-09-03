@@ -12,7 +12,7 @@ public interface SystemParamMapper {
      * 查询参数
      * @return
      */
-    List<SystemParam> querySystems(String code);
+    List<SystemParam> querySystems(String code,String codeName);
 
     /**
      * 查询参数

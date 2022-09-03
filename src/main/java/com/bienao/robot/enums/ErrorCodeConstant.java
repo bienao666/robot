@@ -64,4 +64,9 @@ public final class ErrorCodeConstant {
      */
     public static final String SYSTEMPARAM_ERROR="30006";
 
+    /**
+     *大车头迁移失败
+     */
+    public static final String BIGHEAD_MOVE_ERROR="30007";
+
 }

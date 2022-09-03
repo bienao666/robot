@@ -1,6 +1,6 @@
 server:
   # 服务端口
-  port: 80
+  port: 8899
   servlet:
     context-path: /robot/api
   tomcat:

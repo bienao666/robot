@@ -6,6 +6,7 @@ create table if not exists systemParam (
                                            code varchar UNIQUE,
                                            codeName varchar,
                                            value varchar,
+                                           isShow INTEGER DEFAULT 1,
                                            created_time datetime DEFAULT CURRENT_TIMESTAMP,
                                            updated_time datetime DEFAULT CURRENT_TIMESTAMP
 );

@@ -101,8 +101,17 @@ public class QlController {
      * 一键车头
      * @return
      */
-    @PostMapping("/oneKeyHead")
+    @GetMapping("/oneKeyHead")
     public Result oneKeyHead(){
-        return Result.success();
+        return qlService.oneKeyHead();
+    }
+
+    /**
+     * 取消车头
+     * @return
+     */
+    @GetMapping("/cancelHead")
+    public Result cancelHead(){
+        return qlService.cancelHead();
     }
 }

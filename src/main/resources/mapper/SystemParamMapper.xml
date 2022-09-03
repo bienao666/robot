@@ -3,10 +3,10 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bienao.robot.mapper.SystemParamMapper">
-    <select id="querySystems" parameterType="systemParam" resultType="systemParam">
+    <select id="querySystems" parameterType="string" resultType="systemParam">
         select * from systemParam where 1=1
-        <if test="code !=null and code !=''">
-            and code=#{code}
+        <if test="(code !=null and code !='')||(codeName !=null and codeName !='')">
+            and (code like ('%'||#{code}||'%') or codeName like ('%'||#{codeName}||'%'))
         </if>
         order by id
     </select>
@@ -22,7 +22,7 @@
     <update id="updateSystemParam" parameterType="systemParam">
         update systemParam
         <set>
-            <if test="value !=null">
+            <if test="value !=null and value !=''">
                 value=#{value},
             </if>
             <if test="codeName !=null and codeName !=''">

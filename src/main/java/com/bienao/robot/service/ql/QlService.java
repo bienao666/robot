@@ -52,4 +52,16 @@ public interface QlService {
      * @return
      */
     Result deleteQls(List<Integer> ids);
+
+    /**
+     * 一键车头
+     * @return
+     */
+    Result oneKeyHead();
+
+    /**
+     * 取消车头
+     * @return
+     */
+    Result cancelHead();
 }

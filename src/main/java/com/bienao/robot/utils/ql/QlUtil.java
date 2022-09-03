@@ -87,7 +87,7 @@ public class QlUtil {
      * @param remarks 备注
      * @return
      */
-    public boolean addEnvs(String url,String tokenType,String token,String name,String value,String remarks){
+    public JSONObject addEnvs(String url,String tokenType,String token,String name,String value,String remarks){
         if (!url.endsWith("/")){
             url = url+"/";
         }
@@ -104,17 +104,23 @@ public class QlUtil {
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙添加环境变量失败");
-                return false;
+                return null;
             }
             JSONObject res = JSONObject.parseObject(resStr);
             if (!res.getString("code").equals("200")){
                 log.info("青龙添加环境变量失败");
-                return false;
+                return null;
             }
-            return true;
+            String dataStr = res.getString("data");
+            List<JSONObject> list = JSON.parseArray(dataStr, JSONObject.class);
+            if (list.size()==0){
+                return null;
+            }else {
+                return list.get(0);
+            }
         } catch (HttpException e) {
             log.info("青龙添加环境变量失败");
-            return false;
+            return null;
         }
     }
 
@@ -243,7 +249,7 @@ public class QlUtil {
             JSONObject body = new JSONObject();
             body.put("fromIndex",fromIndex);
             body.put("toIndex",toIndex);
-            String resStr = HttpRequest.get(url + "open/envs/"+id+"/move")
+            String resStr = HttpRequest.put(url + "open/envs/"+id+"/move")
                     .header("Authorization",tokenType + " " + token)
                     .body(body.toJSONString())
                     .execute().body();
