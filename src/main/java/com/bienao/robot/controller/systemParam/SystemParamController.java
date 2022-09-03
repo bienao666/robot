@@ -65,9 +65,21 @@ public class SystemParamController {
      * 查询参数
      * @param code
      */
-    @PostMapping("/querySystemParams")
+    @GetMapping("/querySystemParams")
     public Result querySystemParams(@RequestParam(value = "code",required = false) String code){
         List<SystemParam> systemParams = systemParamUtil.querySystemParams(code);
         return Result.success(systemParams);
+    }
+
+    /**
+     * 删除参数
+     * @return
+     */
+    @PostMapping("/deleteSystemParams")
+    public Result deleteSystemParams(@RequestBody List<Integer> ids){
+        if(ids.size()==0){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"ids不能为空");
+        }
+        return systemParamUtil.deleteSystemParams(ids);
     }
 }

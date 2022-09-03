@@ -4,7 +4,9 @@ import cn.hutool.cache.Cache;
 import cn.hutool.core.date.DateUnit;
 import com.bienao.robot.Constants.systemParam.SysConstant;
 import com.bienao.robot.entity.SystemParam;
+import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.mapper.SystemParamMapper;
+import com.bienao.robot.result.Result;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -61,6 +63,10 @@ public class SystemParamUtil {
      * @return
      */
     public boolean addSystemParam(SystemParam systemParam){
+        List<SystemParam> systemParams = systemParamMapper.querySystems(systemParam.getCode());
+        if (systemParams.size()==1){
+            return false;
+        }
         int i = systemParamMapper.addSystemParam(systemParam);
         if (i==1){
             sysParamRedis.put(systemParam.getCode(),systemParam.getValue(), DateUnit.DAY.getMillis());
@@ -88,6 +94,20 @@ public class SystemParamUtil {
             return true;
         }else {
             return false;
+        }
+    }
+
+    /**
+     * 删除系统参数
+     * @param ids
+     * @return
+     */
+    public Result deleteSystemParams(List<Integer> ids){
+        int i = systemParamMapper.deleteSystemParams(ids);
+        if (i==0){
+            return Result.error(ErrorCodeConstant.QINGLONG_DELETE_ERROR,"系统参数删除异常");
+        }else {
+            return Result.success("删除成功");
         }
     }
 

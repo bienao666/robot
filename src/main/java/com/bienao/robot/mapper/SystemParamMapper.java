@@ -36,8 +36,8 @@ public interface SystemParamMapper {
 
     /**
      * 删除参数
-     * @param code
+     * @param ids
      * @return
      */
-    int deleteSystemParam(String code);
+    int deleteSystemParams(List<Integer> ids);
 }

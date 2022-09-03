@@ -59,7 +59,10 @@ public class QlController {
      * @return
      */
     @GetMapping("/deleteQls")
-    public Result deleteQls(@RequestParam(value = "ids",required = false) List<Integer> ids){
+    public Result deleteQls(@RequestParam(value = "ids") List<Integer> ids){
+        if(ids.size()==0){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"ids不能为空");
+        }
         return qlService.deleteQls(ids);
     }
 
