@@ -4,6 +4,7 @@ import cn.hutool.cache.Cache;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.weixin.WXConstant;
+import com.bienao.robot.entity.QlCron;
 import com.bienao.robot.entity.QlEntity;
 import com.bienao.robot.entity.SystemParam;
 import com.bienao.robot.enums.ErrorCodeConstant;
@@ -84,11 +85,11 @@ public class QlServiceImpl implements QlService {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "clientSecret长度异常");
         }
         String remark = ql.getRemark();
-        if (remark.length() > 50) {
+        if (remark!= null && remark.length() > 50) {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "remark长度异常");
         }
         String head = ql.getHead();
-        if (head.length() > 20) {
+        if (head!= null && head.length() > 20) {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "head长度异常");
         }
 
@@ -120,6 +121,7 @@ public class QlServiceImpl implements QlService {
             } else {
                 ql.setStatus("正常");
             }
+            ql.setClientSecret("******");
         }
         return Result.success(qls);
     }
@@ -157,11 +159,11 @@ public class QlServiceImpl implements QlService {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "clientSecret长度异常");
         }
         String remark = ql.getRemark();
-        if (remark.length() > 50) {
+        if (remark!= null && remark.length() > 50) {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "remark长度异常");
         }
         String head = ql.getHead();
-        if (head.length() > 20) {
+        if (head!= null && head.length() > 20) {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "head长度异常");
         }
 
@@ -348,24 +350,28 @@ public class QlServiceImpl implements QlService {
                 JSONObject tokenJson = qlUtil.getToken(url, clientId, clientSecret);
                 String token = tokenJson.getString("token");
                 String tokenType = tokenJson.getString("token_type");
-                List<JSONObject> crons = qlUtil.getCrons(url, tokenType, token);
-                if (crons == null) {
-                    return Result.error(ErrorCodeConstant.INTERFACE_CALL_ERROR, "接口调用失败");
+                List<QlCron> crons = qlUtil.getCrons(url, tokenType, token);
+                if (crons==null){
+                    //重试一次
+                    crons = qlUtil.getCrons(url, tokenType, token);
                 }
-                for (JSONObject cron : crons) {
-                    JSONObject script = new JSONObject();
-                    String name = cron.getString("name");
-                    script.put("name", name);
-                    String command = cron.getString("command").replace("task ", "");
-                    script.put("command", command);
-                    if (StringUtils.isNotEmpty(key)) {
-                        if (name.contains(key) || command.contains(key)) {
+                if (crons != null) {
+                    for (QlCron cron : crons) {
+                        JSONObject script = new JSONObject();
+                        String name = cron.getName();
+                        script.put("name", name);
+                        String command = cron.getCommand().replace("task ", "");
+                        script.put("command", command);
+                        if (StringUtils.isNotEmpty(key)) {
+                            if (name.contains(key) || command.contains(key)) {
+                                scripts.add(script);
+                            }
+                        } else {
                             scripts.add(script);
                         }
-                    } else {
-                        scripts.add(script);
                     }
                 }
+
             } catch (Exception e) {
                 log.error("查询脚本失败", e);
             }
@@ -390,27 +396,36 @@ public class QlServiceImpl implements QlService {
                 JSONObject tokenJson = qlUtil.getToken(url, ql.getClientID(), ql.getClientSecret());
                 String token = tokenJson.getString("token");
                 String tokenType = tokenJson.getString("token_type");
-                List<JSONObject> crons = qlUtil.getCrons(url, tokenType, token);
-                Integer old = list.size();
-                for (JSONObject cron : crons) {
-                    String name = cron.getString("name");
-                    if (cron.getString("command").contains(command)) {
-                        Integer id = cron.getInteger("id");
-                        List<Integer> cronIds = new ArrayList<>();
-                        cronIds.add(id);
-                        boolean flag = qlUtil.runCron(url, tokenType, token, cronIds);
-                        if (flag) {
-                            list.add(url + "(" + remark + ")" + " 执行" + command + "(" + name + ")" + " 成功");
-                        } else {
-                            list.add(url + "(" + remark + ")" + " 执行" + command + "(" + name + ")" + " 失败");
+                List<QlCron> crons = qlUtil.getCrons(url, tokenType, token);
+                if (crons==null){
+                    //重试一次
+                    crons = qlUtil.getCrons(url, tokenType, token);
+                }
+                if (crons!=null){
+                    Integer old = list.size();
+                    for (QlCron cron : crons) {
+                        String name = cron.getName();
+                        if (cron.getCommand().contains(command)) {
+                            Integer id = cron.getId();
+                            List<Integer> cronIds = new ArrayList<>();
+                            cronIds.add(id);
+                            boolean flag = qlUtil.runCron(url, tokenType, token, cronIds);
+                            if (flag) {
+                                list.add(url + "(" + remark + ")" + " 执行" + command + "(" + name + ")" + " 成功");
+                            } else {
+                                list.add(url + "(" + remark + ")" + " 执行" + command + "(" + name + ")" + " 失败");
+                            }
+                            break;
                         }
-                        break;
                     }
+                    Integer now = list.size();
+                    if (now == old) {
+                        list.add(url + "(" + remark + ")" + command + " 脚本不存在");
+                    }
+                }else {
+                    list.add(url + "(" + remark + ")" + " 执行" + command + " 失败");
                 }
-                Integer now = list.size();
-                if (now == old) {
-                    list.add(url + "(" + remark + ")" + command + " 脚本不存在");
-                }
+
             } catch (Exception e) {
                 list.add(url + "(" + remark + ")" + " 执行" + command + " 失败：" + e.getMessage());
                 e.printStackTrace();

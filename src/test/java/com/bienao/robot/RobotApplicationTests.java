@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.HashSet;
+
 @SpringBootTest
 class RobotApplicationTests {
 
@@ -22,6 +24,11 @@ class RobotApplicationTests {
 
     @Test
     public void test1() throws Exception {
+        HashSet<String> set = new HashSet<>();
+        boolean add = set.add("1");
+        System.out.println(add);
+        add = set.add("1");
+        System.out.println(add);
     }
 
 }

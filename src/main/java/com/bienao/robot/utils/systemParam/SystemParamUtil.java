@@ -49,6 +49,15 @@ public class SystemParamUtil {
     }
 
     /**
+     * 查询展示系统参数
+     * @param key
+     * @return
+     */
+    public List<SystemParam> queryShowSystems(String key){
+        return systemParamMapper.queryShowSystems(key,key);
+    }
+
+    /**
      * 查询系统参数
      * @param key
      * @return

@@ -67,7 +67,7 @@ public class SystemParamController {
      */
     @GetMapping("/querySystemParams")
     public Result querySystemParams(@RequestParam(value = "code",required = false) String code){
-        List<SystemParam> systemParams = systemParamUtil.querySystemParams(code);
+        List<SystemParam> systemParams = systemParamUtil.queryShowSystems(code);
         return Result.success(systemParams);
     }
 

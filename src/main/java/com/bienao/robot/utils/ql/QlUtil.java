@@ -4,6 +4,7 @@ import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.entity.QlCron;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -545,7 +546,7 @@ public class QlUtil {
      * @param token token
      * @return
      */
-    public List<JSONObject> getCrons(String url, String tokenType, String token){
+    public List<QlCron> getCrons(String url, String tokenType, String token){
         if (!url.endsWith("/")){
             url = url+"/";
         }
@@ -559,13 +560,13 @@ public class QlUtil {
             }
             JSONObject res = JSONObject.parseObject(resStr);
             if (!res.getString("code").equals("200")){
-                log.info("青龙获取所有任务详情失败");
+                log.info("青龙获取所有任务详情失败：{}",resStr);
                 return null;
             }
             String data = res.getString("data");
-            return JSON.parseArray(data,JSONObject.class);
+            return JSON.parseArray(data, QlCron.class);
         } catch (HttpException e) {
-            log.info("青龙获取所有任务详情失败");
+            log.info("青龙获取所有任务详情失败",e);
             return null;
         }
     }

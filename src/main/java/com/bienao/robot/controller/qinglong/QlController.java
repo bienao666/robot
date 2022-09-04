@@ -33,7 +33,13 @@ public class QlController {
      */
     @PostMapping("/addQl")
     public Result addQl(@RequestBody QlEntity ql){
-        return qlService.addQl(ql);
+        long start = System.currentTimeMillis();
+        log.info("开始addQl：{}",System.currentTimeMillis());
+        Result result = qlService.addQl(ql);
+        long end = System.currentTimeMillis();
+        log.info("addQl结束：{}",System.currentTimeMillis());
+        log.info("addQl耗时：{}ms",(end-start));
+        return result;
     }
 
     /**
@@ -42,7 +48,13 @@ public class QlController {
      */
     @GetMapping("/queryQls")
     public Result queryQls(@RequestParam(value = "ids",required = false) List<Integer> ids){
-        return qlService.queryQls(ids);
+        long start = System.currentTimeMillis();
+        log.info("开始queryQls：{}",System.currentTimeMillis());
+        Result result = qlService.queryQls(ids);
+        long end = System.currentTimeMillis();
+        log.info("queryQls结束：{}",System.currentTimeMillis());
+        log.info("queryQls耗时：{}ms",(end-start));
+        return result;
     }
 
     /**
@@ -51,7 +63,13 @@ public class QlController {
      */
     @PostMapping("/updateQl")
     public Result updateQl(@RequestBody QlEntity ql){
-        return qlService.updateQl(ql);
+        long start = System.currentTimeMillis();
+        log.info("开始updateQl：{}",System.currentTimeMillis());
+        Result result = qlService.updateQl(ql);
+        long end = System.currentTimeMillis();
+        log.info("updateQl结束：{}",System.currentTimeMillis());
+        log.info("updateQl耗时：{}ms",(end-start));
+        return result;
     }
 
     /**
@@ -63,7 +81,13 @@ public class QlController {
         if(ids.size()==0){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"ids不能为空");
         }
-        return qlService.deleteQls(ids);
+        long start = System.currentTimeMillis();
+        log.info("开始deleteQls：{}",System.currentTimeMillis());
+        Result result = qlService.deleteQls(ids);
+        long end = System.currentTimeMillis();
+        log.info("deleteQls结束：{}",System.currentTimeMillis());
+        log.info("deleteQls耗时：{}ms",(end-start));
+        return result;
     }
 
     /**
@@ -72,7 +96,13 @@ public class QlController {
      */
     @GetMapping("/queryScripts")
     public Result queryScripts(@RequestParam(value = "key",required = false) String key){
-        return qlService.queryScripts(key);
+        long start = System.currentTimeMillis();
+        log.info("开始queryScripts：{}",System.currentTimeMillis());
+        Result result = qlService.queryScripts(key);
+        long end = System.currentTimeMillis();
+        log.info("queryScripts结束：{}",System.currentTimeMillis());
+        log.info("queryScripts耗时：{}ms",(end-start));
+        return result;
     }
 
     /**
@@ -94,7 +124,13 @@ public class QlController {
         if (ids.size()==0){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"ids不能为空");
         }
-        return qlService.runScript(command,ids);
+        long start = System.currentTimeMillis();
+        log.info("开始runScript：{}",System.currentTimeMillis());
+        Result result = qlService.runScript(command, ids);
+        long end = System.currentTimeMillis();
+        log.info("runScript结束：{}",System.currentTimeMillis());
+        log.info("runScript耗时：{}ms",(end-start));
+        return result;
     }
 
     /**
@@ -103,7 +139,13 @@ public class QlController {
      */
     @GetMapping("/oneKeyHead")
     public Result oneKeyHead(){
-        return qlService.oneKeyHead();
+        long start = System.currentTimeMillis();
+        log.info("开始oneKeyHead：{}",System.currentTimeMillis());
+        Result result = qlService.oneKeyHead();
+        long end = System.currentTimeMillis();
+        log.info("oneKeyHead结束：{}",System.currentTimeMillis());
+        log.info("oneKeyHead耗时：{}ms",(end-start));
+        return result;
     }
 
     /**
@@ -112,6 +154,12 @@ public class QlController {
      */
     @GetMapping("/cancelHead")
     public Result cancelHead(){
-        return qlService.cancelHead();
+        long start = System.currentTimeMillis();
+        log.info("开始cancelHead：{}",System.currentTimeMillis());
+        Result result = qlService.cancelHead();
+        long end = System.currentTimeMillis();
+        log.info("cancelHead结束：{}",System.currentTimeMillis());
+        log.info("cancelHead耗时：{}ms",(end-start));
+        return result;
     }
 }
