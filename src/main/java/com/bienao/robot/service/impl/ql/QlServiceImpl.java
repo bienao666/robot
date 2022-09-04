@@ -1,6 +1,7 @@
 package com.bienao.robot.service.impl.ql;
 
 import cn.hutool.cache.Cache;
+import cn.hutool.core.util.PageUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.weixin.WXConstant;
@@ -20,10 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -341,8 +339,9 @@ public class QlServiceImpl implements QlService {
      * @return
      */
     @Override
-    public Result queryScripts(String key) {
-        HashSet<JSONObject> scripts = new HashSet<>();
+    public Result queryScripts(String key,Integer pageNo,Integer pageSize) {
+        HashSet<JSONObject> scriptsSet = new HashSet<>();
+        List<JSONObject> scriptsList = new ArrayList<>();
         List<QlEntity> qls = qlMapper.queryQls(null);
         for (QlEntity ql : qls) {
             try {
@@ -357,6 +356,12 @@ public class QlServiceImpl implements QlService {
                     //重试一次
                     crons = qlUtil.getCrons(url, tokenType, token);
                 }
+                Collections.sort(crons, new Comparator<QlCron>() {
+                    @Override
+                    public int compare(QlCron o1, QlCron o2) {
+                        return o2.getCreatedAt().compareTo(o1.getCreatedAt());
+                    }
+                });
                 if (crons != null) {
                     for (QlCron cron : crons) {
                         JSONObject script = new JSONObject();
@@ -366,10 +371,14 @@ public class QlServiceImpl implements QlService {
                         script.put("command", command);
                         if (StringUtils.isNotEmpty(key)) {
                             if (name.contains(key) || command.contains(key)) {
-                                scripts.add(script);
+                                if (scriptsSet.add(script)){
+                                    scriptsList.add(script);
+                                }
                             }
                         } else {
-                            scripts.add(script);
+                            if (scriptsSet.add(script)){
+                                scriptsList.add(script);
+                            }
                         }
                     }
                 }
@@ -378,7 +387,16 @@ public class QlServiceImpl implements QlService {
                 log.error("查询脚本失败", e);
             }
         }
-        return Result.success(scripts);
+        int start = PageUtil.getStart(pageNo, pageSize);
+        int end = PageUtil.getEnd(pageNo, pageSize);
+        int totalPage = PageUtil.totalPage(scriptsList.size(), pageSize);
+        scriptsList = scriptsList.subList(start,end);
+        JSONObject result = new JSONObject();
+        result.put("totalPage",totalPage);
+        result.put("pageNo",pageNo);
+        result.put("pageSize",pageSize);
+        result.put("scriptsList",scriptsList);
+        return Result.success(result    );
     }
 
     /**

@@ -37,7 +37,7 @@ public interface QlService {
      * 查询脚本
      * @return
      */
-    Result queryScripts(String key);
+    Result queryScripts(String key,Integer pageNo,Integer pageSize);
 
     /**
      * 执行脚本

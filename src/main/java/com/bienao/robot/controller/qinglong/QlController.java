@@ -95,10 +95,12 @@ public class QlController {
      * @return
      */
     @GetMapping("/queryScripts")
-    public Result queryScripts(@RequestParam(value = "key",required = false) String key){
+    public Result queryScripts(@RequestParam(value = "key",required = false) String key,
+                               @RequestParam(value = "pageNo") Integer pageNo,
+                               @RequestParam(value = "pageSize") Integer pageSize){
         long start = System.currentTimeMillis();
         log.info("开始queryScripts：{}",System.currentTimeMillis());
-        Result result = qlService.queryScripts(key);
+        Result result = qlService.queryScripts(key,pageNo,pageSize);
         long end = System.currentTimeMillis();
         log.info("queryScripts结束：{}",System.currentTimeMillis());
         log.info("queryScripts耗时：{}ms",(end-start));
