@@ -168,7 +168,9 @@ public class QlServiceImpl implements QlService {
         }
 
         ql.setUpdatedTime(new Date());
-
+        if ("******".equals(ql.getClientSecret())){
+            ql.setClientSecret("");
+        }
         int i = qlMapper.updateQl(ql);
         if (i == 1) {
             return Result.success("修改成功");
