@@ -431,9 +431,9 @@ public class QlServiceImpl implements QlService {
                             cronIds.add(id);
                             boolean flag = qlUtil.runCron(url, tokenType, token, cronIds);
                             if (flag) {
-                                list.add(url + "(" + remark + ")" + " 执行" + command + "(" + name + ")" + " 成功");
+                                list.add(url + "(" + remark + ")" + " 执行" + "(" + name + ")" + " 成功");
                             } else {
-                                list.add(url + "(" + remark + ")" + " 执行" + command + "(" + name + ")" + " 失败");
+                                list.add(url + "(" + remark + ")" + " 执行" + "(" + name + ")" + " 失败");
                             }
                             break;
                         }
