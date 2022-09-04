@@ -24,11 +24,6 @@ class RobotApplicationTests {
 
     @Test
     public void test1() throws Exception {
-        HashSet<String> set = new HashSet<>();
-        boolean add = set.add("1");
-        System.out.println(add);
-        add = set.add("1");
-        System.out.println(add);
     }
 
 }
