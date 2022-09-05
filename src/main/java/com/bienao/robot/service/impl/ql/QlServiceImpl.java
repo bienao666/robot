@@ -389,10 +389,9 @@ public class QlServiceImpl implements QlService {
         }
         int start = PageUtil.getStart(pageNo, pageSize);
         int end = PageUtil.getEnd(pageNo, pageSize);
-        int totalPage = PageUtil.totalPage(scriptsList.size(), pageSize);
         scriptsList = scriptsList.subList(start,end);
         JSONObject result = new JSONObject();
-        result.put("totalPage",totalPage);
+        result.put("total",scriptsList.size());
         result.put("pageNo",pageNo);
         result.put("pageSize",pageSize);
         result.put("scriptsList",scriptsList);
