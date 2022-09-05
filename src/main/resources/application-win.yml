@@ -2,7 +2,7 @@ server:
   # 服务端口
   port: 8899
   servlet:
-    context-path: /robot/api
+    context-path: /robot
   tomcat:
     max-swallow-size: -1
   shutdown: graceful
