@@ -83,11 +83,11 @@ public class QlServiceImpl implements QlService {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "clientSecret长度异常");
         }
         String remark = ql.getRemark();
-        if (remark!= null && remark.length() > 50) {
+        if (remark != null && remark.length() > 50) {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "remark长度异常");
         }
         String head = ql.getHead();
-        if (head!= null && head.length() > 20) {
+        if (head != null && head.length() > 20) {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "head长度异常");
         }
 
@@ -157,16 +157,16 @@ public class QlServiceImpl implements QlService {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "clientSecret长度异常");
         }
         String remark = ql.getRemark();
-        if (remark!= null && remark.length() > 50) {
+        if (remark != null && remark.length() > 50) {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "remark长度异常");
         }
         String head = ql.getHead();
-        if (head!= null && head.length() > 20) {
+        if (head != null && head.length() > 20) {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "head长度异常");
         }
 
         ql.setUpdatedTime(new Date());
-        if ("******".equals(ql.getClientSecret())){
+        if ("******".equals(ql.getClientSecret())) {
             ql.setClientSecret("");
         }
         int i = qlMapper.updateQl(ql);
@@ -231,9 +231,9 @@ public class QlServiceImpl implements QlService {
                     qlBigHeadJson = env;
                     systemParamUtil.updateSystemParam("BIGHEADLOCATION", "", ql.getId().toString());
                     JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), tokenType, token, env.getString("id"), env.getInteger("id"), 0);
-                    if (jsonObject == null){
+                    if (jsonObject == null) {
                         results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置失败");
-                    }else {
+                    } else {
                         results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置成功");
                     }
                     break;
@@ -271,9 +271,9 @@ public class QlServiceImpl implements QlService {
                         qlBigHeadJson.getString("value"),
                         qlBigHeadJson.getString("remarks"));
                 JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), tokenType, token, env.getString("id"), env.getInteger("id"), 0);
-                if (jsonObject == null){
+                if (jsonObject == null) {
                     results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置失败");
-                }else {
+                } else {
                     results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置成功");
                 }
             }
@@ -283,6 +283,7 @@ public class QlServiceImpl implements QlService {
 
     /**
      * 取消车头
+     *
      * @return
      */
     @Override
@@ -317,14 +318,14 @@ public class QlServiceImpl implements QlService {
             for (JSONObject env : envs) {
                 String name = env.getString("name");
                 String value = env.getString("value");
-                if ("JD_COOKIE".equals(name) && value.contains(qlBigHeadValue) && ql.getId()!=Integer.parseInt(bigHeadLocationValue)) {
+                if ("JD_COOKIE".equals(name) && value.contains(qlBigHeadValue) && ql.getId() != Integer.parseInt(bigHeadLocationValue)) {
                     //删除大车头
                     ArrayList<Integer> ids = new ArrayList<>();
                     ids.add(env.getInteger("id"));
                     boolean b = qlUtil.deleteEnvs(ql.getUrl(), tokenType, token, ids);
-                    if (b){
+                    if (b) {
                         results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "删除车头成功");
-                    }else {
+                    } else {
                         results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "删除车头失败");
                     }
                 }
@@ -339,7 +340,7 @@ public class QlServiceImpl implements QlService {
      * @return
      */
     @Override
-    public Result queryScripts(String key,Integer pageNo,Integer pageSize) {
+    public Result queryScripts(String key, Integer pageNo, Integer pageSize) {
         HashSet<JSONObject> scriptsSet = new HashSet<>();
         List<JSONObject> scriptsList = new ArrayList<>();
         List<QlEntity> qls = qlMapper.queryQls(null);
@@ -352,16 +353,16 @@ public class QlServiceImpl implements QlService {
                 String token = tokenJson.getString("token");
                 String tokenType = tokenJson.getString("token_type");
                 List<QlCron> crons = qlUtil.getCrons(url, tokenType, token);
-                if (crons==null){
+                if (crons == null) {
                     //重试一次
                     crons = qlUtil.getCrons(url, tokenType, token);
                 }
-                Collections.sort(crons, new Comparator<QlCron>() {
+                /*Collections.sort(crons, new Comparator<QlCron>() {
                     @Override
                     public int compare(QlCron o1, QlCron o2) {
                         return o2.getCreatedAt().compareTo(o1.getCreatedAt());
                     }
-                });
+                });*/
                 if (crons != null) {
                     for (QlCron cron : crons) {
                         JSONObject script = new JSONObject();
@@ -371,12 +372,12 @@ public class QlServiceImpl implements QlService {
                         script.put("command", command);
                         if (StringUtils.isNotEmpty(key)) {
                             if (name.contains(key) || command.contains(key)) {
-                                if (scriptsSet.add(script)){
+                                if (scriptsSet.add(script)) {
                                     scriptsList.add(script);
                                 }
                             }
                         } else {
-                            if (scriptsSet.add(script)){
+                            if (scriptsSet.add(script)) {
                                 scriptsList.add(script);
                             }
                         }
@@ -387,15 +388,15 @@ public class QlServiceImpl implements QlService {
                 log.error("查询脚本失败", e);
             }
         }
-        int start = PageUtil.getStart(pageNo, pageSize);
-        int end = PageUtil.getEnd(pageNo, pageSize);
-        scriptsList = scriptsList.subList(start,end);
+        int start = PageUtil.getStart(pageNo, pageSize) - pageSize;
+        int end = PageUtil.getEnd(pageNo, pageSize) - pageSize;
         JSONObject result = new JSONObject();
-        result.put("total",scriptsList.size());
-        result.put("pageNo",pageNo);
-        result.put("pageSize",pageSize);
-        result.put("scriptsList",scriptsList);
-        return Result.success(result    );
+        result.put("total", scriptsList.size());
+        result.put("pageNo", pageNo);
+        result.put("pageSize", pageSize);
+        scriptsList = scriptsList.subList(start, end < scriptsList.size() ? end : scriptsList.size());
+        result.put("scriptsList", scriptsList);
+        return Result.success(result);
     }
 
     /**
@@ -416,11 +417,11 @@ public class QlServiceImpl implements QlService {
                 String token = tokenJson.getString("token");
                 String tokenType = tokenJson.getString("token_type");
                 List<QlCron> crons = qlUtil.getCrons(url, tokenType, token);
-                if (crons==null){
+                if (crons == null) {
                     //重试一次
                     crons = qlUtil.getCrons(url, tokenType, token);
                 }
-                if (crons!=null){
+                if (crons != null) {
                     Integer old = list.size();
                     for (QlCron cron : crons) {
                         String name = cron.getName();
@@ -441,7 +442,7 @@ public class QlServiceImpl implements QlService {
                     if (now == old) {
                         list.add(url + "(" + remark + ")" + command + " 脚本不存在");
                     }
-                }else {
+                } else {
                     list.add(url + "(" + remark + ")" + " 执行" + command + " 失败");
                 }
 
