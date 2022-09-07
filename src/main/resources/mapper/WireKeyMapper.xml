@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bienao.robot.mapper.WireKeyMapper">
+    <insert id="addWireKey">
+        insert into wireKey values(wireId,`key`)
+        <foreach collection="wireKeyEntities" separator="," item="key">
+            (#{wireKeyEntities.wireId}, #{wireKeyEntities.key})
+        </foreach>
+    </insert>
+
+    <update id="updateWire">
+        update wireKey
+        <set>
+            <if test="wireId !=null">
+                wireId=#{wireId},
+            </if>
+            <if test="key !=null and key !=''">
+                key=#{key},
+            </if>
+            <if test="updatedTime !=null">
+                updated_time=#{updatedTime},
+            </if>
+        </set>
+        where id=#{id};
+    </update>
+
+    <delete id="deleteWireKey">
+        delete from wireKey where wireId=#{wireId}
+    </delete>
+</mapper>

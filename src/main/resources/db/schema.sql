@@ -38,3 +38,17 @@ create table if not exists `ql` (
                                        created_time datetime DEFAULT CURRENT_TIMESTAMP,
                                        updated_time datetime DEFAULT CURRENT_TIMESTAMP
 );
+create table if not exists `wire` (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    activity_name varchar,
+                                    script varchar UNIQUE,
+                                    created_time datetime DEFAULT CURRENT_TIMESTAMP,
+                                    updated_time datetime DEFAULT CURRENT_TIMESTAMP
+);
+create table if not exists `wireKey` (
+                                      id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                      wireId INTEGER,
+                                      key varchar,
+                                      created_time datetime DEFAULT CURRENT_TIMESTAMP,
+                                      updated_time datetime DEFAULT CURRENT_TIMESTAMP
+);

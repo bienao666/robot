@@ -69,4 +69,9 @@ public final class ErrorCodeConstant {
      */
     public static final String BIGHEAD_MOVE_ERROR="30007";
 
+    /**
+     * 数据库操作失败
+     */
+    public static final String DATABASE_OPERATE_ERROR="30008";
+
 }

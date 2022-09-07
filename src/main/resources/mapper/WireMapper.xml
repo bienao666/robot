@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bienao.robot.mapper.WireMapper">
+
+    <insert id="addWire" parameterType="wireEntity">
+        insert into wire(activity_name,script) values (#{activityName},#{script})
+    </insert>
+
+    <select id="queryMaxId" resultType="java.lang.Integer">
+        select max(id) from wire
+    </select>
+
+    <select id="queryCount" resultType="java.lang.Integer">
+        select count(*) from wire
+    </select>
+
+    <resultMap id="wireEntityMap" type="wireEntity">
+        <id property="id" column="id"></id>
+        <result property="activityName" column="activity_name"></result>
+        <result property="script" column="script"></result>
+        <association  property="keys" javaType="wireKeyEntity" column="id" select="queryWireKeyEntity" ></association >
+    </resultMap>
+
+    <select id="queryWire" resultMap="wireEntityMap">
+        select * from wire
+        where id in (select id from wire where 1=1
+            <if test="key !=null and key !=''">
+                and (activity_name like '%'||#{key}||'%' or script like '%'||#{key}||'%')
+            </if>
+            union all
+            select wireid from wireKey where 1=1
+            <if test="key !=null and key !=''">
+                and key like '%'||#{key}||'%'
+            </if>)
+        order by created_time desc
+    </select>
+
+    <select id="queryWireKeyEntity" resultType="wireKeyEntity">
+        select * from wireKey order by created_time desc
+    </select>
+
+    <update id="updateWire">
+        update wireKey
+        <set>
+            <if test="activityName !=null and activityName !=''">
+                activity_name=#{activityName},
+            </if>
+            <if test="script !=null and script !=''">
+                script=#{script},
+            </if>
+            <if test="updatedTime !=null">
+                updated_time=#{updatedTime},
+            </if>
+        </set>
+        where id=#{id};
+    </update>
+
+    <delete id="deleteWire" parameterType="list">
+        delete from wire where 1=1 and id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
