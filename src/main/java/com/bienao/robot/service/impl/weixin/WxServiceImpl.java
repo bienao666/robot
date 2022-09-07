@@ -213,7 +213,7 @@ public class WxServiceImpl implements WxService {
         if (msg.equals("比价")) {
             weChatUtil.sendTextMsg("请直接发送商品连接，我会自动识别", content);
         }
-        if (msg.contains("item.m.jd.com") || msg.contains("m.tb.cn")) {
+        if (msg.contains("item.m.jd.com") || msg.contains("m.tb.cn") || msg.contains("mobile.yangkeduo.com")) {
             handleGoods(msg, content);
             return;
         }

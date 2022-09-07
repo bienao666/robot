@@ -14,3 +14,4 @@ INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ELMURL', '饿了�
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('OFFICIALGROUP', '个人微信官方群','',0);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('QLBIGHEAD', '大车头','',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('BIGHEADLOCATION', '大车头所在青龙','',0);
+INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('JDLONGINURL', '京东登陆地址','',1);
