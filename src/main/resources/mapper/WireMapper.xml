@@ -20,7 +20,12 @@
         <id property="id" column="id"></id>
         <result property="activityName" column="activity_name"></result>
         <result property="script" column="script"></result>
-        <association  property="keys" javaType="wireKeyEntity" column="id" select="queryWireKeyEntity" ></association >
+        <collection  property="keys" javaType="ArrayList" column="id" select="queryWireKeyEntity" >
+            <id property="id" column="id"/>
+            <result property="wireId" column="wireId"/>
+            <result property="createdTime" column="created_time"/>
+            <result property="updatedTime" column="updated_time"/>
+        </collection >
     </resultMap>
 
     <select id="queryWire" resultMap="wireEntityMap">
@@ -38,11 +43,11 @@
     </select>
 
     <select id="queryWireKeyEntity" resultType="wireKeyEntity">
-        select * from wireKey order by created_time desc
+        select * from wireKey where wireId = #{id} order by created_time desc
     </select>
 
     <update id="updateWire">
-        update wireKey
+        update wire
         <set>
             <if test="activityName !=null and activityName !=''">
                 activity_name=#{activityName},

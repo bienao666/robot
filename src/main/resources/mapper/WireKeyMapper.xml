@@ -3,14 +3,11 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bienao.robot.mapper.WireKeyMapper">
-    <insert id="addWireKey">
-        insert into wireKey values(wireId,`key`)
-        <foreach collection="wireKeyEntities" separator="," item="key">
-            (#{wireKeyEntities.wireId}, #{wireKeyEntities.key})
-        </foreach>
+    <insert id="addWireKey" parameterType="wireKeyEntity">
+        insert into wireKey (wireId,`key`) values (#{wireId}, #{key})
     </insert>
 
-    <update id="updateWire">
+    <update id="updateWireKey">
         update wireKey
         <set>
             <if test="wireId !=null">
@@ -27,6 +24,9 @@
     </update>
 
     <delete id="deleteWireKey">
-        delete from wireKey where wireId=#{wireId}
+        delete from wireKey where 1=1 and wireId in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
     </delete>
 </mapper>

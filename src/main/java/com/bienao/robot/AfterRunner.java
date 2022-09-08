@@ -105,9 +105,6 @@ public class AfterRunner implements ApplicationRunner {
                     keys.add("DPQDTK");
                     wireService.addWire("店铺签到","jd_shop_sign.js",keys);
 
-                    keys.add("M_WX_LUCK_DRAW_URL");
-                    wireService.addWire("M幸运抽奖","m_jd_wx_luckDraw.js",keys);
-
                     keys.add("jd_nzmhurl");
                     wireService.addWire("女装盲盒","jd_nzmh.js",keys);
 
@@ -128,9 +125,6 @@ public class AfterRunner implements ApplicationRunner {
 
                     keys.add("VENDER_ID");
                     wireService.addWire("入会开卡领取礼","jd_OpenCard_Force.js",keys);
-
-                    keys.add("ACTIVITY_ID");
-                    wireService.addWire("加购物车抽奖","jd_wxCollectionActivity.js",keys);
 
                     keys.add("jd_wxShareActivity_activityId");
                     keys.add("jd_wxShareActivity_helpnum");
@@ -174,7 +168,7 @@ public class AfterRunner implements ApplicationRunner {
                     wireService.addWire("LZ刮刮乐抽奖","jd_drawCenter.js",keys);
 
                     keys.add("jd_wxCartKoi_activityId");
-                    wireService.addWire("LZ购物车锦鲤","jd_wxCartKoi.js",keys);
+                    wireService.addWire("LZ购物车锦鲤/购物车锦鲤通用活动","jd_wxCartKoi.js",keys);
 
                     keys.add("jd_wxFansInterActionActivity_activityId");
                     wireService.addWire("LZ粉丝互动","jd_wxFansInterActionActivity.js",keys);
@@ -182,9 +176,6 @@ public class AfterRunner implements ApplicationRunner {
                     keys.add("yhyactivityId");
                     keys.add("yhyauthorCode");
                     wireService.addWire("邀请赢大礼/邀好友赢大礼","jd_yqhy.py",keys);
-
-                    keys.add("jd_wxCartKoi_activityId");
-                    wireService.addWire("购物车锦鲤通用活动","jd_wxCartKoi.js",keys);
 
                     keys.add("jd_wxShopFollowActivity_activityId");
                     wireService.addWire("关注抽奖","jd_wxShopFollowActivity.js",keys);

@@ -1,5 +1,6 @@
 package com.bienao.robot.service.ql;
 
+import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.WireEntity;
 import com.bienao.robot.result.Result;
 
@@ -41,4 +42,11 @@ public interface WireService {
      * @return
      */
     Result deleteWire(List<Integer> wireIds);
+
+    /**
+     * 添加洞察变量
+     * @param jsonObject
+     * @return
+     */
+    Result addKey(JSONObject jsonObject);
 }

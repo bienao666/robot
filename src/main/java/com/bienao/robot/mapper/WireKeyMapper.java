@@ -16,7 +16,15 @@ public interface WireKeyMapper{
      * @param wireKeyEntities
      * @return
      */
-    int addWireKey(List<WireKeyEntity> wireKeyEntities);
+//    int addWireKey(WireKeyEntity wireKeyEntities);
+
+    /**
+     * 添加活动洞察变量
+     * @param wireId
+     * @param key
+     * @return
+     */
+    int addWireKey(Integer wireId,String key);
 
     /**
      * 修改活动洞察变量
@@ -27,8 +35,8 @@ public interface WireKeyMapper{
 
     /**
      * 删除活动洞察变量
-     * @param wireId
+     * @param ids
      * @return
      */
-    int deleteWireKey(Integer wireId);
+    int deleteWireKey(List<Integer> ids);
 }
