@@ -74,4 +74,9 @@ public final class ErrorCodeConstant {
      */
     public static final String DATABASE_OPERATE_ERROR="30008";
 
+    /**
+     * 服务异常
+     */
+    public static final String SERVICE_ERROR="30009";
+
 }

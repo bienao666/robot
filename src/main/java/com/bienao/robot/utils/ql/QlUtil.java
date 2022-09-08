@@ -377,7 +377,7 @@ public class QlUtil {
      * @param file 配置文件名称
      * @return
      */
-    public JSONObject getFile(String url,String tokenType,String token,String file){
+    public String getFile(String url,String tokenType,String token,String file){
         if (!url.endsWith("/")){
             url = url+"/";
         }
@@ -394,8 +394,7 @@ public class QlUtil {
                 log.info("青龙获取配置文件内容失败");
                 return null;
             }
-            String data = res.getString("data");
-            return JSONObject.parseObject(data);
+            return res.getString("data");
         } catch (HttpException e) {
             log.info("青龙获取配置文件内容失败");
             return null;

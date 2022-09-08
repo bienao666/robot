@@ -29,4 +29,10 @@
             #{id}
         </foreach>
     </delete>
+
+    <select id="queryScript" resultType="string">
+        select w.script from wireKey wk
+        left join wire w on wk.wireId=w.identity
+        where wk.key = #{key}
+    </select>
 </mapper>

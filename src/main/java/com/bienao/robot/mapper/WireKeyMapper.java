@@ -39,4 +39,11 @@ public interface WireKeyMapper{
      * @return
      */
     int deleteWireKey(List<Integer> ids);
+
+    /**
+     * 根据
+     * @param key
+     * @return
+     */
+    String queryScript(String key);
 }

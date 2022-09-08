@@ -42,4 +42,11 @@ public interface WireService {
      * @return
      */
     Result deleteWire(List<Integer> wireIds);
+
+    /**
+     * 执行线报活动
+     * @param wire
+     * @return
+     */
+    Result handleWire(String wire);
 }

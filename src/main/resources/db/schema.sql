@@ -52,3 +52,10 @@ create table if not exists `wireKey` (
                                       created_time datetime DEFAULT CURRENT_TIMESTAMP,
                                       updated_time datetime DEFAULT CURRENT_TIMESTAMP
 );
+create table if not exists `wirelist` (
+                                         id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                         content varchar,
+                                         result varchar,
+                                         created_time datetime DEFAULT CURRENT_TIMESTAMP,
+                                         updated_time datetime DEFAULT CURRENT_TIMESTAMP
+);

@@ -45,7 +45,7 @@ public class WireController {
             result = wireService.addWire(wireEntity);
         } catch (Exception e) {
             e.printStackTrace();
-            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败");
+            return Result.error(ErrorCodeConstant.SERVICE_ERROR,"添加失败");
         }
         long end = System.currentTimeMillis();
         log.info("addWire结束：{}",System.currentTimeMillis());
@@ -85,7 +85,7 @@ public class WireController {
             result = wireService.updateWire(wireEntity);
         } catch (Exception e) {
             e.printStackTrace();
-            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"修改失败");
+            return Result.error(ErrorCodeConstant.SERVICE_ERROR,"修改失败");
         }
         long end = System.currentTimeMillis();
         log.info("updateWire结束：{}",System.currentTimeMillis());
@@ -106,11 +106,32 @@ public class WireController {
             result = wireService.deleteWire(wireIds);
         } catch (Exception e) {
             e.printStackTrace();
-            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"删除失败");
+            return Result.error(ErrorCodeConstant.SERVICE_ERROR,"删除失败");
         }
         long end = System.currentTimeMillis();
         log.info("deleteWire结束：{}",System.currentTimeMillis());
         log.info("deleteWire耗时：{}ms",(end-start));
+        return result;
+    }
+
+    /**
+     * 执行线报活动
+     * @param wire
+     */
+    @PostMapping("/handleWire")
+    public Result deleteWire(@RequestBody String wire){
+        long start = System.currentTimeMillis();
+        log.info("开始handleWire：{}",System.currentTimeMillis());
+        Result result = null;
+        try {
+            result = wireService.handleWire(wire);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error(ErrorCodeConstant.SERVICE_ERROR,"执行失败");
+        }
+        long end = System.currentTimeMillis();
+        log.info("handleWire结束：{}",System.currentTimeMillis());
+        log.info("handleWire耗时：{}ms",(end-start));
         return result;
     }
 
