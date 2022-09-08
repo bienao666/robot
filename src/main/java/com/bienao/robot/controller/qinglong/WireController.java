@@ -114,28 +114,4 @@ public class WireController {
         return result;
     }
 
-    /**
-     * 添加洞察变量
-     * @param jsonObject
-     */
-    @PostMapping("/addKey")
-    public Result addKey(@Validated @RequestBody JSONObject jsonObject){
-        long start = System.currentTimeMillis();
-        log.info("开始addWire：{}",System.currentTimeMillis());
-        Result result = null;
-        try {
-            Integer id = jsonObject.getInteger("id");
-            if (id == null){
-                return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"id不能为空");
-            }
-            result = wireService.addKey(jsonObject);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败");
-        }
-        long end = System.currentTimeMillis();
-        log.info("addWire结束：{}",System.currentTimeMillis());
-        log.info("addWire耗时：{}ms",(end-start));
-        return result;
-    }
 }

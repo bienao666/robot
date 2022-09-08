@@ -42,11 +42,4 @@ public interface WireService {
      * @return
      */
     Result deleteWire(List<Integer> wireIds);
-
-    /**
-     * 添加洞察变量
-     * @param jsonObject
-     * @return
-     */
-    Result addKey(JSONObject jsonObject);
 }

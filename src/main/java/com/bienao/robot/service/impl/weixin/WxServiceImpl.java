@@ -195,7 +195,7 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //买家秀
-        if (msg.trim().contains("mjx") || msg.trim().contains("买家秀")) {
+        if (msg.trim().equals("mjx") || msg.trim().equals("买家秀")) {
             handleMJX(content);
             return;
         }

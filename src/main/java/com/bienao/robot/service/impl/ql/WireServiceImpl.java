@@ -44,12 +44,12 @@ public class WireServiceImpl implements WireService {
         Integer maxId = wireMapper.queryMaxId();
         List<WireKeyEntity> keys = wireEntity.getKeys();
         for (WireKeyEntity key : keys) {
-            wireKeyMapper.addWireKey(maxId,key.getKey());
+            i = wireKeyMapper.addWireKey(maxId, key.getKey());
             if (i==0){
                 throw new RuntimeException("数据库操作异常");
             }
         }
-        return Result.success("添加成功");
+        return Result.success("操作成功");
     }
 
     /**
@@ -78,9 +78,11 @@ public class WireServiceImpl implements WireService {
     public Result updateWire(WireEntity wireEntity) {
         wireEntity.setUpdatedTime(new Date());
         wireMapper.updateWire(wireEntity);
+        ArrayList<Integer> ids = new ArrayList<>();
+        ids.add(wireEntity.getId());
+        wireKeyMapper.deleteWireKey(ids);
         for (WireKeyEntity key : wireEntity.getKeys()) {
-            key.setUpdatedTime(new Date());
-            wireKeyMapper.updateWireKey(key);
+            wireKeyMapper.addWireKey(wireEntity.getId(),key.getKey());
         }
         return Result.success("修改成功");
     }
@@ -104,25 +106,6 @@ public class WireServiceImpl implements WireService {
                 return Result.success();
             }
         }
-    }
-
-    /**
-     * 添加洞察变量
-     * @param jsonObject
-     * @return
-     */
-    @Override
-    public Result addKey(JSONObject jsonObject) {
-        Integer id = jsonObject.getInteger("id");
-        String keysStr = jsonObject.getString("keys");
-        List<String> keys = JSON.parseArray(keysStr, String.class);
-        for (String key : keys) {
-            int i = wireKeyMapper.addWireKey(id, key);
-            if (i==0){
-                return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败");
-            }
-        }
-        return Result.success("添加成功");
     }
 
     /**
