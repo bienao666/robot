@@ -33,6 +33,8 @@ create table if not exists `ql` (
                                        url varchar UNIQUE,
                                        clientID varchar,
                                        clientSecret INTEGER,
+                                       tokenType varchar,
+                                       token varchar,
                                        head varchar,
                                        remark varchar,
                                        created_time datetime DEFAULT CURRENT_TIMESTAMP,
@@ -42,6 +44,7 @@ create table if not exists `wire` (
                                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                                     activity_name varchar,
                                     script varchar UNIQUE,
+                                    status varchar DEFAULT '未执行',
                                     created_time datetime DEFAULT CURRENT_TIMESTAMP,
                                     updated_time datetime DEFAULT CURRENT_TIMESTAMP
 );
@@ -54,7 +57,8 @@ create table if not exists `wireKey` (
 );
 create table if not exists `wirelist` (
                                          id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                         content varchar,
+                                         script varchar,
+                                         content varchar UNIQUE,
                                          result varchar,
                                          created_time datetime DEFAULT CURRENT_TIMESTAMP,
                                          updated_time datetime DEFAULT CURRENT_TIMESTAMP

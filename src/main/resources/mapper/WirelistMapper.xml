@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bienao.robot.mapper.WirelistMapper">
+
+    <insert id="addActivity" parameterType="string">
+        insert into wirelist(script,content) values (#{script},#{content})
+    </insert>
+
+    <select id="queryActivity" resultType="wireActivityEntity">
+        select * from wirelist order by created_time desc limit 10
+    </select>
+</mapper>

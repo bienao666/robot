@@ -2,19 +2,18 @@ package com.bienao.robot.service.impl.ql;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.bienao.robot.entity.QlCron;
-import com.bienao.robot.entity.QlEntity;
-import com.bienao.robot.entity.WireEntity;
-import com.bienao.robot.entity.WireKeyEntity;
+import com.bienao.robot.entity.*;
 import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.mapper.QlMapper;
 import com.bienao.robot.mapper.WireKeyMapper;
 import com.bienao.robot.mapper.WireMapper;
+import com.bienao.robot.mapper.WirelistMapper;
 import com.bienao.robot.result.Result;
 import com.bienao.robot.service.ql.WireKeyService;
 import com.bienao.robot.service.ql.WireService;
 import com.bienao.robot.utils.ql.QlUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +38,9 @@ public class WireServiceImpl implements WireService {
 
     @Autowired
     private QlUtil qlUtil;
+
+    @Autowired
+    private WirelistMapper wirelistMapper;
 
     /**
      * 添加线报活动
@@ -121,25 +123,22 @@ public class WireServiceImpl implements WireService {
 
     /**
      * 执行线报活动
+     * @param script
      * @param wire
      * @return
      */
     @Override
-    public Result handleWire(String wire) {
+    public Result handleActivity(String script,String wire) {
         ArrayList<String> result = new ArrayList<>();
         List<String> list = Arrays.asList(wire.split("\\r?\\n"));
         ArrayList<String> keys = new ArrayList<>();
         List<QlEntity> qls = qlMapper.queryQls(null);
+        boolean handleFlag = false;
         for (QlEntity ql : qls) {
             boolean configFlag = false;
-            String token = "";
-            String tokenType = "";
             //设置参数
             try {
-                JSONObject tokenJson = qlUtil.getToken(ql.getUrl(), ql.getClientID(), ql.getClientSecret());
-                token = tokenJson.getString("token");
-                tokenType = tokenJson.getString("token_type");
-                String configs = qlUtil.getFile(ql.getUrl(), tokenType, token, "config.sh");
+                String configs = qlUtil.getFile(ql.getUrl(), ql.getTokenType(), ql.getToken(), "config.sh");
                 for (String config : list) {
                     if (config.contains("#") && (config.contains(".js") || config.contains(".py"))){
                         continue;
@@ -164,7 +163,7 @@ public class WireServiceImpl implements WireService {
                         }
                     }
                 }
-                JSONObject jsonObject = qlUtil.saveFile(ql.getUrl(), tokenType, token, "config.sh", configs);
+                JSONObject jsonObject = qlUtil.saveFile(ql.getUrl(), ql.getTokenType(), ql.getToken(), "config.sh", configs);
                 if (jsonObject==null){
                     //配置失败
                     result.add(ql.getUrl() + "(" + ql.getRemark() + ")" + " 配置 失败");
@@ -181,23 +180,14 @@ public class WireServiceImpl implements WireService {
             }
 
             if (configFlag){
-                //根据洞察变量查询脚本名称
-                String script = "";
-                for (String key : keys) {
-                    String s = wireKeyMapper.queryScript(key);
-                    if (s!=null){
-                        script = s;
-                        break;
-                    }
-                }
                 //执行脚本
                 String remark = ql.getRemark();
                 String url = ql.getUrl();
                 try {
-                    List<QlCron> crons = qlUtil.getCrons(url, tokenType, token);
+                    List<QlCron> crons = qlUtil.getCrons(url, ql.getTokenType(), ql.getToken());
                     if (crons == null) {
                         //重试一次
-                        crons = qlUtil.getCrons(url, tokenType, token);
+                        crons = qlUtil.getCrons(url, ql.getTokenType(), ql.getToken());
                     }
                     if (crons != null) {
                         Integer old = list.size();
@@ -206,7 +196,7 @@ public class WireServiceImpl implements WireService {
                                 Integer id = cron.getId();
                                 List<Integer> cronIds = new ArrayList<>();
                                 cronIds.add(id);
-                                boolean flag = qlUtil.runCron(url, tokenType, token, cronIds);
+                                boolean flag = qlUtil.runCron(url, ql.getTokenType(), ql.getToken(), cronIds);
                                 if (flag) {
                                     result.add(url + "(" + remark + ")" + " 线报 执行成功");
                                 } else {
@@ -216,7 +206,7 @@ public class WireServiceImpl implements WireService {
                             }
                         }
                         Integer now = result.size();
-                        if (now == old) {
+                        if (now.equals(old)) {
                             result.add(url + "(" + remark + ")" + script + " 脚本不存在，请拉库后执行");
                         }
                     } else {
@@ -229,8 +219,55 @@ public class WireServiceImpl implements WireService {
                 }
             }
         }
+        //更新线报表
 
         return Result.success();
+    }
+
+    /**
+     * 添加线报活动
+     * @param wire
+     * @return
+     */
+    @Override
+    public Result addActivity(String wire) {
+        String script = "";
+        List<String> list = Arrays.asList(wire.split("\\r?\\n"));
+        for (String config : list) {
+            if (config.contains("#") && (config.contains(".js") || config.contains(".py"))){
+                continue;
+            }
+            if (config.contains("=")){
+                //export 参数名
+                String s1 = config.split("=")[0];
+                String key = s1.replace("export", "").replace(" ", "");
+                String s = wireKeyMapper.queryScript(key);
+                if (s!=null){
+                    script = s;
+                    break;
+                }
+            }
+        }
+        if (StringUtils.isEmpty(script)){
+            Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败，线报不存在，请先添加");
+        }
+        int i = wirelistMapper.addActivity(script,wire);
+        if (i!=0){
+            return Result.success("添加成功");
+        }else {
+            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败");
+        }
+    }
+
+    /**
+     * 查询线报活动
+     * @param
+     * @return
+     */
+    @Override
+    public Result queryActivity() {
+        List<WireActivityEntity> wireActivityEntities = wirelistMapper.queryActivity();
+        return Result.success(wireActivityEntities);
     }
 
     /**

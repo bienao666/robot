@@ -29,7 +29,7 @@ public class WireController {
     private WireService wireService;
 
     /**
-     * 添加线报活动
+     * 添加线报
      * @param wireEntity
      */
     @PostMapping("/addWire")
@@ -54,7 +54,7 @@ public class WireController {
     }
 
     /**
-     * 查询线报活动
+     * 查询线报
      * @param key
      */
     @GetMapping("/queryWire")
@@ -69,7 +69,7 @@ public class WireController {
     }
 
     /**
-     * 修改线报活动
+     * 修改线报
      * @param wireEntity
      */
     @PostMapping("/updateWire")
@@ -94,7 +94,7 @@ public class WireController {
     }
 
     /**
-     * 删除线报活动
+     * 删除线报
      * @param wireIds
      */
         @PostMapping("/deleteWire")
@@ -115,23 +115,45 @@ public class WireController {
     }
 
     /**
-     * 执行线报活动
+     * 添加线报活动
      * @param wire
      */
-    @PostMapping("/handleWire")
-    public Result deleteWire(@RequestBody String wire){
+    @PostMapping("/addActivity")
+    public Result addActivity(@RequestBody String wire){
         long start = System.currentTimeMillis();
-        log.info("开始handleWire：{}",System.currentTimeMillis());
-        Result result = null;
-        try {
-            result = wireService.handleWire(wire);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Result.error(ErrorCodeConstant.SERVICE_ERROR,"执行失败");
-        }
+        log.info("开始addActivity：{}",System.currentTimeMillis());
+        Result result = wireService.addActivity(wire);
         long end = System.currentTimeMillis();
-        log.info("handleWire结束：{}",System.currentTimeMillis());
-        log.info("handleWire耗时：{}ms",(end-start));
+        log.info("addActivity结束：{}",System.currentTimeMillis());
+        log.info("addActivity耗时：{}ms",(end-start));
+        return result;
+    }
+
+    /**
+     * 添加线报活动
+     */
+    @GetMapping("/queryActivity")
+    public Result queryActivity(){
+        long start = System.currentTimeMillis();
+        log.info("开始queryActivity：{}",System.currentTimeMillis());
+        Result result = wireService.queryActivity();
+        long end = System.currentTimeMillis();
+        log.info("queryActivity结束：{}",System.currentTimeMillis());
+        log.info("queryActivity耗时：{}ms",(end-start));
+        return result;
+    }
+
+    /**
+     * 执行线报活动
+     */
+    @GetMapping("/handleActivity")
+    public Result handleActivity(@RequestParam String script,@RequestParam String wire){
+        long start = System.currentTimeMillis();
+        log.info("开始handleActivity：{}",System.currentTimeMillis());
+        Result result = wireService.handleActivity(script,wire);
+        long end = System.currentTimeMillis();
+        log.info("handleActivity结束：{}",System.currentTimeMillis());
+        log.info("handleActivity耗时：{}ms",(end-start));
         return result;
     }
 

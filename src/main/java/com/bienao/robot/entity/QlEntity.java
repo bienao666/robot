@@ -23,6 +23,10 @@ public class QlEntity {
     //clientSecret
     private String clientSecret;
 
+    private String tokenType;
+
+    private String token;
+
     //车头
     private String head;
 

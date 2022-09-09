@@ -31,13 +31,13 @@ public interface WireService {
     void addWire(String activityName, String script, List<String> keys);
 
     /**
-     * 修改线报活动
+     * 修改活动
      * @param wireEntity
      */
     Result updateWire(WireEntity wireEntity);
 
     /**
-     * 删除线报活动
+     * 删除活动
      * @param wireIds
      * @return
      */
@@ -48,5 +48,18 @@ public interface WireService {
      * @param wire
      * @return
      */
-    Result handleWire(String wire);
+    Result handleActivity(String script,String wire);
+
+    /**
+     * 添加线报活动
+     * @param wire
+     * @return
+     */
+    Result addActivity(String wire);
+
+    /**
+     * 查询线报活动
+     * @return
+     */
+    Result queryActivity();
 }

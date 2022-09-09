@@ -113,11 +113,16 @@ public class QlServiceImpl implements QlService {
     public Result queryQls(List<Integer> ids) {
         List<QlEntity> qls = qlMapper.queryQls(ids);
         for (QlEntity ql : qls) {
-            JSONObject jsonObject = qlUtil.getToken(ql.getUrl(), ql.getClientID(), ql.getClientSecret());
-            if (jsonObject == null) {
+            JSONObject tokenJson = qlUtil.getToken(ql.getUrl(), ql.getClientID(), ql.getClientSecret());
+            if (tokenJson == null) {
                 ql.setStatus("异常");
             } else {
                 ql.setStatus("正常");
+                ql.setToken(tokenJson.getString("token"));
+                ql.setTokenType(tokenJson.getString("token_type"));
+                qlMapper.updateQl(ql);
+                ql.setToken("******");
+                ql.setTokenType("******");
             }
             ql.setClientSecret("******");
         }
@@ -218,10 +223,7 @@ public class QlServiceImpl implements QlService {
         for (QlEntity ql : qls) {
             //大车头是否存在
             boolean isContainBigHead = false;
-            JSONObject tokenJson = qlUtil.getToken(ql.getUrl(), ql.getClientID(), ql.getClientSecret());
-            String token = tokenJson.getString("token");
-            String tokenType = tokenJson.getString("token_type");
-            List<JSONObject> envs = qlUtil.getEnvs(ql.getUrl(), tokenType, token);
+            List<JSONObject> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
             for (JSONObject env : envs) {
                 String name = env.getString("name");
                 String value = env.getString("value");
@@ -230,7 +232,7 @@ public class QlServiceImpl implements QlService {
                     isContainBigHead = true;
                     qlBigHeadJson = env;
                     systemParamUtil.updateSystemParam("BIGHEADLOCATION", "", ql.getId().toString());
-                    JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), tokenType, token, env.getString("id"), env.getInteger("id"), 0);
+                    JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getString("id"), env.getInteger("id"), 0);
                     if (jsonObject == null) {
                         results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置失败");
                     } else {
@@ -252,10 +254,7 @@ public class QlServiceImpl implements QlService {
         for (QlEntity ql : qls) {
             //大车头是否存在
             boolean isContainBigHead = false;
-            JSONObject tokenJson = qlUtil.getToken(ql.getUrl(), ql.getClientID(), ql.getClientSecret());
-            String token = tokenJson.getString("token");
-            String tokenType = tokenJson.getString("token_type");
-            List<JSONObject> envs = qlUtil.getEnvs(ql.getUrl(), tokenType, token);
+            List<JSONObject> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
             for (JSONObject env : envs) {
                 String name = env.getString("name");
                 String value = env.getString("value");
@@ -267,10 +266,10 @@ public class QlServiceImpl implements QlService {
             //该青龙没有大车头
             if (!isContainBigHead) {
                 //设置大车头
-                JSONObject env = qlUtil.addEnvs(ql.getUrl(), tokenType, token, qlBigHeadJson.getString("name"),
+                JSONObject env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), qlBigHeadJson.getString("name"),
                         qlBigHeadJson.getString("value"),
                         qlBigHeadJson.getString("remarks"));
-                JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), tokenType, token, env.getString("id"), env.getInteger("id"), 0);
+                JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getString("id"), env.getInteger("id"), 0);
                 if (jsonObject == null) {
                     results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置失败");
                 } else {
@@ -311,10 +310,7 @@ public class QlServiceImpl implements QlService {
 
         //查询大车头数据
         for (QlEntity ql : qls) {
-            JSONObject tokenJson = qlUtil.getToken(ql.getUrl(), ql.getClientID(), ql.getClientSecret());
-            String token = tokenJson.getString("token");
-            String tokenType = tokenJson.getString("token_type");
-            List<JSONObject> envs = qlUtil.getEnvs(ql.getUrl(), tokenType, token);
+            List<JSONObject> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
             for (JSONObject env : envs) {
                 String name = env.getString("name");
                 String value = env.getString("value");
@@ -322,7 +318,7 @@ public class QlServiceImpl implements QlService {
                     //删除大车头
                     ArrayList<Integer> ids = new ArrayList<>();
                     ids.add(env.getInteger("id"));
-                    boolean b = qlUtil.deleteEnvs(ql.getUrl(), tokenType, token, ids);
+                    boolean b = qlUtil.deleteEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), ids);
                     if (b) {
                         results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "删除车头成功");
                     } else {
@@ -349,20 +345,11 @@ public class QlServiceImpl implements QlService {
                 String url = ql.getUrl();
                 String clientId = ql.getClientID();
                 String clientSecret = ql.getClientSecret();
-                JSONObject tokenJson = qlUtil.getToken(url, clientId, clientSecret);
-                String token = tokenJson.getString("token");
-                String tokenType = tokenJson.getString("token_type");
-                List<QlCron> crons = qlUtil.getCrons(url, tokenType, token);
+                List<QlCron> crons = qlUtil.getCrons(url, ql.getTokenType(), ql.getToken());
                 if (crons == null) {
                     //重试一次
-                    crons = qlUtil.getCrons(url, tokenType, token);
+                    crons = qlUtil.getCrons(url, ql.getTokenType(), ql.getToken());
                 }
-                /*Collections.sort(crons, new Comparator<QlCron>() {
-                    @Override
-                    public int compare(QlCron o1, QlCron o2) {
-                        return o2.getCreatedAt().compareTo(o1.getCreatedAt());
-                    }
-                });*/
                 if (crons != null) {
                     for (QlCron cron : crons) {
                         JSONObject script = new JSONObject();
@@ -413,13 +400,10 @@ public class QlServiceImpl implements QlService {
             String remark = ql.getRemark();
             String url = ql.getUrl();
             try {
-                JSONObject tokenJson = qlUtil.getToken(url, ql.getClientID(), ql.getClientSecret());
-                String token = tokenJson.getString("token");
-                String tokenType = tokenJson.getString("token_type");
-                List<QlCron> crons = qlUtil.getCrons(url, tokenType, token);
+                List<QlCron> crons = qlUtil.getCrons(url, ql.getTokenType(), ql.getToken());
                 if (crons == null) {
                     //重试一次
-                    crons = qlUtil.getCrons(url, tokenType, token);
+                    crons = qlUtil.getCrons(url, ql.getTokenType(), ql.getToken());
                 }
                 if (crons != null) {
                     Integer old = list.size();
@@ -429,7 +413,7 @@ public class QlServiceImpl implements QlService {
                             Integer id = cron.getId();
                             List<Integer> cronIds = new ArrayList<>();
                             cronIds.add(id);
-                            boolean flag = qlUtil.runCron(url, tokenType, token, cronIds);
+                            boolean flag = qlUtil.runCron(url, ql.getTokenType(), ql.getToken(), cronIds);
                             if (flag) {
                                 list.add(url + "(" + remark + ")" + " 执行" + "(" + name + ")" + " 成功");
                             } else {
