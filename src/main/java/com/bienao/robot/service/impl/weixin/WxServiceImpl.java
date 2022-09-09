@@ -147,6 +147,10 @@ public class WxServiceImpl implements WxService {
         if (msg.equals("菜单")) {
             handleFunctionList(content);
         }
+        //博客
+        if (msg.equals("博客")) {
+            handleFunctionBoKe(content);
+        }
         //加群
         if (msg.equals("加群") || msg.equals("进群")) {
             handleAddGroup(content);
@@ -244,6 +248,19 @@ public class WxServiceImpl implements WxService {
             if (num <= 50 && StringUtils.isNotEmpty(publicKey)) {
                 handleLast(content, num, publicKey);
             }
+        }
+    }
+
+    /**
+     * 博客
+     * @param content
+     */
+    private void handleFunctionBoKe(JSONObject content) {
+        String bokeUrl = systemParamUtil.querySystemParam("BOKEURL");
+        if (StringUtils.isEmpty(bokeUrl)){
+            weChatUtil.sendTextMsg("尚未设置博客地址",content);
+        }else {
+            weChatUtil.sendTextMsg(bokeUrl,content);
         }
     }
 
