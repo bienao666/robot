@@ -410,7 +410,7 @@ public class QlUtil {
      * @param content 配置文件内容
      * @return
      */
-    public JSONObject saveFile(String url,String tokenType,String token,String name,String content){
+    public boolean saveFile(String url,String tokenType,String token,String name,String content){
         if (!url.endsWith("/")){
             url = url+"/";
         }
@@ -418,24 +418,23 @@ public class QlUtil {
             JSONObject body = new JSONObject();
             body.put("name",name);
             body.put("content",content);
-            String resStr = HttpRequest.get(url + "open/configs/save")
+            String resStr = HttpRequest.post(url + "open/configs/save")
                     .header("Authorization",tokenType + " " + token)
                     .body(body.toJSONString())
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙保存配置文件失败");
-                return null;
+                return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
             if (!res.getString("code").equals("200")){
                 log.info("青龙保存配置文件失败");
-                return null;
+                return false;
             }
-            String data = res.getString("data");
-            return JSONObject.parseObject(data);
+            return true;
         } catch (HttpException e) {
             log.info("青龙保存配置文件失败");
-            return null;
+            return false;
         }
     }
 

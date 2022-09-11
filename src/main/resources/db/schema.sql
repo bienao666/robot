@@ -33,8 +33,6 @@ create table if not exists `ql` (
                                        url varchar UNIQUE,
                                        clientID varchar,
                                        clientSecret INTEGER,
-                                       tokenType varchar,
-                                       token varchar,
                                        head varchar,
                                        remark varchar,
                                        created_time datetime DEFAULT CURRENT_TIMESTAMP,
@@ -63,3 +61,5 @@ create table if not exists `wirelist` (
                                          created_time datetime DEFAULT CURRENT_TIMESTAMP,
                                          updated_time datetime DEFAULT CURRENT_TIMESTAMP
 );
+alter table `ql` add `tokenType` varchar after clientSecret;
+alter table `ql` add `token` varchar after tokenType;

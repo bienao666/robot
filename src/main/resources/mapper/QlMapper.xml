@@ -46,6 +46,12 @@
             <if test="clientSecret !=null and clientSecret !=''">
                 clientSecret=#{clientSecret},
             </if>
+            <if test="tokenType !=null and tokenType !=''">
+                tokenType=#{tokenType},
+            </if>
+            <if test="token !=null and token !=''">
+                token=#{token},
+            </if>
             <if test="head !=null and head !=''">
                 head=#{head},
             </if>

@@ -128,7 +128,7 @@ public class WireServiceImpl implements WireService {
      * @return
      */
     @Override
-    public Result handleActivity(String script,String wire) {
+    public Result handleActivity(Integer wireListId,String script,String wire) {
         ArrayList<String> result = new ArrayList<>();
         List<String> list = Arrays.asList(wire.split("\\r?\\n"));
         ArrayList<String> keys = new ArrayList<>();
@@ -140,7 +140,7 @@ public class WireServiceImpl implements WireService {
             try {
                 String configs = qlUtil.getFile(ql.getUrl(), ql.getTokenType(), ql.getToken(), "config.sh");
                 for (String config : list) {
-                    if (config.contains("#") && (config.contains(".js") || config.contains(".py"))){
+                    if (config.contains("#") && (config.contains(".js") || config.contains(".py") || config.contains("【"))){
                         continue;
                     }
                     if (config.contains("=")){
@@ -154,8 +154,8 @@ public class WireServiceImpl implements WireService {
                         if (configs.contains(s1)){
                             //配置过
                             int s1index = configs.indexOf(s1);
-                            int first = configs.indexOf("\"", s1index);
-                            int last = configs.indexOf("\"", first);
+                            int first = configs.indexOf("\"", s1index + s1.length());
+                            int last = configs.indexOf("\"", first+1)+1;
                             configs = stringBuffer.replace(first,last,s2).toString();
                         }else {
                             //没配置过
@@ -163,16 +163,16 @@ public class WireServiceImpl implements WireService {
                         }
                     }
                 }
-                JSONObject jsonObject = qlUtil.saveFile(ql.getUrl(), ql.getTokenType(), ql.getToken(), "config.sh", configs);
-                if (jsonObject==null){
+                boolean flag = qlUtil.saveFile(ql.getUrl(), ql.getTokenType(), ql.getToken(), "config.sh", configs);
+                if (flag){
+                    //配置成功
+                    result.add(ql.getUrl() + "(" + ql.getRemark() + ")" + " 配置 成功");
+                    configFlag = true;
+                }else {
                     //配置失败
                     result.add(ql.getUrl() + "(" + ql.getRemark() + ")" + " 配置 失败");
                     configFlag = false;
                     throw new RuntimeException("配置失败");
-                }else {
-                    //配置成功
-                    result.add(ql.getUrl() + "(" + ql.getRemark() + ")" + " 配置 成功");
-                    configFlag = true;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -199,6 +199,7 @@ public class WireServiceImpl implements WireService {
                                 boolean flag = qlUtil.runCron(url, ql.getTokenType(), ql.getToken(), cronIds);
                                 if (flag) {
                                     result.add(url + "(" + remark + ")" + " 线报 执行成功");
+                                    handleFlag = true;
                                 } else {
                                     result.add(url + "(" + remark + ")" + " 线报 执行失败，请手动执行");
                                 }
@@ -220,7 +221,10 @@ public class WireServiceImpl implements WireService {
             }
         }
         //更新线报表
-
+        wirelistMapper.updateWirelist(wireListId,JSONObject.toJSONString(result),new Date());
+        if (handleFlag){
+            wireMapper.updateWireStatus(script,"执行中");
+        }
         return Result.success();
     }
 

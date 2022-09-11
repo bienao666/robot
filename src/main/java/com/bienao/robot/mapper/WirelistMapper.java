@@ -4,6 +4,8 @@ import com.bienao.robot.entity.WireActivityEntity;
 import com.bienao.robot.entity.WireEntity;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -13,4 +15,5 @@ public interface WirelistMapper {
 
     List<WireActivityEntity> queryActivity();
 
+    void updateWirelist(Integer id, String result, Date updatedTime);
 }

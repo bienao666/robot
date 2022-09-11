@@ -233,6 +233,9 @@ public class AfterRunner implements ApplicationRunner {
                     keys.add("jd_completeInfoActivity_venderId");
                     keys.add("jd_completeInfoActivity_activityUrl");
                     wireService.addWire("完善信息有礼","jd_completeInfoActivity.js",keys);
+
+                    keys.add("DPLHTY");
+                    wireService.addWire("大牌联合通用开卡","jd_opencardDPLHTY.js",keys);
                 }
             }
         }).start();

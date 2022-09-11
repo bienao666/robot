@@ -11,4 +11,17 @@
     <select id="queryActivity" resultType="wireActivityEntity">
         select * from wirelist order by created_time desc limit 10
     </select>
+
+    <update id="updateWirelist">
+        update wirelist
+        <set>
+            <if test="result !=null and result !=''">
+                result=#{result},
+            </if>
+            <if test="updatedTime !=null">
+                updated_time=#{updatedTime},
+            </if>
+        </set>
+        where id=#{id};
+    </update>
 </mapper>

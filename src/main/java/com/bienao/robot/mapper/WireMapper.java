@@ -51,4 +51,8 @@ public interface WireMapper {
      */
     Integer deleteWire(List<Integer> ids);
 
+    /**
+     * 修改线报脚本状态
+     */
+    void updateWireStatus(String script,String status);
 }

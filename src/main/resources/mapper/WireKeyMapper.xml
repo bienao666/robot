@@ -32,7 +32,7 @@
 
     <select id="queryScript" resultType="string">
         select w.script from wireKey wk
-        left join wire w on wk.wireId=w.identity
+        left join wire w on wk.wireId=w.id
         where wk.key = #{key}
     </select>
 </mapper>

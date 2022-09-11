@@ -48,7 +48,7 @@ public interface WireService {
      * @param wire
      * @return
      */
-    Result handleActivity(String script,String wire);
+    Result handleActivity(Integer id,String script,String wire);
 
     /**
      * 添加线报活动

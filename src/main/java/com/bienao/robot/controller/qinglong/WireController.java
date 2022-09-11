@@ -130,7 +130,7 @@ public class WireController {
     }
 
     /**
-     * 添加线报活动
+     * 查询线报活动
      */
     @GetMapping("/queryActivity")
     public Result queryActivity(){
@@ -147,10 +147,10 @@ public class WireController {
      * 执行线报活动
      */
     @GetMapping("/handleActivity")
-    public Result handleActivity(@RequestParam String script,@RequestParam String wire){
+        public Result handleActivity(@RequestParam Integer id,@RequestParam String script,@RequestParam String wire){
         long start = System.currentTimeMillis();
         log.info("开始handleActivity：{}",System.currentTimeMillis());
-        Result result = wireService.handleActivity(script,wire);
+        Result result = wireService.handleActivity(id,script,wire);
         long end = System.currentTimeMillis();
         log.info("handleActivity结束：{}",System.currentTimeMillis());
         log.info("handleActivity耗时：{}ms",(end-start));
