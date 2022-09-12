@@ -12,6 +12,7 @@ public class QlCron {
     private String schedule;
     private String timestamp;
     private boolean saved;
+    //任务状态 0(执行中) 1(未执行)
     private Integer status;
     private Integer isSystem;
     private Integer pid;

@@ -62,4 +62,6 @@ public interface WireService {
      * @return
      */
     Result queryActivity();
+
+    void handleWire(Integer id,String script,String content);
 }

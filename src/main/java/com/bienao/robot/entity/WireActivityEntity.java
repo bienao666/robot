@@ -20,6 +20,8 @@ public class WireActivityEntity {
     //序号
     private Integer id;
 
+    private String script;
+
     //活动内容
     @NotBlank(message = "活动内容不能为空")
     @Size(max = 500, message = "活动名称长度不能超过500个字符")

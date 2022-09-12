@@ -79,4 +79,9 @@ public final class ErrorCodeConstant {
      */
     public static final String SERVICE_ERROR="30009";
 
+    /**
+     * telegram接口异常
+     */
+    public static final String TELEGRAM_ERROR="30010";
+
 }

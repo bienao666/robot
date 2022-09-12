@@ -9,7 +9,15 @@
     </insert>
 
     <select id="queryActivity" resultType="wireActivityEntity">
-        select * from wirelist order by created_time desc limit 10
+        select * from wirelist order by created_time asc limit 10
+    </select>
+
+    <select id="queryToBeExecutedActivity" resultType="wireActivityEntity">
+        select * from wirelist where `result` is null order by created_time asc limit 5
+    </select>
+
+    <select id="queryMaxId" resultType="java.lang.Integer">
+        select max(id) from wirelist
     </select>
 
     <update id="updateWirelist">

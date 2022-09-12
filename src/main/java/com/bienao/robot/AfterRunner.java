@@ -68,7 +68,7 @@ public class AfterRunner implements ApplicationRunner {
             }
         }).start();
 
-        //启动监听
+        //初始化线报活动
         new Thread(new Runnable() {
             @Override
             public void run() {

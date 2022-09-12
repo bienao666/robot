@@ -12,6 +12,7 @@ import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.mapper.QlMapper;
 import com.bienao.robot.result.Result;
 import com.bienao.robot.service.ql.QlService;
+import com.bienao.robot.service.ql.WireService;
 import com.bienao.robot.utils.ql.QlUtil;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import com.bienao.robot.utils.weixin.QingLongGuanLiUtil;
@@ -343,8 +344,6 @@ public class QlServiceImpl implements QlService {
         for (QlEntity ql : qls) {
             try {
                 String url = ql.getUrl();
-                String clientId = ql.getClientID();
-                String clientSecret = ql.getClientSecret();
                 List<QlCron> crons = qlUtil.getCrons(url, ql.getTokenType(), ql.getToken());
                 if (crons == null) {
                     //重试一次

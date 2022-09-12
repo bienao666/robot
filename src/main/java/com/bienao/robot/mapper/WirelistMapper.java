@@ -13,7 +13,11 @@ public interface WirelistMapper {
 
     int addActivity(String script,String content);
 
+    List<WireActivityEntity> queryToBeExecutedActivity();
+
     List<WireActivityEntity> queryActivity();
+
+    Integer queryMaxId();
 
     void updateWirelist(Integer id, String result, Date updatedTime);
 }

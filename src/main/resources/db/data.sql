@@ -16,3 +16,6 @@ INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('QLBIGHEAD', '大�
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('BIGHEADLOCATION', '大车头所在青龙','',0);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('JDLONGINURL', '京东登陆地址','',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('BOKEURL', '个人博客地址','',1);
+INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('TGPROXY', 'tg代理','',1);
+INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('TGBOTTOKEN', 'tgbot token','',1);
+INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('TGBOTUSERNAME', 'tgbot 名称','',1);

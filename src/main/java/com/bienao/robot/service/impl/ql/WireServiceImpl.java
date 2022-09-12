@@ -18,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -133,7 +130,7 @@ public class WireServiceImpl implements WireService {
         List<String> list = Arrays.asList(wire.split("\\r?\\n"));
         ArrayList<String> keys = new ArrayList<>();
         List<QlEntity> qls = qlMapper.queryQls(null);
-        boolean handleFlag = false;
+//        boolean handleFlag = false;
         for (QlEntity ql : qls) {
             boolean configFlag = false;
             //设置参数
@@ -199,7 +196,7 @@ public class WireServiceImpl implements WireService {
                                 boolean flag = qlUtil.runCron(url, ql.getTokenType(), ql.getToken(), cronIds);
                                 if (flag) {
                                     result.add(url + "(" + remark + ")" + " 线报 执行成功");
-                                    handleFlag = true;
+//                                    handleFlag = true;
                                 } else {
                                     result.add(url + "(" + remark + ")" + " 线报 执行失败，请手动执行");
                                 }
@@ -222,9 +219,9 @@ public class WireServiceImpl implements WireService {
         }
         //更新线报表
         wirelistMapper.updateWirelist(wireListId,JSONObject.toJSONString(result),new Date());
-        if (handleFlag){
+        /*if (handleFlag){
             wireMapper.updateWireStatus(script,"执行中");
-        }
+        }*/
         return Result.success();
     }
 
@@ -255,7 +252,15 @@ public class WireServiceImpl implements WireService {
         if (StringUtils.isEmpty(script)){
             Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败，线报不存在，请先添加");
         }
-        int i = wirelistMapper.addActivity(script,wire);
+        int i = 0;
+        try {
+            i = wirelistMapper.addActivity(script,wire);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败");
+        }
+        Integer maxId = wirelistMapper.queryMaxId();
+        handleWire(maxId,script,wire);
         if (i!=0){
             return Result.success("添加成功");
         }else {
@@ -264,7 +269,7 @@ public class WireServiceImpl implements WireService {
     }
 
     /**
-     * 查询线报活动
+     * 查询待执行线报活动
      * @param
      * @return
      */
@@ -283,6 +288,45 @@ public class WireServiceImpl implements WireService {
     public Result queryWire(String key) {
         List<WireEntity> wireEntities = wireMapper.queryWire(key);
         return Result.success(wireEntities);
+    }
+
+    /**
+     * 执行线报
+     * @param id
+     * @param script
+     * @param content
+     */
+    public void handleWire(Integer id,String script,String content) {
+        //青龙id->脚本列表
+        TreeMap<Integer, List<QlCron>> qlIdToScripts = new TreeMap<>();
+        //青龙id->活动id
+        TreeMap<Integer, Integer> qlIdToCronId = new TreeMap<>();
+        //所有青龙cron状态
+        ArrayList<Integer> status = new ArrayList<>();
+        //查询所有青龙
+        List<QlEntity> qlEntities = qlMapper.queryQls(null);
+        for (int i = 0; i < qlEntities.size(); i++) {
+            QlEntity qlEntity = qlEntities.get(i);
+            List<QlCron> crons = qlUtil.getCrons(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
+            qlIdToScripts.put(i,crons);
+        }
+
+        //查询所有青龙该任务状态
+        for (int i = 0; i < qlIdToScripts.entrySet().size(); i++) {
+            List<QlCron> qlCrons = qlIdToScripts.get(i);
+            for (QlCron qlCron : qlCrons) {
+                if (qlCron.getCommand().contains(script)){
+                    qlIdToCronId.put(i,qlCron.getId());
+                    status.add(qlCron.getStatus());
+                    break;
+                }
+            }
+        }
+        //该任务都是未运行中
+        if (!status.contains(0)){
+            //执行该任务
+            handleActivity(id,script,content);
+        }
     }
 
 
