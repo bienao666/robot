@@ -20,7 +20,7 @@ public interface WireService {
      * @param key
      * @return
      */
-    Result queryWire(String key);
+    Result queryWire(String key,Integer pageNo,Integer pageSize);
 
     /**
      * 添加活动
@@ -61,7 +61,7 @@ public interface WireService {
      * 查询线报活动
      * @return
      */
-    Result queryActivity();
+    Result queryActivity(Integer pageNo,Integer pageSize);
 
     void handleWire(Integer id,String script,String content);
 }

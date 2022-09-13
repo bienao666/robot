@@ -30,7 +30,7 @@ public class WireEntity {
     //脚本名称
     @NotBlank(message = "脚本名称不能为空")
     @Size(max = 30, message = "脚本名称长度不能超过50个字符")
-        private String script;
+    private String script;
 
     //洞察变量
     private List<WireKeyEntity> keys;

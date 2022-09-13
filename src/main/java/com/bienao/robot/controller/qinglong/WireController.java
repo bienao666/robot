@@ -58,10 +58,12 @@ public class WireController {
      * @param key
      */
     @GetMapping("/queryWire")
-    public Result queryWire(@RequestParam(value = "key",required = false) String key){
+    public Result queryWire(@RequestParam(value = "key",required = false) String key,
+                            @RequestParam(value = "pageNo") Integer pageNo,
+                            @RequestParam(value = "pageSize") Integer pageSize){
         long start = System.currentTimeMillis();
         log.info("开始queryWire：{}",System.currentTimeMillis());
-        Result result = wireService.queryWire(key);
+        Result result = wireService.queryWire(key,pageNo,pageSize);
         long end = System.currentTimeMillis();
         log.info("queryWire结束：{}",System.currentTimeMillis());
         log.info("queryWire耗时：{}ms",(end-start));
@@ -133,10 +135,11 @@ public class WireController {
      * 查询线报活动
      */
     @GetMapping("/queryActivity")
-    public Result queryActivity(){
+    public Result queryActivity(@RequestParam(value = "pageNo") Integer pageNo,
+                                @RequestParam(value = "pageSize") Integer pageSize){
         long start = System.currentTimeMillis();
         log.info("开始queryActivity：{}",System.currentTimeMillis());
-        Result result = wireService.queryActivity();
+        Result result = wireService.queryActivity(pageNo,pageSize);
         long end = System.currentTimeMillis();
         log.info("queryActivity结束：{}",System.currentTimeMillis());
         log.info("queryActivity耗时：{}ms",(end-start));

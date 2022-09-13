@@ -1,5 +1,6 @@
 package com.bienao.robot.service.impl.ql;
 
+import cn.hutool.core.util.PageUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.*;
@@ -284,9 +285,17 @@ public class WireServiceImpl implements WireService {
      * @return
      */
     @Override
-    public Result queryActivity() {
+    public Result queryActivity(Integer pageNo,Integer pageSize) {
         List<WireActivityEntity> wireActivityEntities = wirelistMapper.queryActivity();
-        return Result.success(wireActivityEntities);
+        int start = PageUtil.getStart(pageNo, pageSize) - pageSize;
+        int end = PageUtil.getEnd(pageNo, pageSize) - pageSize;
+        JSONObject result = new JSONObject();
+        result.put("total", wireActivityEntities.size());
+        result.put("pageNo", pageNo);
+        result.put("pageSize", pageSize);
+        wireActivityEntities = wireActivityEntities.subList(start, end < wireActivityEntities.size() ? end : wireActivityEntities.size());
+        result.put("wireActivityList",wireActivityEntities);
+        return Result.success(result);
     }
 
     /**
@@ -295,9 +304,17 @@ public class WireServiceImpl implements WireService {
      * @return
      */
     @Override
-    public Result queryWire(String key) {
+    public Result queryWire(String key,Integer pageNo,Integer pageSize) {
         List<WireEntity> wireEntities = wireMapper.queryWire(key);
-        return Result.success(wireEntities);
+        int start = PageUtil.getStart(pageNo, pageSize) - pageSize;
+        int end = PageUtil.getEnd(pageNo, pageSize) - pageSize;
+        JSONObject result = new JSONObject();
+        result.put("total", wireEntities.size());
+        result.put("pageNo", pageNo);
+        result.put("pageSize", pageSize);
+        wireEntities = wireEntities.subList(start, end < wireEntities.size() ? end : wireEntities.size());
+        result.put("wireList",wireEntities);
+        return Result.success(result);
     }
 
     /**
