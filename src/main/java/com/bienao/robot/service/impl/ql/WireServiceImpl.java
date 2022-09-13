@@ -135,7 +135,6 @@ public class WireServiceImpl implements WireService {
         List<String> list = Arrays.asList(wire.split("\\r?\\n"));
         ArrayList<String> keys = new ArrayList<>();
         List<QlEntity> qls = qlMapper.queryQls(null);
-//        boolean handleFlag = false;
         for (QlEntity ql : qls) {
             boolean configFlag = false;
             //设置参数
