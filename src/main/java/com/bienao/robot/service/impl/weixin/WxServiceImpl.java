@@ -174,18 +174,38 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //取消茅台洋河监控
-        if (msg.trim().equals("取消茅台洋河监控")) {
+        if (msg.trim().equals("取消监控茅台洋河")) {
             handleQxMtYhJk(content);
             return;
         }
         //饿了么推送
-        if (msg.trim().equals("饿了么推送")) {
+        if (msg.trim().equals("推送饿了么")) {
             handleElmTs(content);
             return;
         }
         //取消饿了么推送
-        if (msg.trim().equals("取消饿了么推送")) {
+        if (msg.trim().equals("取消推送饿了么")) {
             handleQxElmTs(content);
+            return;
+        }
+        //推送摸鱼
+        if (msg.trim().equals("推送摸鱼")) {
+            handleTsMy(content);
+            return;
+        }
+        //取消推送摸鱼
+        if (msg.trim().equals("取消推送摸鱼")) {
+            handleQxTsWb(content);
+            return;
+        }
+        //推送微博
+        if (msg.trim().equals("推送微博")) {
+            handleTsWb(content);
+            return;
+        }
+        //取消推送微博
+        if (msg.trim().equals("取消推送微博")) {
+            handleQxTsMy(content);
             return;
         }
         //举牌
@@ -335,6 +355,104 @@ public class WxServiceImpl implements WxService {
     }
 
     /**
+     * 取消推送摸鱼
+     *
+     * @param content
+     */
+    private void handleQxTsMy(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag) {
+            //获取微信群号
+            String from_group = content.getString("from_group");
+            int i = groupMapper.deleteGroupByGroupIdAndFunctionType(from_group, FunctionType.myts);
+            if (i > 0) {
+                weChatUtil.sendTextMsg("取消推送摸鱼成功", content);
+            } else {
+                weChatUtil.sendTextMsg("此群并未设置推送摸鱼，无法取消", content);
+            }
+        }
+    }
+
+    /**
+     * 推送摸鱼
+     *
+     * @param content
+     */
+    private void handleTsMy(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag) {
+            //获取微信群号
+            String from_group = content.getString("from_group");
+            if (StringUtils.isNotEmpty(from_group)) {
+                Group group = groupMapper.queryGroupByGroupIdAndFunctionType(from_group, FunctionType.myts);
+                if (group != null) {
+                    weChatUtil.sendTextMsg("已开启摸鱼推送", content);
+                } else {
+                    group = new Group();
+                    group.setGroupid(from_group);
+                    group.setGroupName(content.getString("from_group_name"));
+                    group.setFunctionType(FunctionType.myts);
+                    int i = groupMapper.addGroup(group);
+                    if (i == 0) {
+                        weChatUtil.sendTextMsg("开启推送失败", content);
+                    } else {
+                        weChatUtil.sendTextMsg("开启推送成功", content);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 取消推送微博
+     *
+     * @param content
+     */
+    private void handleQxTsWb(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag) {
+            //获取微信群号
+            String from_group = content.getString("from_group");
+            int i = groupMapper.deleteGroupByGroupIdAndFunctionType(from_group, FunctionType.wbts);
+            if (i > 0) {
+                weChatUtil.sendTextMsg("取消推送微博成功", content);
+            } else {
+                weChatUtil.sendTextMsg("此群并未设置推送微博，无法取消", content);
+            }
+        }
+    }
+
+    /**
+     * 推送微博
+     *
+     * @param content
+     */
+    private void handleTsWb(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag) {
+            //获取微信群号
+            String from_group = content.getString("from_group");
+            if (StringUtils.isNotEmpty(from_group)) {
+                Group group = groupMapper.queryGroupByGroupIdAndFunctionType(from_group, FunctionType.wbts);
+                if (group != null) {
+                    weChatUtil.sendTextMsg("已开启微博推送", content);
+                } else {
+                    group = new Group();
+                    group.setGroupid(from_group);
+                    group.setGroupName(content.getString("from_group_name"));
+                    group.setFunctionType(FunctionType.wbts);
+                    int i = groupMapper.addGroup(group);
+                    if (i == 0) {
+                        weChatUtil.sendTextMsg("开启推送失败", content);
+                    } else {
+                        weChatUtil.sendTextMsg("开启推送成功", content);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * 取消茅台洋河监控
      *
      * @param content
@@ -468,9 +586,6 @@ public class WxServiceImpl implements WxService {
                             break;
                         case "微博推送":
                             handleSetParam("SENDWEIBOLIST","微博推送", split[1], content);
-                            break;
-                        case "摸鱼推送":
-                            handleSetParam("SENDMOYULIST","摸鱼推送", split[1], content);
                             break;
                         case "饿了么图片":
                             systemParamUtil.updateSystemParam("ELMURL","饿了么图片", split[1]);
@@ -701,6 +816,34 @@ public class WxServiceImpl implements WxService {
                 .body(body)
                 .execute().body();
         return resStr;
+    }
+
+    /**
+     * 摸鱼定时
+     */
+    @Override
+    public void timeHandleMY() {
+        List<Group> groups = groupMapper.queryGroupByFunctionType(FunctionType.myts);
+        for (Group group : groups) {
+            JSONObject content = new JSONObject();
+            content.put("from_group", group.getGroupid());
+            content.put("robot_wxid", systemParamUtil.querySystemParam("ROBORTWXID"));
+            handleMoYu(content);
+        }
+    }
+
+    /**
+     * 微博定时
+     */
+    @Override
+    public void timeHandleWB() {
+        List<Group> groups = groupMapper.queryGroupByFunctionType(FunctionType.wbts);
+        for (Group group : groups) {
+            JSONObject content = new JSONObject();
+            content.put("from_group", group.getGroupid());
+            content.put("robot_wxid", systemParamUtil.querySystemParam("ROBORTWXID"));
+            handleWeiBo(content);
+        }
     }
 
     /**

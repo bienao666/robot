@@ -7,4 +7,8 @@ public class FunctionType {
     public static Integer mtyhjk = 1;
     //饿了么推送
     public static Integer elmts = 2;
+    //摸鱼推送
+    public static Integer myts = 3;
+    //微博推送
+    public static Integer wbts = 3;
 }

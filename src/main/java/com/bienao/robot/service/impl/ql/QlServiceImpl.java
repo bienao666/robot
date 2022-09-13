@@ -332,6 +332,214 @@ public class QlServiceImpl implements QlService {
     }
 
     /**
+     * 停止脚本
+     * @param command
+     * @param ids
+     * @return
+     */
+    @Override
+    public Result stopScript(String command, List<Integer> ids) {
+        ArrayList<String> list = new ArrayList<>();
+        List<QlEntity> qls = qlMapper.queryQls(ids);
+        for (QlEntity ql : qls) {
+            String remark = ql.getRemark();
+            String url = ql.getUrl();
+            try {
+                List<QlCron> crons = qlUtil.getCrons(url, ql.getTokenType(), ql.getToken());
+                if (crons == null) {
+                    //重试一次
+                    crons = qlUtil.getCrons(url, ql.getTokenType(), ql.getToken());
+                }
+                if (crons != null) {
+                    Integer old = list.size();
+                    for (QlCron cron : crons) {
+                        String name = cron.getName();
+                        if (cron.getCommand().contains(command)) {
+                            Integer id = cron.getId();
+                            List<Integer> cronIds = new ArrayList<>();
+                            cronIds.add(id);
+                            boolean flag = qlUtil.stopCron(url, ql.getTokenType(), ql.getToken(), cronIds);
+                            if (flag) {
+                                list.add(url + "(" + remark + ")" + " 停止" + "(" + name + ")" + " 成功");
+                            } else {
+                                list.add(url + "(" + remark + ")" + " 停止" + "(" + name + ")" + " 失败");
+                            }
+                            break;
+                        }
+                    }
+                    Integer now = list.size();
+                    if (now == old) {
+                        list.add(url + "(" + remark + ")" + command + " 脚本不存在");
+                    }
+                } else {
+                    list.add(url + "(" + remark + ")" + " 停止" + command + " 失败");
+                }
+
+            } catch (Exception e) {
+                list.add(url + "(" + remark + ")" + " 停止" + command + " 失败：" + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return Result.success(list);
+    }
+
+    /**
+     * 置顶脚本
+     * @param command
+     * @param ids
+     * @return
+     */
+    @Override
+    public Result pinScript(String command, List<Integer> ids) {
+        ArrayList<String> list = new ArrayList<>();
+        List<QlEntity> qls = qlMapper.queryQls(ids);
+        for (QlEntity ql : qls) {
+            String remark = ql.getRemark();
+            String url = ql.getUrl();
+            try {
+                List<QlCron> crons = qlUtil.getCrons(url, ql.getTokenType(), ql.getToken());
+                if (crons == null) {
+                    //重试一次
+                    crons = qlUtil.getCrons(url, ql.getTokenType(), ql.getToken());
+                }
+                if (crons != null) {
+                    Integer old = list.size();
+                    for (QlCron cron : crons) {
+                        String name = cron.getName();
+                        if (cron.getCommand().contains(command)) {
+                            Integer id = cron.getId();
+                            List<Integer> cronIds = new ArrayList<>();
+                            cronIds.add(id);
+                            boolean flag = qlUtil.pinCrons(url, ql.getTokenType(), ql.getToken(), cronIds);
+                            if (flag) {
+                                list.add(url + "(" + remark + ")" + " 置顶" + "(" + name + ")" + " 成功");
+                            } else {
+                                list.add(url + "(" + remark + ")" + " 置顶" + "(" + name + ")" + " 失败");
+                            }
+                            break;
+                        }
+                    }
+                    Integer now = list.size();
+                    if (now == old) {
+                        list.add(url + "(" + remark + ")" + command + " 脚本不存在");
+                    }
+                } else {
+                    list.add(url + "(" + remark + ")" + " 置顶" + command + " 失败");
+                }
+
+            } catch (Exception e) {
+                list.add(url + "(" + remark + ")" + " 置顶" + command + " 失败：" + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return Result.success(list);
+    }
+
+    /**
+     * 禁用脚本
+     * @param command
+     * @param ids
+     * @return
+     */
+    @Override
+    public Result disableScript(String command, List<Integer> ids) {
+        ArrayList<String> list = new ArrayList<>();
+        List<QlEntity> qls = qlMapper.queryQls(ids);
+        for (QlEntity ql : qls) {
+            String remark = ql.getRemark();
+            String url = ql.getUrl();
+            try {
+                List<QlCron> crons = qlUtil.getCrons(url, ql.getTokenType(), ql.getToken());
+                if (crons == null) {
+                    //重试一次
+                    crons = qlUtil.getCrons(url, ql.getTokenType(), ql.getToken());
+                }
+                if (crons != null) {
+                    Integer old = list.size();
+                    for (QlCron cron : crons) {
+                        String name = cron.getName();
+                        if (cron.getCommand().contains(command)) {
+                            Integer id = cron.getId();
+                            List<Integer> cronIds = new ArrayList<>();
+                            cronIds.add(id);
+                            boolean flag = qlUtil.disableCrons(url, ql.getTokenType(), ql.getToken(), cronIds);
+                            if (flag) {
+                                list.add(url + "(" + remark + ")" + " 禁用" + "(" + name + ")" + " 成功");
+                            } else {
+                                list.add(url + "(" + remark + ")" + " 禁用" + "(" + name + ")" + " 失败");
+                            }
+                            break;
+                        }
+                    }
+                    Integer now = list.size();
+                    if (now == old) {
+                        list.add(url + "(" + remark + ")" + command + " 脚本不存在");
+                    }
+                } else {
+                    list.add(url + "(" + remark + ")" + " 禁用" + command + " 失败");
+                }
+
+            } catch (Exception e) {
+                list.add(url + "(" + remark + ")" + " 禁用" + command + " 失败：" + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return Result.success(list);
+    }
+
+    /**
+     * 启用脚本
+     * @param command
+     * @param ids
+     * @return
+     */
+    @Override
+    public Result enableScript(String command, List<Integer> ids) {
+        ArrayList<String> list = new ArrayList<>();
+        List<QlEntity> qls = qlMapper.queryQls(ids);
+        for (QlEntity ql : qls) {
+            String remark = ql.getRemark();
+            String url = ql.getUrl();
+            try {
+                List<QlCron> crons = qlUtil.getCrons(url, ql.getTokenType(), ql.getToken());
+                if (crons == null) {
+                    //重试一次
+                    crons = qlUtil.getCrons(url, ql.getTokenType(), ql.getToken());
+                }
+                if (crons != null) {
+                    Integer old = list.size();
+                    for (QlCron cron : crons) {
+                        String name = cron.getName();
+                        if (cron.getCommand().contains(command)) {
+                            Integer id = cron.getId();
+                            List<Integer> cronIds = new ArrayList<>();
+                            cronIds.add(id);
+                            boolean flag = qlUtil.enableCrons(url, ql.getTokenType(), ql.getToken(), cronIds);
+                            if (flag) {
+                                list.add(url + "(" + remark + ")" + " 启用" + "(" + name + ")" + " 成功");
+                            } else {
+                                list.add(url + "(" + remark + ")" + " 启用" + "(" + name + ")" + " 失败");
+                            }
+                            break;
+                        }
+                    }
+                    Integer now = list.size();
+                    if (now == old) {
+                        list.add(url + "(" + remark + ")" + command + " 脚本不存在");
+                    }
+                } else {
+                    list.add(url + "(" + remark + ")" + " 启用" + command + " 失败");
+                }
+
+            } catch (Exception e) {
+                list.add(url + "(" + remark + ")" + " 启用" + command + " 失败：" + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return Result.success(list);
+    }
+
+    /**
      * 查询脚本
      *
      * @return

@@ -136,6 +136,118 @@ public class QlController {
     }
 
     /**
+     * 停止脚本
+     * @return
+     */
+    @PostMapping("/stopScript")
+    public Result stopScript(@RequestBody JSONObject jsonObject){
+        //任务
+        String command = jsonObject.getString("command");
+        if (StringUtils.isEmpty(command)){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"command不能为空");
+        }
+        String idsSr = jsonObject.getString("ids");
+        if (StringUtils.isEmpty(idsSr)){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"ids不能为空");
+        }
+        List<Integer> ids = JSON.parseArray(idsSr, Integer.class);
+        if (ids.size()==0){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"ids不能为空");
+        }
+        long start = System.currentTimeMillis();
+        log.info("开始stopScript：{}",System.currentTimeMillis());
+        Result result = qlService.stopScript(command, ids);
+        long end = System.currentTimeMillis();
+        log.info("stopScript结束：{}",System.currentTimeMillis());
+        log.info("stopScript耗时：{}ms",(end-start));
+        return result;
+    }
+
+    /**
+     * 置顶脚本
+     * @return
+     */
+    @PostMapping("/pinScript")
+    public Result pinScript(@RequestBody JSONObject jsonObject){
+        //任务
+        String command = jsonObject.getString("command");
+        if (StringUtils.isEmpty(command)){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"command不能为空");
+        }
+        String idsSr = jsonObject.getString("ids");
+        if (StringUtils.isEmpty(idsSr)){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"ids不能为空");
+        }
+        List<Integer> ids = JSON.parseArray(idsSr, Integer.class);
+        if (ids.size()==0){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"ids不能为空");
+        }
+        long start = System.currentTimeMillis();
+        log.info("开始pinScript：{}",System.currentTimeMillis());
+        Result result = qlService.pinScript(command, ids);
+        long end = System.currentTimeMillis();
+        log.info("pinScript结束：{}",System.currentTimeMillis());
+        log.info("pinScript耗时：{}ms",(end-start));
+        return result;
+    }
+
+    /**
+     * 禁用脚本
+     * @return
+     */
+    @PostMapping("/disableScript")
+    public Result disableScript(@RequestBody JSONObject jsonObject){
+        //任务
+        String command = jsonObject.getString("command");
+        if (StringUtils.isEmpty(command)){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"command不能为空");
+        }
+        String idsSr = jsonObject.getString("ids");
+        if (StringUtils.isEmpty(idsSr)){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"ids不能为空");
+        }
+        List<Integer> ids = JSON.parseArray(idsSr, Integer.class);
+        if (ids.size()==0){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"ids不能为空");
+        }
+        long start = System.currentTimeMillis();
+        log.info("开始disableScript：{}",System.currentTimeMillis());
+        Result result = qlService.disableScript(command, ids);
+        long end = System.currentTimeMillis();
+        log.info("disableScript结束：{}",System.currentTimeMillis());
+        log.info("disableScript耗时：{}ms",(end-start));
+        return result;
+    }
+
+    /**
+     * 启用脚本
+     * @return
+     */
+    @PostMapping("/enableScript")
+    public Result enableScript(@RequestBody JSONObject jsonObject){
+        //任务
+        String command = jsonObject.getString("command");
+        if (StringUtils.isEmpty(command)){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"command不能为空");
+        }
+        String idsSr = jsonObject.getString("ids");
+        if (StringUtils.isEmpty(idsSr)){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"ids不能为空");
+        }
+        List<Integer> ids = JSON.parseArray(idsSr, Integer.class);
+        if (ids.size()==0){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"ids不能为空");
+        }
+        long start = System.currentTimeMillis();
+        log.info("开始enableScript：{}",System.currentTimeMillis());
+        Result result = qlService.enableScript(command, ids);
+        long end = System.currentTimeMillis();
+        log.info("enableScript结束：{}",System.currentTimeMillis());
+        log.info("enableScript耗时：{}ms",(end-start));
+        return result;
+    }
+
+    /**
      * 一键车头
      * @return
      */

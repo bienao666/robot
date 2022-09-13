@@ -8,6 +8,10 @@ public interface WxService {
 
     void timeHandleELM();
 
+    void timeHandleMY();
+
+    void timeHandleWB();
+
     void handleWeiBo(JSONObject content);
 
     void handleMoYu(JSONObject content);

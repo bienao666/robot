@@ -40,11 +40,7 @@ public class wxTask {
      */
     @Scheduled(cron = "0 30 8 * * ?")
     public void timeWeiBo() {
-        JSONObject content = new JSONObject();
-        content.put("msg","微博");
-        content.put("from_group",systemParamUtil.querySystemParam("SENDWEIBOLIST"));
-        content.put("robot_wxid",systemParamUtil.querySystemParam("ROBORTWXID"));
-        wxServicel.handleWeiBo(content);
+        wxServicel.timeHandleWB();
     }
 
     /**
@@ -52,11 +48,7 @@ public class wxTask {
      */
     @Scheduled(cron = "0 0 15 * * ?")
     public void timeMoYu() {
-        JSONObject content = new JSONObject();
-        content.put("msg","摸鱼");
-        content.put("from_group",systemParamUtil.querySystemParam("SENDMOYULIST"));
-        content.put("robot_wxid",systemParamUtil.querySystemParam("ROBORTWXID"));
-        wxServicel.handleMoYu(content);
+        wxServicel.timeHandleMY();
     }
 
     /**
