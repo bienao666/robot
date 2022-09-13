@@ -69,13 +69,17 @@ public class WireServiceImpl implements WireService {
      */
     @Override
     public void addWire(String activityName,String script,List<String> keys){
-        WireEntity wireEntity = new WireEntity(activityName,script);
-        Integer res = wireMapper.addWire(wireEntity);
-        if (res!=0){
-            Integer maxId = wireMapper.queryMaxId();
-            for (String key : keys) {
-                wireKeyMapper.addWireKey(maxId,key);
+        try {
+            WireEntity wireEntity = new WireEntity(activityName,script);
+            Integer res = wireMapper.addWire(wireEntity);
+            if (res!=0){
+                Integer maxId = wireMapper.queryMaxId();
+                for (String key : keys) {
+                    wireKeyMapper.addWireKey(maxId,key);
+                }
             }
+        } catch (Exception e) {
+            //todo
         }
         keys.clear();
     }
@@ -126,6 +130,7 @@ public class WireServiceImpl implements WireService {
      */
     @Override
     public Result handleActivity(Integer wireListId,String script,String wire) {
+        log.info("执行线报活动：{}->{}",script,wire);
         ArrayList<String> result = new ArrayList<>();
         List<String> list = Arrays.asList(wire.split("\\r?\\n"));
         ArrayList<String> keys = new ArrayList<>();
@@ -137,7 +142,7 @@ public class WireServiceImpl implements WireService {
             try {
                 String configs = qlUtil.getFile(ql.getUrl(), ql.getTokenType(), ql.getToken(), "config.sh");
                 for (String config : list) {
-                    if (config.contains("#") && (config.contains(".js") || config.contains(".py") || config.contains("【"))){
+                    if (!config.contains("export")){
                         continue;
                     }
                     if (config.contains("=")){
@@ -218,11 +223,12 @@ public class WireServiceImpl implements WireService {
             }
         }
         //更新线报表
-        wirelistMapper.updateWirelist(wireListId,JSONObject.toJSONString(result),new Date());
-        /*if (handleFlag){
-            wireMapper.updateWireStatus(script,"执行中");
-        }*/
-        return Result.success();
+        if (result.size()!=0){
+            wirelistMapper.updateWirelist(wireListId,JSONObject.toJSONString(result),new Date());
+            return Result.success();
+        }else {
+            return Result.error(ErrorCodeConstant.SERVICE_ERROR,"线报执行异常");
+        }
     }
 
     /**
@@ -250,14 +256,13 @@ public class WireServiceImpl implements WireService {
             }
         }
         if (StringUtils.isEmpty(script)){
-            Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败，线报不存在，请先添加");
+            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败，线报不存在，请先添加");
         }
         int i = 0;
         try {
             i = wirelistMapper.addActivity(script,wire);
         } catch (Exception e) {
-            e.printStackTrace();
-            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败");
+            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"线报已存在，添加失败");
         }
         Integer maxId = wirelistMapper.queryMaxId();
         handleWire(maxId,script,wire);
@@ -296,7 +301,8 @@ public class WireServiceImpl implements WireService {
      * @param script
      * @param content
      */
-    public void handleWire(Integer id,String script,String content) {
+    @Override
+    public void handleWire(Integer id, String script, String content) {
         //青龙id->脚本列表
         TreeMap<Integer, List<QlCron>> qlIdToScripts = new TreeMap<>();
         //青龙id->活动id

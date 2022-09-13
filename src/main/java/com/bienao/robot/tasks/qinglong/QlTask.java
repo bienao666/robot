@@ -21,13 +21,6 @@ public class QlTask {
     @Autowired
     private WirelistMapper wirelistMapper;
 
-    /**
-     * 查询脚本状态
-     */
-    /*@Scheduled(cron = "0 * * * * ?")
-    public void queryStatus() {
-        List<QlEntity> qlEntities = qlMapper.queryQls(null);
-    }*/
 
     /**
      * 执行线报

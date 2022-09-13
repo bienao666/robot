@@ -1,5 +1,13 @@
 package com.bienao.robot.entity;
 
+import com.bienao.robot.result.Result;
+import com.bienao.robot.service.ql.WireService;
+import com.bienao.robot.utils.SpringUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -7,15 +15,14 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import javax.annotation.PostConstruct;
 
+@Slf4j
+@Component
 public class TgBot extends TelegramLongPollingBot {
-
     //填你自己的token和username
-    private String token ="5595104960";
-    private String username ="AAEcSHLiGL9OM6-XsNtCUQblpjziSoluyrk";
+    private String token;
+    private String username;
 
     public TgBot() {
         this( new DefaultBotOptions());
@@ -35,6 +42,14 @@ public class TgBot extends TelegramLongPollingBot {
         return this.username;
     }
 
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage()) {
@@ -44,17 +59,19 @@ public class TgBot extends TelegramLongPollingBot {
 
             String text = message.getText();
 
-            String[] split = text.split("=");
-            if (split.length == 1){
-                sendMsg("不处理该类指令",chatId);
-                return;
-            }
+            log.info("tg监听消息 chatId：{}->text：{}",chatId,text);
 
-            String s = executeLinuxCmd(split[1]);
-            sendMsg(s,chatId);
+            if (StringUtils.isNotEmpty(text)){
+                //处理消息
+                if (text.contains("export ")){
+                    ApplicationContext applicationContext = SpringUtil.getApplicationContext();
+                    WireService wireService = applicationContext.getBean(WireService.class);
+                    Result result = wireService.addActivity(text);
+                    sendMsg(result.getMessage(),chatId);
+                }
+            }
         }
     }
-
 
     //回复普通文本消息
     public void sendMsg(String text,Long chatId){
@@ -65,30 +82,5 @@ public class TgBot extends TelegramLongPollingBot {
             execute(response);
         } catch (TelegramApiException e) {
         }
-    }
-
-
-    public String executeLinuxCmd(String cmd) {
-        System.out.println("执行命令[ " + cmd + " ]");
-        Runtime run = Runtime.getRuntime();
-        try {
-            Process process = run.exec(cmd);
-            String line;
-            BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            StringBuffer out = new StringBuffer();
-            while ((line = stdoutReader.readLine()) != null ) {
-                out.append(line+"\n");
-            }
-            try {
-                process.waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            process.destroy();
-            return out.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }
