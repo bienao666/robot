@@ -263,9 +263,9 @@ public class AfterRunner implements ApplicationRunner {
 
             botOptions.setProxyHost(proxyHost);
             botOptions.setProxyPort(proxyPort);
+            //注意一下这里，ProxyType是个枚举，看源码你就知道有NO_PROXY,HTTP,SOCKS4,SOCKS5;
+            botOptions.setProxyType(DefaultBotOptions.ProxyType.HTTP);
         }
-        //注意一下这里，ProxyType是个枚举，看源码你就知道有NO_PROXY,HTTP,SOCKS4,SOCKS5;
-        botOptions.setProxyType(DefaultBotOptions.ProxyType.HTTP);
 
         DefaultBotSession defaultBotSession = new DefaultBotSession();
         defaultBotSession.setOptions(botOptions);

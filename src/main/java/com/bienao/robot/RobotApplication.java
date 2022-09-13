@@ -1,6 +1,6 @@
 package com.bienao.robot;
 
-import com.bienao.robot.utils.SpringUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

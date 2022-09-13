@@ -1,5 +1,6 @@
 package com.bienao.robot.entity;
 
+import com.alibaba.fastjson.JSON;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,10 +31,16 @@ public class WireActivityEntity {
     //运行结果
     private String result;
 
+    //运行结果
+    private List<String> resultList;
+
     //新增时间
     private Date createdTime;
 
     //更新时间
     private Date updatedTime;
 
+    public List<String> getResultList() {
+        return JSON.parseArray(result,String.class);
+    }
 }

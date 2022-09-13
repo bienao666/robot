@@ -1,11 +1,10 @@
 package com.bienao.robot.entity;
 
+import cn.hutool.extra.spring.SpringUtil;
 import com.bienao.robot.result.Result;
 import com.bienao.robot.service.ql.WireService;
-import com.bienao.robot.utils.SpringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
