@@ -130,14 +130,14 @@ public class WxServiceImpl implements WxService {
         }
 
         //查看当前会话
-        String curSession = redis.get(from_wxid + "curSession");
+        /*String curSession = redis.get(from_wxid + "curSession");
         if (StringUtils.isNotEmpty(curSession)) {
             if ("青龙管理".equals(curSession)) {
                 qingLongGuanLiUtil.handleOperate(content);
                 return;
             }
 
-        }
+        }*/
 
         //系统参数
         if (msg.startsWith("设置") || msg.startsWith("启用") || msg.startsWith("关闭")) {
@@ -242,10 +242,10 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //青龙管理
-        if (msg.trim().equals("青龙")) {
+        /*if (msg.trim().equals("青龙")) {
             qingLongGuanLiUtil.handleQingLong(content);
             return;
-        }
+        }*/
         //查询我的uid
         if (msg.trim().equals("我的uid") || msg.trim().equals("myuid")) {
             handleMyUid(content);
