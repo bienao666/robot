@@ -147,11 +147,17 @@ public class WireServiceImpl implements WireService {
                     if (config.contains("=")){
                         StringBuffer stringBuffer = new StringBuffer(configs);
                         //export 参数名
-                        String s1 = config.split("=")[0];
+                        String[] split = config.split("=");
+                        String s1 = split[0];
                         String key = s1.replace("export", "").replace(" ", "");
                         keys.add(key);
                         //参数值
-                        String s2 = config.split("=")[1];
+                        String s2 = split[1];
+                        if (split.length>2){
+                            for (int i = 2; i < split.length; i++) {
+                                s2 = s2 + "=" + split[i];
+                            }
+                        }
                         if (configs.contains(s1)){
                             //配置过
                             int s1index = configs.indexOf(s1);
