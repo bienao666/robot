@@ -9,6 +9,12 @@ public class User {
     //序号
     private Integer id;
 
+    //用户名
+    private String userName;
+
+    //密码
+    private String passWord;
+
     //微信uid
     private String wxid;
 
