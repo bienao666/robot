@@ -104,4 +104,23 @@ public final class ErrorCodeConstant {
      */
     public static final String REGISTER_ERROR="30014";
 
+    /**
+     * 无token
+     */
+    public static final String NO_TOKEN_ERROR="30015";
+
+    /**
+     * token校验失败
+     */
+    public static final String TOKEN_CHECK_ERROR="30016";
+
+    /**
+     * 用户不存在
+     */
+    public static final String NO_USER_ERROR="30017";
+
+    /**
+     * token过期
+     */
+    public static final String TOKEN_EXPIRED_ERROR="30018";
 }

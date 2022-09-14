@@ -5,9 +5,12 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.bienao.robot.annotation.LoginToken;
 import com.bienao.robot.annotation.PassToken;
 import com.bienao.robot.entity.User;
+import com.bienao.robot.enums.ErrorCodeConstant;
+import com.bienao.robot.result.Result;
 import com.bienao.robot.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.HandlerMethod;
@@ -16,7 +19,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 public class JwtInterceptor implements HandlerInterceptor {
     @Autowired
@@ -48,25 +54,33 @@ public class JwtInterceptor implements HandlerInterceptor {
             if (loginToken.required()) {
                 // 执行认证
                 if (token == null) {
-                    throw new RuntimeException("无token，请重新登录");
+                    returnResult(response,ErrorCodeConstant.NO_TOKEN_ERROR,"无token，请重新登录");
+                    return false;
                 }
                 // 获取 token 中的 userName
                 String userName;
                 try {
                     userName = JWT.decode(token).getAudience().get(0);
                 } catch (JWTDecodeException j) {
-                    throw new RuntimeException("401");
+                    returnResult(response,ErrorCodeConstant.TOKEN_CHECK_ERROR,"token验证失败");
+                    return false;
                 }
                 User user = userService.getUser(userName);
                 if (user == null) {
-                    throw new RuntimeException("用户不存在，请重新登录");
+                    returnResult(response,ErrorCodeConstant.NO_USER_ERROR,"用户不存在，请重新登录");
+                    return false;
                 }
                 // 验证 token
                 JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(user.getPassWord())).build();
                 try {
                     jwtVerifier.verify(token);
-                } catch (JWTVerificationException e) {
-                    throw new RuntimeException("401");
+                } catch (TokenExpiredException e){
+                    returnResult(response,ErrorCodeConstant.TOKEN_EXPIRED_ERROR,"token已过期");
+                    return false;
+                }
+                catch (JWTVerificationException e) {
+                    returnResult(response,ErrorCodeConstant.TOKEN_CHECK_ERROR,"token验证失败");
+                    return false;
                 }
                 return true;
             }
@@ -80,5 +94,21 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+    }
+
+    private void returnResult(HttpServletResponse response, String code,String message){
+        PrintWriter writer = null;
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json; charset=utf-8");
+        try {
+            Result error = Result.error(code, message);
+            writer.print(error);
+        } catch (Exception e){
+            //todo
+        } finally {
+            if(writer != null){
+                writer.close();
+            }
+        }
     }
 }
