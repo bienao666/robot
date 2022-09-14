@@ -84,4 +84,24 @@ public final class ErrorCodeConstant {
      */
     public static final String TELEGRAM_ERROR="30010";
 
+    /**
+     * 未注册
+     */
+    public static final String NO_REGISTER_ERROR="30011";
+
+    /**
+     * 未登陆
+     */
+    public static final String NO_LOGIN_ERROR="30012";
+
+    /**
+     * 已过期
+     */
+    public static final String EXPIRE_ERROR="30013";
+
+    /**
+     * 注册异常
+     */
+    public static final String REGISTER_ERROR="30014";
+
 }

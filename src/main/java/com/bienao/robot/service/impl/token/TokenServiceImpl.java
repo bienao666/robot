@@ -10,8 +10,8 @@ import java.util.Date;
 
 @Service
 public class TokenServiceImpl implements TokenService {
-    //5分钟之后过期
-    private static final long EXPIRE_TIME = 5 * 60 * 1000;
+    //有效期3天
+    private static final long EXPIRE_TIME =3 * 24 * 60 * 60 * 1000;
 
     @Override
     public String getToken(User user) {

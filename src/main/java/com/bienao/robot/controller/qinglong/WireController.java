@@ -1,6 +1,7 @@
 package com.bienao.robot.controller.qinglong;
 
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.annotation.LoginToken;
 import com.bienao.robot.entity.QlEntity;
 import com.bienao.robot.entity.WireEntity;
 import com.bienao.robot.entity.WireKeyEntity;
@@ -32,6 +33,7 @@ public class WireController {
      * 添加线报
      * @param wireEntity
      */
+    @LoginToken
     @PostMapping("/addWire")
     public Result addWire(@Validated @RequestBody WireEntity wireEntity){
         long start = System.currentTimeMillis();
@@ -57,6 +59,7 @@ public class WireController {
      * 查询线报
      * @param key
      */
+    @LoginToken
     @GetMapping("/queryWire")
     public Result queryWire(@RequestParam(value = "key",required = false) String key,
                             @RequestParam(value = "pageNo") Integer pageNo,
@@ -74,6 +77,7 @@ public class WireController {
      * 修改线报
      * @param wireEntity
      */
+    @LoginToken
     @PostMapping("/updateWire")
     public Result updateWire(@RequestBody WireEntity wireEntity){
         long start = System.currentTimeMillis();
@@ -99,7 +103,8 @@ public class WireController {
      * 删除线报
      * @param wireIds
      */
-        @PostMapping("/deleteWire")
+    @LoginToken
+    @PostMapping("/deleteWire")
     public Result deleteWire(@RequestBody List<Integer> wireIds){
         long start = System.currentTimeMillis();
         log.info("开始deleteWire：{}",System.currentTimeMillis());
@@ -120,6 +125,7 @@ public class WireController {
      * 添加线报活动
      * @param wire
      */
+    @LoginToken
     @PostMapping("/addActivity")
     public Result addActivity(@RequestBody String wire){
         long start = System.currentTimeMillis();
@@ -134,6 +140,7 @@ public class WireController {
     /**
      * 查询线报活动
      */
+    @LoginToken
     @GetMapping("/queryActivity")
     public Result queryActivity(@RequestParam(value = "pageNo") Integer pageNo,
                                 @RequestParam(value = "pageSize") Integer pageSize){
@@ -149,6 +156,7 @@ public class WireController {
     /**
      * 执行线报活动
      */
+    @LoginToken
     @GetMapping("/handleActivity")
         public Result handleActivity(@RequestParam Integer id,@RequestParam String script,@RequestParam String wire){
         long start = System.currentTimeMillis();

@@ -2,8 +2,11 @@ package com.bienao.robot.service.impl.user;
 
 import com.bienao.robot.entity.SystemParam;
 import com.bienao.robot.entity.User;
+import com.bienao.robot.enums.ErrorCodeConstant;
+import com.bienao.robot.result.Result;
 import com.bienao.robot.service.user.UserService;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +50,35 @@ public class UserServiceImpl implements UserService {
         }
         else{
             return null;
+        }
+    }
+
+    @Override
+    public Result check() {
+        List<SystemParam> systemParams = systemParamUtil.querySystemParams("USERNAME");
+        String userName = systemParams.get(0).getValue();
+        systemParams = systemParamUtil.querySystemParams("PASSWORD");
+        String passWord = systemParams.get(0).getValue();
+        if (StringUtils.isEmpty(userName) && StringUtils.isEmpty(passWord)){
+            //未注册过
+            return Result.error(ErrorCodeConstant.NO_REGISTER_ERROR,"账号尚未注册");
+        }else {
+            return Result.success();
+        }
+    }
+
+    @Override
+    public Result register(String username, String password) {
+        List<SystemParam> systemParams = systemParamUtil.querySystemParams("USERNAME");
+        String userName = systemParams.get(0).getValue();
+        systemParams = systemParamUtil.querySystemParams("PASSWORD");
+        String passWord = systemParams.get(0).getValue();
+        if (StringUtils.isEmpty(userName) && StringUtils.isEmpty(passWord)){
+            systemParamUtil.updateSystemParam("USERNAME",null,userName);
+            systemParamUtil.updateSystemParam("PASSWORD",null,passWord);
+            return Result.success();
+        }else {
+            return Result.error(ErrorCodeConstant.REGISTER_ERROR,"已注册过，注册失败");
         }
     }
 }

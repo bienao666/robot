@@ -2,6 +2,7 @@ package com.bienao.robot.controller.weixin;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.weixin.WXConstant;
+import com.bienao.robot.annotation.PassToken;
 import com.google.common.collect.EvictingQueue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class WeiXinController {
 
     @PostMapping("/message")
+    @PassToken
     public JSONObject message(@RequestBody JSONObject jsonObject) {
         log.info("接收消息：{}", jsonObject.toJSONString());
         EvictingQueue<JSONObject> messageLists = WXConstant.messageList;

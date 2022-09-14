@@ -2,6 +2,7 @@ package com.bienao.robot.controller.qinglong;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.annotation.LoginToken;
 import com.bienao.robot.entity.QlEntity;
 import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.result.Result;
@@ -31,6 +32,7 @@ public class QlController {
      * 添加青龙
      * @param ql
      */
+    @LoginToken
     @PostMapping("/addQl")
     public Result addQl(@RequestBody QlEntity ql){
         long start = System.currentTimeMillis();
@@ -46,6 +48,7 @@ public class QlController {
      * 查询青龙
      * @return
      */
+    @LoginToken
     @GetMapping("/queryQls")
     public Result queryQls(@RequestParam(value = "ids",required = false) List<Integer> ids){
         long start = System.currentTimeMillis();
@@ -61,6 +64,7 @@ public class QlController {
      * 更新青龙
      * @return
      */
+    @LoginToken
     @PostMapping("/updateQl")
     public Result updateQl(@RequestBody QlEntity ql){
         long start = System.currentTimeMillis();
@@ -76,6 +80,7 @@ public class QlController {
      * 删除青龙
      * @return
      */
+    @LoginToken
     @GetMapping("/deleteQls")
     public Result deleteQls(@RequestParam(value = "ids") List<Integer> ids){
         if(ids.size()==0){
@@ -94,6 +99,7 @@ public class QlController {
      * 查询脚本
      * @return
      */
+    @LoginToken
     @GetMapping("/queryScripts")
     public Result queryScripts(@RequestParam(value = "key",required = false) String key,
                                @RequestParam(value = "pageNo") Integer pageNo,
@@ -111,6 +117,7 @@ public class QlController {
      * 执行脚本
      * @return
      */
+    @LoginToken
     @PostMapping("/runScript")
     public Result runScript(@RequestBody JSONObject jsonObject){
         //任务
@@ -139,6 +146,7 @@ public class QlController {
      * 停止脚本
      * @return
      */
+    @LoginToken
     @PostMapping("/stopScript")
     public Result stopScript(@RequestBody JSONObject jsonObject){
         //任务
@@ -167,6 +175,7 @@ public class QlController {
      * 置顶脚本
      * @return
      */
+    @LoginToken
     @PostMapping("/pinScript")
     public Result pinScript(@RequestBody JSONObject jsonObject){
         //任务
@@ -195,6 +204,7 @@ public class QlController {
      * 禁用脚本
      * @return
      */
+    @LoginToken
     @PostMapping("/disableScript")
     public Result disableScript(@RequestBody JSONObject jsonObject){
         //任务
@@ -223,6 +233,7 @@ public class QlController {
      * 启用脚本
      * @return
      */
+    @LoginToken
     @PostMapping("/enableScript")
     public Result enableScript(@RequestBody JSONObject jsonObject){
         //任务
@@ -251,6 +262,7 @@ public class QlController {
      * 一键车头
      * @return
      */
+    @LoginToken
     @GetMapping("/oneKeyHead")
     public Result oneKeyHead(){
         long start = System.currentTimeMillis();
@@ -266,6 +278,7 @@ public class QlController {
      * 取消车头
      * @return
      */
+    @LoginToken
     @GetMapping("/cancelHead")
     public Result cancelHead(){
         long start = System.currentTimeMillis();

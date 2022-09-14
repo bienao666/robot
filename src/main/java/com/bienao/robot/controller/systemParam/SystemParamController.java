@@ -1,6 +1,7 @@
 package com.bienao.robot.controller.systemParam;
 
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.annotation.LoginToken;
 import com.bienao.robot.entity.QlEntity;
 import com.bienao.robot.entity.SystemParam;
 import com.bienao.robot.enums.ErrorCodeConstant;
@@ -31,6 +32,7 @@ public class SystemParamController {
      * 添加参数
      * @param systemParam
      */
+    @LoginToken
     @PostMapping("/addSystemParam")
     public Result addSystemParam(@RequestBody SystemParam systemParam){
         boolean flag = systemParamUtil.addSystemParam(systemParam);
@@ -45,6 +47,7 @@ public class SystemParamController {
      * 修改参数
      * @param systemParam
      */
+    @LoginToken
     @PostMapping("/updateSystemParam")
     public Result updateSystemParam(@RequestBody SystemParam systemParam){
         String code = systemParam.getCode();
@@ -65,6 +68,7 @@ public class SystemParamController {
      * 查询参数
      * @param code
      */
+    @LoginToken
     @GetMapping("/querySystemParams")
     public Result querySystemParams(@RequestParam(value = "code",required = false) String code){
         List<SystemParam> systemParams = systemParamUtil.queryShowSystems(code);
@@ -75,6 +79,7 @@ public class SystemParamController {
      * 删除参数
      * @return
      */
+    @LoginToken
     @PostMapping("/deleteSystemParams")
     public Result deleteSystemParams(@RequestBody List<Integer> ids){
         if(ids.size()==0){
