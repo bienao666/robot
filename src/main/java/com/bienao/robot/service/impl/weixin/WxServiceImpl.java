@@ -19,10 +19,7 @@ import com.bienao.robot.entity.SystemParam;
 import com.bienao.robot.mapper.GroupMapper;
 import com.bienao.robot.entity.Weather;
 import com.bienao.robot.service.weixin.WxService;
-import com.bienao.robot.utils.CaiHongPiUtils;
-import com.bienao.robot.utils.HeFengWeatherUtil;
-import com.bienao.robot.utils.JiNianRiUtils;
-import com.bienao.robot.utils.WeatherUtils;
+import com.bienao.robot.utils.*;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import com.bienao.robot.utils.weixin.QingLongGuanLiUtil;
 import com.bienao.robot.utils.weixin.WeChatUtil;
@@ -73,7 +70,7 @@ public class WxServiceImpl implements WxService {
         JSONObject content = message.getJSONObject("content");
         //发送人
         String from_wxid = content.getString("from_wxid");
-        String msg = content.getString("msg");
+        String msg = content.getString("msg").trim();
 
         //机器人
         String robortwxid = systemParamUtil.querySystemParam("ROBORTWXID");
@@ -129,15 +126,43 @@ public class WxServiceImpl implements WxService {
             }
         }
 
-        //查看当前会话
-        /*String curSession = redis.get(from_wxid + "curSession");
-        if (StringUtils.isNotEmpty(curSession)) {
-            if ("青龙管理".equals(curSession)) {
-                qingLongGuanLiUtil.handleOperate(content);
-                return;
-            }
+        //退出当前操作
+        if ("q".equals(msg.trim())){
+            redis.remove(from_wxid+"operate");
+            weChatUtil.sendTextMsg("已退出",content);
+        }
 
-        }*/
+        //查看当前操作
+        String operate = redis.get(from_wxid+"operate");
+        if (StringUtils.isNotEmpty(operate)) {
+            if ("readPhone".equals(operate)) {
+                if (VerifyUtil.verifyPhone(msg)){
+                    redis.put(from_wxid+"phone",msg,5 * 60 * 1000);
+                    if (sendSMS(msg)){
+                        weChatUtil.sendTextMsg("请在五分钟内输入验证码：(输入q退出当前操作)",content);
+                        redis.put(from_wxid+"operate","readIdentifyingCode",5 * 60 * 1000);
+                    }else {
+                        redis.remove(from_wxid+"operate");
+                        weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试",content);
+                    }
+                }else {
+                    weChatUtil.sendTextMsg("非法手机号，请在一分钟内重新输入手机号：(输入q退出当前操作)",content);
+                    redis.put(from_wxid+"operate","readPhone",60 * 1000);
+                }
+            }
+            if ("readIdentifyingCode".equals(operate)){
+                String phone = redis.get(from_wxid + "phone");
+                String ck = verifyCode(phone, msg);
+                if (StringUtils.isEmpty(ck)){
+                    redis.remove(from_wxid+"operate");
+                    weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试",content);
+                }else {
+                    redis.put(from_wxid+"ck","ck",60 * 1000);
+                    //生成wxpusher二维码
+                    //todo
+                }
+            }
+        }
 
         //系统参数
         if (msg.startsWith("设置") || msg.startsWith("启用") || msg.startsWith("关闭")) {
@@ -289,11 +314,13 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleJdLogin(JSONObject content) {
+        String from_wxid = content.getString("from_wxid");
         String jdlonginurl = systemParamUtil.querySystemParam("JDLONGINURL");
         if (StringUtils.isEmpty(jdlonginurl)){
-            weChatUtil.sendTextMsg("尚未设置京东登陆地址",content);
+            weChatUtil.sendTextMsg("尚未设置京东登陆地址，请联系管理员",content);
         }else {
-            weChatUtil.sendTextMsg(jdlonginurl,content);
+            weChatUtil.sendTextMsg("请在一分钟内输入手机号：(输入q退出当前操作)",content);
+            redis.put(from_wxid+"operate","readPhone",60 * 1000);
         }
     }
 
@@ -1182,6 +1209,64 @@ public class WxServiceImpl implements WxService {
         } catch (Exception e) {
             System.out.println("推送失败：" + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * nark发送手机号
+     * @param phone
+     * @return
+     */
+    public boolean sendSMS(String phone){
+        String jdlonginurl = systemParamUtil.querySystemParam("JDLONGINURL").replace("login","");
+        if (!jdlonginurl.endsWith("/")){
+            jdlonginurl += "/";
+        }
+        JSONObject body = new JSONObject();
+        body.put("Phone",phone);
+        body.put("qlkey",0);
+        String resultStr = HttpRequest.post(jdlonginurl + "api/SendSMS")
+                .body(body.toJSONString())
+                .execute().body();
+        if (StringUtils.isNotEmpty(resultStr)){
+            JSONObject res = JSONObject.parseObject(resultStr);
+            if (res.getBoolean("success")){
+                return true;
+            }else {
+                return false;
+            }
+        }else {
+            return false;
+        }
+    }
+
+    /**
+     * nark发送验证码
+     * @param phone
+     * @return
+     */
+    public String verifyCode(String phone,String code){
+        String jdlonginurl = systemParamUtil.querySystemParam("JDLONGINURL").replace("login","");
+        if (!jdlonginurl.endsWith("/")){
+            jdlonginurl += "/";
+        }
+        JSONObject body = new JSONObject();
+        body.put("Phone",phone);
+        body.put("QQ","");
+        body.put("qlkey",0);
+        body.put("Code",code);
+        String resultStr = HttpRequest.post(jdlonginurl + "api/VerifyCode")
+                .body(body.toJSONString())
+                .execute().body();
+        if (StringUtils.isNotEmpty(resultStr)){
+            JSONObject res = JSONObject.parseObject(resultStr);
+            if (res.getBoolean("success")){
+                return res.getJSONObject("data").get("ck").toString();
+            }else {
+                return null;
+            }
+        }else {
+            return null;
         }
     }
 }
