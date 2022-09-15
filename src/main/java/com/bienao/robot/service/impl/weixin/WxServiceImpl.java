@@ -231,6 +231,11 @@ public class WxServiceImpl implements WxService {
             handleMJX(content);
             return;
         }
+        //老色批
+        if (msg.trim().equals("lsp") || msg.trim().equals("老色批")) {
+            handleLSP(content);
+            return;
+        }
         //摸鱼
         if (msg.trim().equals("my") || msg.trim().equals("摸鱼")) {
             handleMoYu(content);
@@ -277,6 +282,15 @@ public class WxServiceImpl implements WxService {
                 handleLast(content, num, publicKey);
             }
         }
+    }
+
+    /**
+     * 老色批
+     * @param content
+     */
+    private void handleLSP(JSONObject content) {
+        String url = HttpRequest.get("https://api.uomg.com/api/rand.img3?format=images").execute().header("location");
+        weChatUtil.sendImageMsg(url,content);
     }
 
     /**
