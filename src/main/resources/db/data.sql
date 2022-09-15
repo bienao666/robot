@@ -21,3 +21,4 @@ INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('TGBOTTOKEN', 'tgbo
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('TGBOTUSERNAME', 'tgbot 名称','',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('USERNAME', '用户名','',0);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('PASSWORD', '密码','',0);
+INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('WXPUSHERTOKEN', 'wxpusher token','',1);

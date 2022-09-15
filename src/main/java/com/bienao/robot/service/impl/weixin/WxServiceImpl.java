@@ -666,7 +666,11 @@ public class WxServiceImpl implements WxService {
                             weChatUtil.sendTextMsg("设置成功", content);
                             break;
                         case "京东登陆":
-                            systemParamUtil.updateSystemParam("JDLONGINURL","京东登陆", split[1]);
+                            systemParamUtil.updateSystemParam("JDLONGINURL","京东登陆地址", split[1]);
+                            weChatUtil.sendTextMsg("设置成功", content);
+                            break;
+                        case "wxpusher token":
+                            systemParamUtil.updateSystemParam("WXPUSHERTOKEN","wxpusher token", split[1]);
                             weChatUtil.sendTextMsg("设置成功", content);
                             break;
                     }
