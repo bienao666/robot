@@ -207,9 +207,6 @@ public class AfterRunner implements ApplicationRunner {
                 keys.add("jd_shopLeagueId");
                 wireService.addWire("通用开卡-shopLeague系列","jd_shopLeague_opencard.py",keys);
 
-                keys.add("jd_wdz_activityId");
-                wireService.addWire("微定制组队通用脚本","jd_wdz.py",keys);
-
                 keys.add("jd_joinCommonId");
                 wireService.addWire("通用开卡-joinCommon","jd_joinCommon_opencard.py",keys);
 
