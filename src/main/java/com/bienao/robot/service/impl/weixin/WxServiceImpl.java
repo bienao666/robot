@@ -412,7 +412,7 @@ public class WxServiceImpl implements WxService {
                     group = new Group();
                     group.setGroupid(from_group);
                     group.setGroupName(content.getString("from_group_name"));
-                    group.setFunctionType(FunctionType.mtyhjk);
+                    group.setFunctionType(FunctionType.elmts);
                     int i = groupMapper.addGroup(group);
                     if (i == 0) {
                         weChatUtil.sendTextMsg("开启推送失败", content);
