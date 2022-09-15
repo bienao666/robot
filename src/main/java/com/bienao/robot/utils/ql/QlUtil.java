@@ -5,6 +5,7 @@ import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.QlCron;
+import com.bienao.robot.entity.QlEnv;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -53,7 +54,7 @@ public class QlUtil {
      * @param token token
      * @return
      */
-    public List<JSONObject> getEnvs(String url,String tokenType,String token){
+    public List<QlEnv> getEnvs(String url,String tokenType,String token){
         if (!url.endsWith("/")){
             url = url+"/";
         }
@@ -71,7 +72,7 @@ public class QlUtil {
                 return null;
             }
             String data = res.getString("data");
-            return JSON.parseArray(data,JSONObject.class);
+            return JSON.parseArray(data, QlEnv.class);
         } catch (HttpException e) {
             log.info("青龙获取所有环境变量详情失败");
             return null;
@@ -135,20 +136,19 @@ public class QlUtil {
      * @param remarks 备注
      * @return
      */
-    public boolean updateEnvs(String url,String tokenType,String token,String name,String value,String remarks){
+    public boolean updateEnvs(String url,String tokenType,String token,Integer id,String name,String value,String remarks){
         if (!url.endsWith("/")){
             url = url+"/";
         }
         try {
-            ArrayList<JSONObject> body = new ArrayList<>();
             JSONObject env = new JSONObject();
             env.put("name",name);
             env.put("value",value);
             env.put("remarks",remarks);
-            env.put("id",0);
-            body.add(env);
-            String resStr = HttpRequest.post(url + "open/envs")
+            env.put("id",id);
+            String resStr = HttpRequest.put(url + "open/envs")
                     .header("Authorization",tokenType + " " + token)
+                    .body(env.toString())
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙更新环境变量失败");

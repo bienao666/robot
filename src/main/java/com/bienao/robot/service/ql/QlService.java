@@ -95,4 +95,10 @@ public interface QlService {
      * @return
      */
     Result enableScript(String command, List<Integer> ids);
+
+    /**
+     * 添加京东ck
+     * @return
+     */
+    void addJdCk(JSONObject content,String ck,String wxPusherUid);
 }

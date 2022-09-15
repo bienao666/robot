@@ -18,6 +18,7 @@ import com.bienao.robot.entity.Group;
 import com.bienao.robot.entity.SystemParam;
 import com.bienao.robot.mapper.GroupMapper;
 import com.bienao.robot.entity.Weather;
+import com.bienao.robot.service.ql.QlService;
 import com.bienao.robot.service.weixin.WxService;
 import com.bienao.robot.utils.*;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
@@ -54,7 +55,7 @@ public class WxServiceImpl implements WxService {
     private SystemParamUtil systemParamUtil;
 
     @Autowired
-    private QingLongGuanLiUtil qingLongGuanLiUtil;
+    private QlService qlService;
 
     @Autowired
     private HeFengWeatherUtil heFengWeatherUtil;
@@ -130,63 +131,45 @@ public class WxServiceImpl implements WxService {
         if ("q".equals(msg.trim())){
             redis.remove(from_wxid+"operate");
             weChatUtil.sendTextMsg("已退出",content);
+            return;
         }
 
         //查看当前操作
         String operate = redis.get(from_wxid+"operate");
         if (StringUtils.isNotEmpty(operate)) {
-            if ("readPhone".equals(operate)) {
-                if (VerifyUtil.verifyPhone(msg)){
-                    redis.put(from_wxid+"phone",msg,5 * 60 * 1000);
-                    if (sendSMS(msg)){
-                        weChatUtil.sendTextMsg("请在五分钟内输入验证码：(输入q退出当前操作)",content);
-                        redis.put(from_wxid+"operate","readIdentifyingCode",5 * 60 * 1000);
-                    }else {
-                        redis.remove(from_wxid+"operate");
-                        weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试",content);
-                    }
-                }else {
-                    weChatUtil.sendTextMsg("非法手机号，请在一分钟内重新输入手机号：(输入q退出当前操作)",content);
-                    redis.put(from_wxid+"operate","readPhone",60 * 1000);
-                }
-            }
-            if ("readIdentifyingCode".equals(operate)){
-                String phone = redis.get(from_wxid + "phone");
-                String ck = verifyCode(phone, msg);
-                if (StringUtils.isEmpty(ck)){
-                    redis.remove(from_wxid+"operate");
-                    weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试",content);
-                }else {
-                    redis.put(from_wxid+"ck","ck",60 * 1000);
-                    //生成wxpusher二维码
-                    //todo
-                }
-            }
+            handleOperate(content,operate,msg,from_wxid);
+            return;
         }
 
         //系统参数
         if (msg.startsWith("设置") || msg.startsWith("启用") || msg.startsWith("关闭")) {
             handleSetSysParam(content);
+            return;
         }
         //功能列表
         if (msg.equals("菜单")) {
             handleFunctionList(content);
+            return;
         }
         //博客
         if (msg.equals("博客")) {
             handleFunctionBoKe(content);
+            return;
         }
         //加群
         if (msg.equals("加群") || msg.equals("进群")) {
             handleAddGroup(content);
+            return;
         }
         //登陆
         if (msg.equals("登陆") || msg.equals("登录"))  {
             handleJdLogin(content);
+            return;
         }
         //饿了么
         if (msg.trim().equals("饿了么") || msg.trim().equals("elm")) {
             handleELM(content);
+            return;
         }
         //微博
         if (msg.trim().equals("微博") || msg.trim().equals("wb")) {
@@ -297,6 +280,65 @@ public class WxServiceImpl implements WxService {
     }
 
     /**
+     * 处理当前操作
+     * @param content
+     */
+    private void handleOperate(JSONObject content,String operate,String msg,String from_wxid) {
+        if ("readPhone".equals(operate)) {
+            if (VerifyUtil.verifyPhone(msg)){
+                redis.put(from_wxid+"phone",msg,5 * 60 * 1000);
+                if (sendSMS(msg)){
+                    weChatUtil.sendTextMsg("请在五分钟内输入验证码：(输入q退出当前操作)",content);
+                    redis.put(from_wxid+"operate","readIdentifyingCode",5 * 60 * 1000);
+                }else {
+                    redis.remove(from_wxid+"operate");
+                    weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试",content);
+                }
+            }else {
+                weChatUtil.sendTextMsg("非法手机号，请在一分钟内重新输入手机号：(输入q退出当前操作)",content);
+                redis.put(from_wxid+"operate","readPhone",60 * 1000);
+            }
+            return;
+        }
+        if ("readIdentifyingCode".equals(operate)){
+            String phone = redis.get(from_wxid + "phone");
+            String ck = verifyCode(phone, msg);
+            if (StringUtils.isEmpty(ck)){
+                redis.remove(from_wxid+"operate");
+                weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试",content);
+            }else {
+                //生成wxpusher二维码
+                if (getWxpusherCode(content)){
+                    try {
+                        Thread.sleep(11 * 1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    String wxpusherUid = "";
+                    for (int i = 0; i < 2; i++) {
+                        weChatUtil.sendTextMsg("正在配置资产推送中，请稍后。。。",content);
+                        wxpusherUid = getWxpusherUid(content);
+                        if (StringUtils.isNotEmpty(wxpusherUid)){
+                            break;
+                        }
+                        try {
+                            Thread.sleep(11 * 1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    //保存ck
+                    qlService.addJdCk(content,ck, wxpusherUid);
+                }else {
+                    //保存ck
+                    qlService.addJdCk(content,ck, "");
+                }
+            }
+            return;
+        }
+    }
+
+    /**
      * 博客
      * @param content
      */
@@ -318,10 +360,11 @@ public class WxServiceImpl implements WxService {
         String jdlonginurl = systemParamUtil.querySystemParam("JDLONGINURL");
         if (StringUtils.isEmpty(jdlonginurl)){
             weChatUtil.sendTextMsg("尚未设置京东登陆地址，请联系管理员",content);
-        }else {
-            weChatUtil.sendTextMsg("请在一分钟内输入手机号：(输入q退出当前操作)",content);
-            redis.put(from_wxid+"operate","readPhone",60 * 1000);
+            return;
         }
+        weChatUtil.sendTextMsg("请在一分钟内输入手机号：(输入q退出当前操作)",content);
+        redis.put(from_wxid+"operate","readPhone",60 * 1000);
+
     }
 
     /**
@@ -1259,12 +1302,61 @@ public class WxServiceImpl implements WxService {
                 .body(body.toJSONString())
                 .execute().body();
         if (StringUtils.isNotEmpty(resultStr)){
+            log.info("手机号{}短信登陆结果：{}",phone,resultStr);
             JSONObject res = JSONObject.parseObject(resultStr);
             if (res.getBoolean("success")){
                 return res.getJSONObject("data").get("ck").toString();
             }else {
                 return null;
             }
+        }else {
+            return null;
+        }
+    }
+
+    public boolean getWxpusherCode(JSONObject content){
+        String wxpusherToken = systemParamUtil.querySystemParam("WXPUSHERTOKEN");
+        if (StringUtils.isEmpty(wxpusherToken)){
+            return false;
+        }
+        JSONObject body = new JSONObject();
+        body.put("appToken","AT_upaWvmZ7ScZDe4k1N7fBMAPWC4dEn7n0");
+        body.put("extra","bienao");
+        body.put("validTime",40);
+        String resStr = HttpRequest.post("http://wxpusher.zjiecode.com/api/fun/create/qrcode")
+                .body(body.toJSONString())
+                .execute().body();
+        if (StringUtils.isEmpty(resStr)){
+            return false;
+        }
+        JSONObject res = JSONObject.parseObject(resStr);
+        if (res.getInteger("code")==1000 && "处理成功".equals(res.getString("msg"))){
+            JSONObject data = res.getJSONObject("data");
+            String code = data.getString("code");
+            String url = data.getString("url");
+            weChatUtil.sendTextMsg("请在30s内扫描下方二维码：",content);
+            weChatUtil.sendImageMsg(url,content);
+            //发送人
+            String from_wxid = content.getString("from_wxid");
+            redis.put(from_wxid+"code",code,40 * 1000);
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    public String getWxpusherUid(JSONObject content){
+        //发送人
+        String from_wxid = content.getString("from_wxid");
+        String code = redis.get(from_wxid + "code");
+        String resStr = HttpRequest.get("https://wxpusher.zjiecode.com/api/fun/scan-qrcode-uid?code="+code)
+                .execute().body();
+        if (StringUtils.isEmpty(resStr)){
+            return null;
+        }
+        JSONObject res = JSONObject.parseObject(resStr);
+        if (res.getInteger("code")==1000 && "处理成功".equals(res.getString("msg"))){
+            return res.getString("data");
         }else {
             return null;
         }
