@@ -1,5 +1,6 @@
 package com.bienao.robot.interceptor;
 
+import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -101,8 +102,11 @@ public class JwtInterceptor implements HandlerInterceptor {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=utf-8");
         try {
-            Result error = Result.error(code, message);
-            writer.print(error);
+            writer = response.getWriter();
+            JSONObject res = new JSONObject();
+            res.put("code",code);
+            res.put("message",message);
+            writer.print(res);
         } catch (Exception e){
             //todo
         } finally {
