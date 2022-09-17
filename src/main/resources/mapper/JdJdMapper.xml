@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bienao.robot.mapper.jingdong.JdJdMapper">
+
+    <update id="addJdDate" >
+        insert into jdjd(date,jdCount) values (#{date},#{jdCount});
+    </update>
+
+    <select id="queryJd" resultType="com.alibaba.fastjson.JSONObject">
+        select * from jdjd where 1 = 1 order by date desc limit 7
+    </select>
+
+
+</mapper>

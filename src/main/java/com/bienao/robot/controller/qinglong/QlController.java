@@ -1,5 +1,6 @@
 package com.bienao.robot.controller.qinglong;
 
+import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.annotation.LoginToken;
@@ -288,5 +289,10 @@ public class QlController {
         log.info("cancelHead结束：{}",System.currentTimeMillis());
         log.info("cancelHead耗时：{}ms",(end-start));
         return result;
+    }
+
+    public static void main(String[] args) {
+        String body = HttpRequest.get("https://api.iyk0.com/yq/?msg=南京").execute().body();
+        System.out.println(body);
     }
 }

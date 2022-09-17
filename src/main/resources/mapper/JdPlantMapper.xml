@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bienao.robot.mapper.jingdong.JdPlantMapper">
+
+    <update id="resetPlantStatus">
+        update jdPlant set help_status = 0,to_help_status = 1;
+    </update>
+
+    <update id="updateJdPlant" parameterType="JdPlantEntity">
+        update jdPlant
+        <set>
+            <if test="helpCode != null and helpCode != ''">
+                help_code = #{helpCode},
+            </if>
+            <if test="isPlantHei != null">
+                is_Plant_hei = #{isPlantHei},
+            </if>
+            <if test="helpStatus != null">
+                help_status = #{helpStatus},
+            </if>
+            <if test="toHelpStatus != null">
+                to_help_status = #{toHelpStatus},
+            </if>
+        </set>
+        where id=#{id};
+    </update>
+
+    <select id="getHelpTimes" resultType="java.lang.Integer">
+        select count(*) from jdPlant where help_status = 1
+    </select>
+
+    <insert id="addJdPlant" parameterType="JdPlantEntity">
+        insert into jdPlant(help_code,ckid,is_Plant_hei) values (#{helpCode},#{ckId},#{isPlantHei});
+    </insert>
+</mapper>

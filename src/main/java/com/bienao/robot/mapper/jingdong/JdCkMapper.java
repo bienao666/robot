@@ -1,0 +1,78 @@
+package com.bienao.robot.mapper.jingdong;
+
+import com.bienao.robot.entity.jingdong.JdCkEntity;
+import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
+
+@Mapper
+public interface JdCkMapper {
+
+    /**
+     * 添加ck
+     * @param jdCkEntity
+     * @return
+     */
+    int addCk(JdCkEntity jdCkEntity);
+
+    /**
+     * 更新ck
+     * @param jdCkEntity
+     * @return
+     */
+    int updateCk(JdCkEntity jdCkEntity);
+
+    /**
+     * 查询ck
+     * @param jdCkEntity
+     * @return
+     */
+    JdCkEntity queryCk(JdCkEntity jdCkEntity);
+
+    /**
+     * 批量查询ck
+     * @param jdCkEntity
+     * @return
+     */
+    List<JdCkEntity> queryCks(JdCkEntity jdCkEntity);
+
+    /**
+     * 批量查询ck
+     * @param levels
+     * @return
+     */
+    List<JdCkEntity> queryCksByLevels(String levels);
+
+    /**
+     * 东东农场批量查询ck
+     * @return
+     */
+    List<JdCkEntity> queryCksAndActivity();
+
+    /**
+     * 清理过期ck
+     * @return
+     */
+    int deleteCk(JdCkEntity jdCkEntity);
+
+    /**
+     * 查询ck数量
+     * @param jdCkEntity
+     * @return
+     */
+    int queryCount(JdCkEntity jdCkEntity);
+
+    /**
+     * 汇总京豆
+     * @return
+     */
+    int sumJdCount();
+
+    int resetJd();
+
+    /**
+     * 查询助力池当前ck数
+     * @return
+     */
+    Integer queryCkCount();
+}

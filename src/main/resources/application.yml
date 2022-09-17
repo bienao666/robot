@@ -17,3 +17,12 @@ mybatis:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     mapUnderscoreToCamelCase: true
+
+JD_API_HOST: https://api.m.jd.com/client.action
+
+task-function:
+  shareHelp: true
+  resetCkStatus: true
+  checkCk: true
+  updateShareCode: true
+  countJd: true
