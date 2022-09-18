@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bienao.robot.mapper.YlgyMapper">
+
+    <insert id="addWire">
+        insert into ylgy(uid,token,times) values (#{uid},#{token},#{times})
+    </insert>
+
+    <select id="queryCount" resultType="java.lang.Integer">
+        select count(*) from ylgy
+    </select>
+
+    <select id="query" resultType="com.alibaba.fastjson.JSONObject">
+        select * from ylgy order by created_time limit 2
+    </select>
+
+    <delete id="delete" parameterType="string">
+        delete from ylgy where id = #{id};
+    </delete>
+
+</mapper>

@@ -113,3 +113,11 @@ create table if not exists `jdPlant` (
                            `created_time` datetime DEFAULT (datetime('now', 'localtime')),
                            `updated_time` datetime DEFAULT (datetime('now', 'localtime'))
 );
+create table if not exists `ylgy` (
+                                         `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+                                         `uid` varchar,
+                                         `token` INTEGER,
+                                         `times` INTEGER DEFAULT '100000',
+                                         `created_time` datetime DEFAULT (datetime('now', 'localtime')),
+                                         `updated_time` datetime DEFAULT (datetime('now', 'localtime'))
+    );

@@ -18,6 +18,7 @@ import com.bienao.robot.entity.Group;
 import com.bienao.robot.entity.SystemParam;
 import com.bienao.robot.mapper.GroupMapper;
 import com.bienao.robot.entity.Weather;
+import com.bienao.robot.mapper.YlgyMapper;
 import com.bienao.robot.service.ql.QlService;
 import com.bienao.robot.service.weixin.WxService;
 import com.bienao.robot.utils.*;
@@ -62,6 +63,9 @@ public class WxServiceImpl implements WxService {
 
     @Autowired
     private GroupMapper groupMapper;
+
+    @Autowired
+    private YlgyMapper ylgyMapper;
 
     private Cache<String, String> redis = WXConstant.redis;
 
@@ -149,6 +153,11 @@ public class WxServiceImpl implements WxService {
         //功能列表
         if (msg.equals("菜单")) {
             handleFunctionList(content);
+            return;
+        }
+        //羊了个羊
+        if (msg.startsWith("羊 ")){
+            handleYLGY(content);
             return;
         }
         //博客
@@ -285,6 +294,31 @@ public class WxServiceImpl implements WxService {
     }
 
     /**
+     * 羊了个羊
+     * @param content
+     */
+    private void handleYLGY(JSONObject content) {
+        String from_wxid = content.getString("from_wxid");
+        String msg = content.getString("msg");
+        String uid = msg.replace("羊 ","");
+        if (StringUtils.isEmpty(uid)){
+            weChatUtil.sendTextMsg("请传入羊了个羊的uid",content);
+            return;
+        }
+        String token = YlgyUtils.getYlgyToken(uid);
+        if (StringUtils.isNotEmpty(token)){
+            weChatUtil.sendTextMsg("您的羊了个羊的token：",content);
+            weChatUtil.sendTextMsg(token,content);
+            redis.put(from_wxid+"ylgyUid",uid,15 * 1000);
+            redis.put(from_wxid+"ylgyToken",token,15 * 1000);
+            redis.put(from_wxid+"operate","brushylgy",11 * 1000);
+            weChatUtil.sendTextMsg("是否需要代刷，需要请在10s内输入: y",content);
+        }else {
+            weChatUtil.sendTextMsg("获取羊了个羊token失败，请重试获取联系管理员",content);
+        }
+    }
+
+    /**
      * 老色批
      * @param content
      */
@@ -298,6 +332,7 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleOperate(JSONObject content,String operate,String msg,String from_wxid) {
+        //京东登陆
         if ("readPhone".equals(operate)) {
             if (VerifyUtil.verifyPhone(msg)){
                 redis.put(from_wxid+"phone",msg,5 * 60 * 1000);
@@ -314,6 +349,7 @@ public class WxServiceImpl implements WxService {
             }
             return;
         }
+        //京东登陆
         if ("readIdentifyingCode".equals(operate)){
             String phone = redis.get(from_wxid + "phone");
             String ck = verifyCode(phone, msg);
@@ -349,6 +385,39 @@ public class WxServiceImpl implements WxService {
                 }
             }
             return;
+        }
+        //羊了个羊
+        if ("brushylgy".equals(operate)){
+            if("y".equals(msg)){
+                weChatUtil.sendTextMsg("请在10s内输入需要刷的次数：(输入q退出当前操作)",content);
+                redis.put(from_wxid+"ylgyUid",redis.get(from_wxid + "ylgyUid"),15 * 1000);
+                redis.put(from_wxid+"ylgyToken",redis.get(from_wxid + "ylgyToken"),15 * 1000);
+                redis.put(from_wxid+"operate","brushylgytimes",11 * 1000);
+            }
+        }
+        if ("brushylgytimes".equals(operate)){
+            if (NumberUtil.isInteger(msg)){
+                Integer times = Integer.parseInt(msg);
+                if (times<=0 || times>1000000){
+                    weChatUtil.sendTextMsg("输入数据异常，请重新输入(输入q退出当前操作)",content);
+                    redis.put(from_wxid+"ylgyUid",redis.get(from_wxid + "ylgyUid"),15 * 1000);
+                    redis.put(from_wxid+"ylgyToken",redis.get(from_wxid + "ylgyToken"),15 * 1000);
+                    redis.put(from_wxid+"operate","brushylgytimes",11 * 1000);
+                    return;
+                }
+                String uid= redis.get(from_wxid + "ylgyUid");
+                String token = redis.get(from_wxid + "ylgyToken");
+                int i = ylgyMapper.addWire(uid, token, times);
+                if (i==1){
+                    Integer count = ylgyMapper.queryCount();
+                    weChatUtil.sendTextMsg("添加成功，当前还有"+count+"个号排队中，请耐心等待",content);
+                }
+            }else {
+                weChatUtil.sendTextMsg("输入数据异常，请重新输入(输入q退出当前操作)",content);
+                redis.put(from_wxid+"ylgyUid",redis.get(from_wxid + "ylgyUid"),15 * 1000);
+                redis.put(from_wxid+"ylgyToken",redis.get(from_wxid + "ylgyToken"),15 * 1000);
+                redis.put(from_wxid+"operate","brushylgytimes",11 * 1000);
+            }
         }
     }
 
