@@ -160,6 +160,11 @@ public class WxServiceImpl implements WxService {
             handleYLGY(content);
             return;
         }
+        //羊了个羊
+        if (msg.startsWith("羊t ")){
+            handleYLGYt(content);
+            return;
+        }
         //博客
         if (msg.equals("博客")) {
             handleFunctionBoKe(content);
@@ -291,6 +296,20 @@ public class WxServiceImpl implements WxService {
                 handleLast(content, num, publicKey);
             }
         }
+    }
+
+    /**
+     * 羊了个羊
+     * @param content
+     */
+    private void handleYLGYt(JSONObject content) {
+        String from_wxid = content.getString("from_wxid");
+        String msg = content.getString("msg");
+        String token = msg.replace("羊t ","");
+        weChatUtil.sendTextMsg("请在10s内输入需要刷的次数：(输入q退出当前操作)",content);
+        redis.put(from_wxid+"ylgyUid","",15 * 1000);
+        redis.put(from_wxid+"ylgyToken",token,15 * 1000);
+        redis.put(from_wxid+"operate","brushylgytimes",11 * 1000);
     }
 
     /**
