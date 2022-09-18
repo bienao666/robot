@@ -69,7 +69,7 @@ public class YlgyServiceImpl implements YlgyService {
                                             time++;
                                         }
                                         if (10003==res.getInteger("err_code")){
-                                            token = YlgyUtils.getYlgyToken(ylgy.getString("uid"));
+//                                            token = YlgyUtils.getYlgyToken(ylgy.getString("uid"));
                                         }
                                     }
                                     Thread.sleep(RandomUtil.randomInt(10)*100);

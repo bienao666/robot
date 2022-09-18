@@ -1,5 +1,6 @@
 package com.bienao.robot.utils;
 
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONObject;
@@ -32,7 +33,7 @@ public class YlgyUtils {
                 } catch (Exception e) {
 
                 }
-                if (StringUtils.isNotEmpty(resStr)){
+                if (StringUtils.isNotEmpty(resStr) && !resStr.contains("404")){
                     JSONObject res = JSONObject.parseObject(resStr);
                     if (0==res.getInteger("err_code")){
                         wxOpenId = res.getJSONObject("data").getString("wx_open_id");
@@ -44,7 +45,7 @@ public class YlgyUtils {
             }
             //休息休息一下
             try {
-                Thread.sleep(5000);
+                Thread.sleep(RandomUtil.randomInt(10)* 100L);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -55,13 +56,22 @@ public class YlgyUtils {
             for (int i = 0; i < 20; i++) {
                 try {
                     resStr = HttpRequest.post("https://cat-match.easygame2021.com/sheep/v1/user/login_tourist")
-                            .form("uuid", wxOpenId)
+                            .header("Accept","*/*")
+                            .header("Accept-Encoding","gzip,compress,br,deflate")
+                            .header("Connection","keep-alive")
+                            .header("content-type","application/json")
+                            .header("Host","cat-match.easygame2021.com")
+                            .header("Connection","keep-alive")
+                            .header("t","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTQ1MDI0NDUsIm5iZiI6MTY2MzQwMDI0NSwiaWF0IjoxNjYzMzk4NDQ1LCJqdGkiOiJDTTpjYXRfbWF0Y2g6bHQxMjM0NTYiLCJvcGVuX2lkIjoiIiwidWlkIjo0NTk0MjYwMiwiZGVidWciOiIiLCJsYW5nIjoiIn0.1lXIcb1WL_SdsXG5N_i1drjjACRhRZUS2uadHlT6zIY")
+                            .header("User-Agent","Mozilla/5.0 (iPhone; CPU iPhone OS 15_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.27(0x18001b36) NetType/4G Language/zh_CN")
+                            .header("Referer","https://servicewechat.com/wx141bfb9b73c970a9/14/page-frame.html")
                             .timeout(3000)
+                            .form("uuid", wxOpenId)
                             .execute().body();
                 } catch (HttpException e) {
 
                 }
-                if (StringUtils.isNotEmpty(resStr)){
+                if (StringUtils.isNotEmpty(resStr) && !resStr.contains("404")){
                     JSONObject res = JSONObject.parseObject(resStr);
                     if (0==res.getInteger("err_code")){
                         return res.getJSONObject("data").getString("token");
@@ -69,7 +79,7 @@ public class YlgyUtils {
                 }
                 //休息休息一下
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(RandomUtil.randomInt(10)* 100L);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
