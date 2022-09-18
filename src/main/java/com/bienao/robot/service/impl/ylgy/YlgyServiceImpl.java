@@ -1,5 +1,6 @@
 package com.bienao.robot.service.impl.ylgy;
 
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.mapper.YlgyMapper;
@@ -71,6 +72,7 @@ public class YlgyServiceImpl implements YlgyService {
                                             token = YlgyUtils.getYlgyToken(ylgy.getString("uid"));
                                         }
                                     }
+                                    Thread.sleep(RandomUtil.randomInt(10)*100);
                                 } catch (Exception e) {
                                     log.info("羊了个羊代刷异常：",e);
                                 }
