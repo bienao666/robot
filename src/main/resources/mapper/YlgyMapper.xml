@@ -13,7 +13,7 @@
     </select>
 
     <select id="query" resultType="com.alibaba.fastjson.JSONObject">
-        select * from ylgy order by created_time limit 2
+        select * from ylgy order by created_time
     </select>
 
     <delete id="delete" parameterType="string">

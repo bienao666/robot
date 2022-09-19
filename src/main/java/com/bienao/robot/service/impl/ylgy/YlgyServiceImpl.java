@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -21,19 +22,26 @@ public class YlgyServiceImpl implements YlgyService {
     private YlgyMapper ylgyMapper;
 
     //同时刷号个数上限
-    private Integer limit = 3;
+    private Integer limit = 10;
     //当前刷号个数
     private Integer count = 0;
-
+    //正在刷的序号
+    private ArrayList<String> idList = new ArrayList<>();
     @Override
     public void brush() {
         if (count<limit){
-            //查询2个待刷账号
+            //查询待刷账号
             List<JSONObject> list = ylgyMapper.query();
             for (JSONObject ylgy : list) {
                 if (count<=limit){
-                    count++;
+                    String id = ylgy.getString("id");
+                    if (idList.contains(id)){
+                        continue;
+                    }else {
+                        idList.add(id);
+                    }
                     log.info("开始刷羊了个羊uid：{}",ylgy.getString("uid"));
+                    count++;
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -48,6 +56,7 @@ public class YlgyServiceImpl implements YlgyService {
                             while (true){
                                 if (time>times){
                                     ylgyMapper.delete(id);
+                                    idList.remove(id);
                                     count--;
                                     return;
                                 }
@@ -69,12 +78,12 @@ public class YlgyServiceImpl implements YlgyService {
                                             time++;
                                         }
                                         if (10003==res.getInteger("err_code")){
-//                                            token = YlgyUtils.getYlgyToken(ylgy.getString("uid"));
+                                            token = YlgyUtils.getYlgyToken(ylgy.getString("uid"));
                                         }
                                     }
                                     int i = RandomUtil.randomInt(10);
                                     if (i==5){
-                                        log.info("羊了个羊刷关随机日志：{}",resStr);
+                                        log.info("用户 {} 羊了个羊第 {} 次刷关随机日志：{}",ylgy.getString("uid"),time,resStr);
                                     }
                                     Thread.sleep(i*100);
                                 } catch (Exception e) {

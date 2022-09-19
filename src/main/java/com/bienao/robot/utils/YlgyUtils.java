@@ -12,6 +12,8 @@ public class YlgyUtils {
 
     public static String getYlgyToken(String uid){
         String wxOpenId = "";
+        String avatar = "";
+        String nickName = "";
         //获取wxUnionId
         for (int i = 0; i < 20; i++) {
             if (StringUtils.isEmpty(wxOpenId)){
@@ -37,6 +39,8 @@ public class YlgyUtils {
                     JSONObject res = JSONObject.parseObject(resStr);
                     if (0==res.getInteger("err_code")){
                         wxOpenId = res.getJSONObject("data").getString("wx_open_id");
+                        avatar = res.getJSONObject("data").getString("wx_open_id");
+                        nickName = res.getJSONObject("data").getString("wx_open_id");
                         break;
                     }
                 }
@@ -50,12 +54,17 @@ public class YlgyUtils {
                 e.printStackTrace();
             }
         }
-        if (StringUtils.isNotEmpty(wxOpenId)){
+        if (StringUtils.isNotEmpty(wxOpenId)&&StringUtils.isNotEmpty(avatar)&&StringUtils.isNotEmpty(nickName)){
+            JSONObject body = new JSONObject();
+            body.put("uid",uid);
+            body.put("nick_name",nickName);
+            body.put("avatar",avatar    );
+            body.put("sex",1);
             //获取token
             String resStr = null;
             for (int i = 0; i < 20; i++) {
                 try {
-                    resStr = HttpRequest.post("https://cat-match.easygame2021.com/sheep/v1/user/login_tourist")
+                    resStr = HttpRequest.post("https://cat-match.easygame2021.com/sheep/v1/user/login_oppo")
                             .header("Accept","*/*")
                             .header("Accept-Encoding","gzip,compress,br,deflate")
                             .header("Connection","keep-alive")
@@ -66,7 +75,7 @@ public class YlgyUtils {
                             .header("User-Agent","Mozilla/5.0 (iPhone; CPU iPhone OS 15_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.27(0x18001b36) NetType/4G Language/zh_CN")
                             .header("Referer","https://servicewechat.com/wx141bfb9b73c970a9/14/page-frame.html")
                             .timeout(3000)
-                            .form("uuid", wxOpenId)
+                            .body(body.toJSONString())
                             .execute().body();
                 } catch (HttpException e) {
 

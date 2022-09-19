@@ -429,7 +429,7 @@ public class WxServiceImpl implements WxService {
                 int i = ylgyMapper.addWire(uid, token, times);
                 if (i==1){
                     Integer count = ylgyMapper.queryCount();
-                    weChatUtil.sendTextMsg("添加成功，当前还有"+count+"个号排队中，请耐心等待",content);
+                    weChatUtil.sendTextMsg("添加成功，开刷。。。",content);
                 }
             }else {
                 weChatUtil.sendTextMsg("输入数据异常，请重新输入(输入q退出当前操作)",content);
