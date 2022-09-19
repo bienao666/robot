@@ -1095,7 +1095,7 @@ public class WxServiceImpl implements WxService {
         String bandListStr = jsonObject.getJSONObject("data").getString("band_list");
         List<JSONObject> bandLists = JSONArray.parseArray(bandListStr, JSONObject.class);
         //加入缓存
-        redis.put("WbBandLists", bandListStr, DateUnit.SECOND.getMillis() * 60 * 2);
+        redis.put("WbBandLists", bandListStr);
         String msg = "微博实时热搜：\r\n\r\n";
         int index = 1;
         for (JSONObject band : bandLists) {
