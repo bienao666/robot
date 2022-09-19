@@ -72,7 +72,11 @@ public class YlgyServiceImpl implements YlgyService {
 //                                            token = YlgyUtils.getYlgyToken(ylgy.getString("uid"));
                                         }
                                     }
-                                    Thread.sleep(RandomUtil.randomInt(10)*100);
+                                    int i = RandomUtil.randomInt(10);
+                                    if (i==5){
+                                        log.info("羊了个羊刷关随机日志：{}",resStr);
+                                    }
+                                    Thread.sleep(i*100);
                                 } catch (Exception e) {
                                     log.info("羊了个羊代刷异常：",e);
                                 }
