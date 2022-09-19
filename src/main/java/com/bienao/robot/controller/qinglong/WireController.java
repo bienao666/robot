@@ -1,12 +1,10 @@
 package com.bienao.robot.controller.qinglong;
 
-import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.annotation.LoginToken;
-import com.bienao.robot.entity.QlEntity;
 import com.bienao.robot.entity.WireEntity;
 import com.bienao.robot.entity.WireKeyEntity;
 import com.bienao.robot.enums.ErrorCodeConstant;
-import com.bienao.robot.result.Result;
+import com.bienao.robot.entity.Result;
 import com.bienao.robot.service.ql.WireService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

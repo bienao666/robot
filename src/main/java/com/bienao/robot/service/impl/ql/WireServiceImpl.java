@@ -1,7 +1,6 @@
 package com.bienao.robot.service.impl.ql;
 
 import cn.hutool.core.util.PageUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.*;
 import com.bienao.robot.enums.ErrorCodeConstant;
@@ -9,8 +8,7 @@ import com.bienao.robot.mapper.QlMapper;
 import com.bienao.robot.mapper.WireKeyMapper;
 import com.bienao.robot.mapper.WireMapper;
 import com.bienao.robot.mapper.WirelistMapper;
-import com.bienao.robot.result.Result;
-import com.bienao.robot.service.ql.WireKeyService;
+import com.bienao.robot.entity.Result;
 import com.bienao.robot.service.ql.WireService;
 import com.bienao.robot.utils.ql.QlUtil;
 import lombok.extern.slf4j.Slf4j;

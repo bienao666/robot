@@ -15,7 +15,8 @@ mybatis:
   mapper-locations: classpath:mapper/*Mapper.xml
   type-aliases-package: com.bienao.robot.entity
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+     # 打印sql
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     mapUnderscoreToCamelCase: true
 
 JD_API_HOST: https://api.m.jd.com/client.action

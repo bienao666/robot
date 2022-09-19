@@ -2,7 +2,6 @@ package com.bienao.robot.service.impl.ql;
 
 import cn.hutool.cache.Cache;
 import cn.hutool.core.util.PageUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.weixin.WXConstant;
 import com.bienao.robot.entity.QlCron;
@@ -11,18 +10,15 @@ import com.bienao.robot.entity.QlEnv;
 import com.bienao.robot.entity.SystemParam;
 import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.mapper.QlMapper;
-import com.bienao.robot.result.Result;
+import com.bienao.robot.entity.Result;
 import com.bienao.robot.service.ql.QlService;
-import com.bienao.robot.service.ql.WireService;
 import com.bienao.robot.utils.ql.QlUtil;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
-import com.bienao.robot.utils.weixin.QingLongGuanLiUtil;
 import com.bienao.robot.utils.weixin.WeChatUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.*;
 import java.util.regex.Matcher;

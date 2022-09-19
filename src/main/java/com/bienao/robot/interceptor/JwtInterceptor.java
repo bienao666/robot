@@ -11,7 +11,6 @@ import com.bienao.robot.annotation.LoginToken;
 import com.bienao.robot.annotation.PassToken;
 import com.bienao.robot.entity.User;
 import com.bienao.robot.enums.ErrorCodeConstant;
-import com.bienao.robot.result.Result;
 import com.bienao.robot.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.HandlerMethod;
@@ -20,10 +19,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
-import java.util.Map;
 
 public class JwtInterceptor implements HandlerInterceptor {
     @Autowired

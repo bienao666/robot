@@ -1,9 +1,6 @@
 package com.bienao.robot.mapper;
 
-import com.bienao.robot.entity.QlEntity;
-import com.bienao.robot.entity.WireEntity;
 import com.bienao.robot.entity.WireKeyEntity;
-import com.bienao.robot.result.Result;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

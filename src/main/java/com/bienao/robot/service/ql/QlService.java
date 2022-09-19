@@ -2,8 +2,7 @@ package com.bienao.robot.service.ql;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.QlEntity;
-import com.bienao.robot.result.Result;
-import org.springframework.web.bind.annotation.RequestBody;
+import com.bienao.robot.entity.Result;
 
 import java.util.List;
 

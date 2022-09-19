@@ -1,11 +1,9 @@
 package com.bienao.robot.controller.systemParam;
 
-import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.annotation.LoginToken;
-import com.bienao.robot.entity.QlEntity;
 import com.bienao.robot.entity.SystemParam;
 import com.bienao.robot.enums.ErrorCodeConstant;
-import com.bienao.robot.result.Result;
+import com.bienao.robot.entity.Result;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

@@ -1,7 +1,7 @@
 package com.bienao.robot.service.user;
 
 import com.bienao.robot.entity.User;
-import com.bienao.robot.result.Result;
+import com.bienao.robot.entity.Result;
 
 public interface UserService {
 

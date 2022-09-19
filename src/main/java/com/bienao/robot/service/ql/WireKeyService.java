@@ -1,8 +1,7 @@
 package com.bienao.robot.service.ql;
 
-import com.bienao.robot.entity.WireEntity;
 import com.bienao.robot.entity.WireKeyEntity;
-import com.bienao.robot.result.Result;
+import com.bienao.robot.entity.Result;
 
 import java.util.List;
 

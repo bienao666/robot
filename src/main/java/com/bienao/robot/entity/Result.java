@@ -1,10 +1,7 @@
-package com.bienao.robot.result;
+package com.bienao.robot.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author sedwt

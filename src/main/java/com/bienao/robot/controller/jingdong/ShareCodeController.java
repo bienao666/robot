@@ -3,7 +3,7 @@ package com.bienao.robot.controller.jingdong;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.jingdong.JdCkEntity;
 import com.bienao.robot.mapper.jingdong.JdCkMapper;
-import com.bienao.robot.result.Result;
+import com.bienao.robot.entity.Result;
 import com.bienao.robot.service.jingdong.JdService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

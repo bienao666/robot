@@ -4,14 +4,12 @@ import com.bienao.robot.entity.SystemParam;
 import com.bienao.robot.entity.User;
 import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.mapper.SystemParamMapper;
-import com.bienao.robot.result.Result;
+import com.bienao.robot.entity.Result;
 import com.bienao.robot.service.user.UserService;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {

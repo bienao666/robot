@@ -1,6 +1,6 @@
 package com.bienao.robot.controller.jingdong;
 
-import com.bienao.robot.result.Result;
+import com.bienao.robot.entity.Result;
 import com.bienao.robot.service.jingdong.CkService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

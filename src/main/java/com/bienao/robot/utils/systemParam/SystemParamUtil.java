@@ -6,7 +6,7 @@ import com.bienao.robot.Constants.systemParam.SysConstant;
 import com.bienao.robot.entity.SystemParam;
 import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.mapper.SystemParamMapper;
-import com.bienao.robot.result.Result;
+import com.bienao.robot.entity.Result;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
