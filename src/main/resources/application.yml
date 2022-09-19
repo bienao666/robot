@@ -26,3 +26,17 @@ task-function:
   checkCk: true
   updateShareCode: true
   countJd: true
+
+# 异步线程配置
+async:
+  executor:
+    thread:
+      # 配置核心线程数
+      core_pool_size: 6
+      # 配置最大线程数
+      max_pool_size: 10
+      # 配置队列大小
+      queue_capacity: 15
+      # 配置线程池中的线程的名称前缀
+      name:
+        prefix: async-service-

@@ -76,11 +76,11 @@ public class JiankongImpl implements Jiankong {
                         String suffix = priceStr.substring(index, priceStr.length());
                         String channel = detail.childNode(7).childNode(3).childNode(3).childNode(1).childNode(0).toString().trim();
                         String url = detail.childNode(7).childNode(3).childNode(1).childNode(1).childNode(1).attr("href");
-                        if (goodName.contains("天之蓝") && price<600 && goodName.contains("2瓶")){
+                        if (goodName.contains("天之蓝") && price<600 && price>500 && goodName.contains("2瓶")){
                             sendGoodsToGroup(goodName,price,suffix,channel,url);
                             sleep();
                         }
-                        if (goodName.contains("梦之蓝") && price<1150 && goodName.contains("2瓶")){
+                        if (goodName.contains("梦之蓝") && price<1150 && price>1050 && goodName.contains("2瓶")){
                             sendGoodsToGroup(goodName,price,suffix,channel,url);
                             sleep();
                         }
@@ -132,7 +132,7 @@ public class JiankongImpl implements Jiankong {
                         String suffix = priceStr.substring(index, priceStr.length());
                         String channel = detail.childNode(7).childNode(3).childNode(3).childNode(1).childNode(0).toString().trim();
                         String url = detail.childNode(7).childNode(3).childNode(1).childNode(1).childNode(1).attr("href");
-                        if (goodName.contains("500ml") && price<1500){
+                        if (goodName.contains("500ml") && price<1500 && price>1400){
                             sendGoodsToGroup(goodName,price,suffix,channel,url);
                             sleep();
                         }

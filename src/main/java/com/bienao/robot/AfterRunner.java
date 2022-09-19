@@ -50,6 +50,11 @@ public class AfterRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
+        log.info("=================================================");
+        log.info("===================web页面地址=====================");
+        log.info("     http://127.0.0.1:8899/robot/index.html");
+        log.info("=================================================");
+
         //添加功能列表
         String msg = "菜单列表：\r\n";
         msg += "————功能区————\r\n";
@@ -60,6 +65,54 @@ public class AfterRunner implements ApplicationRunner {
         msg += "           举牌  |  天气  \r\n";
         msg += "           买家秀     \r\n";
         redis.put("functionList",msg);
+
+        //初始化tgbot
+        try {
+            DefaultBotOptions botOptions = new DefaultBotOptions();
+            List<SystemParam> SystemParams = systemParamUtil.querySystemParams("TGPROXY");
+            String tgProxy = SystemParams.get(0).getValue();
+            if (StringUtils.isNotEmpty(tgProxy) && tgProxy.contains(":")){
+                String[] split = tgProxy.split(":");
+                //梯子在自己电脑上就写127.0.0.1  软路由就写路由器的地址
+                String proxyHost = split[0];
+                //端口根据实际情况填写，说明在上面，自己看
+                int proxyPort = Integer.parseInt(split[1]);
+
+                botOptions.setProxyHost(proxyHost);
+                botOptions.setProxyPort(proxyPort);
+                //注意一下这里，ProxyType是个枚举，看源码你就知道有NO_PROXY,HTTP,SOCKS4,SOCKS5;
+                botOptions.setProxyType(DefaultBotOptions.ProxyType.HTTP);
+            }
+
+            DefaultBotSession defaultBotSession = new DefaultBotSession();
+            defaultBotSession.setOptions(botOptions);
+            try {
+                TelegramBotsApi telegramBotsApi = new TelegramBotsApi(defaultBotSession.getClass());
+                SystemParams = systemParamUtil.querySystemParams("TGBOTTOKEN");
+                String tgBotToken = SystemParams.get(0).getValue();
+                SystemParams = systemParamUtil.querySystemParams("TGBOTUSERNAME");
+                String tgBotUsername = SystemParams.get(0).getValue();
+                if (StringUtils.isNotEmpty(tgProxy) && tgProxy.contains(":")){
+                    //需要代理
+                    TgBot bot = new TgBot(botOptions);
+                    bot.setToken(tgBotToken);
+                    bot.setUsername(tgBotUsername);
+                    telegramBotsApi.registerBot(bot);
+                }else {
+                    //不需代理
+                    TgBot bot = new TgBot();
+                    bot.setToken(tgBotToken);
+                    bot.setUsername(tgBotUsername);
+                    telegramBotsApi.registerBot(bot);
+                }
+                log.info("tgbot连接成功");
+                log.info("开始监听tg信息。。。");
+            } catch (TelegramApiException e) {
+                log.info("tgbot连接失败，请检查配置");
+            }
+        } catch (NumberFormatException e) {
+            log.info("tgbot连接失败，请检查配置");
+        }
 
         //启动监听
         new Thread(new Runnable() {
@@ -244,53 +297,5 @@ public class AfterRunner implements ApplicationRunner {
                 wireService.addWire("邀好友赢大礼","jd_inviteFriendsGift.py",keys);
             }
         }).start();
-
-        //初始化tgbot
-        try {
-            DefaultBotOptions botOptions = new DefaultBotOptions();
-            List<SystemParam> SystemParams = systemParamUtil.querySystemParams("TGPROXY");
-            String tgProxy = SystemParams.get(0).getValue();
-            if (StringUtils.isNotEmpty(tgProxy) && tgProxy.contains(":")){
-                String[] split = tgProxy.split(":");
-                //梯子在自己电脑上就写127.0.0.1  软路由就写路由器的地址
-                String proxyHost = split[0];
-                //端口根据实际情况填写，说明在上面，自己看
-                int proxyPort = Integer.parseInt(split[1]);
-
-                botOptions.setProxyHost(proxyHost);
-                botOptions.setProxyPort(proxyPort);
-                //注意一下这里，ProxyType是个枚举，看源码你就知道有NO_PROXY,HTTP,SOCKS4,SOCKS5;
-                botOptions.setProxyType(DefaultBotOptions.ProxyType.HTTP);
-            }
-
-            DefaultBotSession defaultBotSession = new DefaultBotSession();
-            defaultBotSession.setOptions(botOptions);
-            try {
-                TelegramBotsApi telegramBotsApi = new TelegramBotsApi(defaultBotSession.getClass());
-                SystemParams = systemParamUtil.querySystemParams("TGBOTTOKEN");
-                String tgBotToken = SystemParams.get(0).getValue();
-                SystemParams = systemParamUtil.querySystemParams("TGBOTUSERNAME");
-                String tgBotUsername = SystemParams.get(0).getValue();
-                if (StringUtils.isNotEmpty(tgProxy) && tgProxy.contains(":")){
-                    //需要代理
-                    TgBot bot = new TgBot(botOptions);
-                    bot.setToken(tgBotToken);
-                    bot.setUsername(tgBotUsername);
-                    telegramBotsApi.registerBot(bot);
-                }else {
-                    //不需代理
-                    TgBot bot = new TgBot();
-                    bot.setToken(tgBotToken);
-                    bot.setUsername(tgBotUsername);
-                    telegramBotsApi.registerBot(bot);
-                }
-            } catch (TelegramApiException e) {
-                log.info("tgbot连接失败，请检查配置");
-                e.printStackTrace();
-            }
-            log.info("tgbot连接成功");
-        } catch (NumberFormatException e) {
-            log.info("tgbot连接失败，请检查配置");
-        }
     }
 }
