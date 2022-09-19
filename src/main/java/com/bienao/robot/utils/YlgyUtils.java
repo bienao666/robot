@@ -80,7 +80,7 @@ public class YlgyUtils {
                 } catch (HttpException e) {
 
                 }
-                if (StringUtils.isNotEmpty(resStr) && !resStr.contains("404")){
+                if (StringUtils.isNotEmpty(resStr)){
                     JSONObject res = JSONObject.parseObject(resStr);
                     if (0==res.getInteger("err_code")){
                         return res.getJSONObject("data").getString("token");
