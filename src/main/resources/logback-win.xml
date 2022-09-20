@@ -16,8 +16,8 @@
         <file>${LOG_HOME}/logback.log</file> <!-- 日志名称 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${LOG_HOME}/logback.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
-            <maxFileSize>50MB</maxFileSize>  <!-- 日志文件过大会使的编辑器打开非常慢，因此设置日志最大50MB -->
-            <maxHistory>10</maxHistory>  <!-- 保存10天 -->
+            <maxFileSize>100MB</maxFileSize>  <!-- 日志文件过大会使的编辑器打开非常慢，因此设置日志最大50MB -->
+            <maxHistory>3</maxHistory>  <!-- 保存10天 -->
             <totalSizeCap>2GB</totalSizeCap>  <!-- 总日志大小 -->
         </rollingPolicy>
         <!-- encoder负责两件事，一是把日志信息转换成字节数组，二是把字节数组写入到输出流。 -->
