@@ -45,4 +45,6 @@ public interface JdService {
      * 统计京豆收益
      */
     void countJd();
+
+    List<JdCkEntity> getJdCks();
 }

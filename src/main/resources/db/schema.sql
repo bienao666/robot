@@ -67,12 +67,12 @@ create table if not exists `jdck` (
                                       `id` INTEGER PRIMARY KEY AUTOINCREMENT,
                                       `ck` varchar,
                                       `pt_pin` varchar,
-                                      `expiry` INTEGER DEFAULT '-1',
                                       `remark` varchar,
                                       `status` INTEGER DEFAULT '0',
                                       `level` INTEGER DEFAULT '2',
                                       `jd` INTEGER DEFAULT '0',
                                       `created_time` datetime DEFAULT (datetime('now', 'localtime')),
+                                      `expiry_time` datetime,
                                       `updated_time` datetime DEFAULT (datetime('now', 'localtime'))
 );
 create table if not exists `jdFruit` (

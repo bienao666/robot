@@ -15,9 +15,6 @@ public class JdCkEntity {
     //pt_pin
     private String ptPin;
 
-    //过期天数
-    private Integer expiry;
-
     //京东ck备注
     private String remark;
 
@@ -32,6 +29,9 @@ public class JdCkEntity {
 
     //新增时间
     private Date createdTime;
+
+    //过期时间
+    private Date expiryTime;
 
     //更新时间
     private Date updatedTime;

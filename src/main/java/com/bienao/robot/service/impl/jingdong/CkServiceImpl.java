@@ -12,6 +12,7 @@ import com.bienao.robot.service.jingdong.CkService;
 import com.bienao.robot.utils.jingdong.GetUserAgentUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.jdbc.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -145,6 +146,7 @@ public class CkServiceImpl implements CkService {
     /**
      * 检查ck是否过期
      */
+    @Override
     public void checkCk() {
         log.info("定时检查ck开始。。。");
         JdCkEntity jdCkEntityQuery = new JdCkEntity();
@@ -166,13 +168,12 @@ public class CkServiceImpl implements CkService {
                     }
                 }
                 //查看助力超级vip是否过期
-                if (jdCkEntity.getLevel()==1 && jdCkEntity.getExpiry() != -1){
-                    Integer expiry = jdCkEntity.getExpiry();
-                    Date createdTime = jdCkEntity.getCreatedTime();
-                    Date expiryTime = DateUtil.offsetDay(createdTime, expiry);
+                if (jdCkEntity.getLevel()==1 && jdCkEntity.getExpiryTime() != null){
+                    Date expiryTime = jdCkEntity.getExpiryTime();
                     if (expiryTime.getTime() < DateUtil.date().getTime()){
                         jdCkEntity.setLevel(2);
                         jdCkEntity.setUpdatedTime(new Date());
+                        jdCkEntity.setExpiryTime(null);
                         jdCkMapper.updateCk(jdCkEntity);
                     }
                 }

@@ -638,6 +638,12 @@ public class JdServiceImpl implements JdService {
         }
     }
 
+    @Override
+    public List<JdCkEntity> getJdCks() {
+        JdCkEntity jdCkEntity = new JdCkEntity();
+        return jdCkMapper.queryCks(jdCkEntity);
+    }
+
     public JSONObject getJingBeanBalanceDetail(String ck,int page,int pageSize){
         String result = HttpRequest.post("https://api.m.jd.com/client.action?functionId=getJingBeanBalanceDetail")
                 .body("body=%7B%22pageSize%22%3A%22"+pageSize+"%22%2C%22page%22%3A%22"+page+"%22%7D&appid=ld")

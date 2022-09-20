@@ -62,6 +62,7 @@
             <if test="jd != null">
                 jd = #{jd},
             </if>
+                expiry_time = #{expiryTime},
             <if test="updatedTime != null">
                 updated_time = #{updatedTime},
             </if>
