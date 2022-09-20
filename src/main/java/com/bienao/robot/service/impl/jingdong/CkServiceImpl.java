@@ -157,7 +157,8 @@ public class CkServiceImpl implements CkService {
             if (jsonObject == null) {
                 //清理过期ck
                 log.info("{}已过期，删除！！！",jdCkEntity.getCk());
-                jdCkMapper.deleteCk(jdCkEntity);
+                jdCkEntity.setStatus(1);
+                jdCkMapper.updateCk(jdCkEntity);
             } else {
                 if (StringUtils.isEmpty(jdCkEntity.getRemark())){
                     JSONObject baseInfo = jsonObject.getJSONObject("baseInfo");
