@@ -158,13 +158,6 @@ public class ShareCodeController {
         return Result.success(helpInfo);
     }
 
-    /**
-     * 获取京东账号列表
-     */
-    @GetMapping("/getJdCks")
-    public Result getJdCks(@RequestParam(value = "ids") List<Integer> ids){
-        List<JdCkEntity> jdcks = jdService.getJdCks();
-        return Result.success(jdcks);
-    }
+
 
 }

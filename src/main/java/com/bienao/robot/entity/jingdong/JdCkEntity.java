@@ -1,7 +1,11 @@
 package com.bienao.robot.entity.jingdong;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
@@ -10,6 +14,7 @@ public class JdCkEntity {
     private Integer id;
 
     //京东ck
+    @NotBlank(message = "京东ck不能为空")
     private String ck;
 
     //pt_pin
@@ -19,6 +24,7 @@ public class JdCkEntity {
     private String remark;
 
     //svip 0，vip 1，普通用户 2，工具人 3
+    @NotNull(message = "等级不能为空")
     private Integer level;
 
     //是否有效 0否1是
@@ -31,6 +37,8 @@ public class JdCkEntity {
     private Date createdTime;
 
     //过期时间
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date expiryTime;
 
     //更新时间

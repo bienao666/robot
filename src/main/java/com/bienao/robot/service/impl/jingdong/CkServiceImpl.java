@@ -3,7 +3,9 @@ package com.bienao.robot.service.impl.jingdong;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.entity.Result;
 import com.bienao.robot.entity.jingdong.JdCkEntity;
+import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.mapper.jingdong.JdCkMapper;
 import com.bienao.robot.mapper.jingdong.JdFruitMapper;
 import com.bienao.robot.mapper.jingdong.JdPetMapper;
@@ -74,43 +76,39 @@ public class CkServiceImpl implements CkService {
     /**
      * 添加ck
      *
-     * @param ck
-     * @param level
+     * @param jdCkEntity
      * @return
      */
     @Override
-    public boolean addCk(String ck, int level) {
+    public boolean addCk(JdCkEntity jdCkEntity) {
         //判断ck是否已经添加
         JdCkEntity jdCkEntityQuery = new JdCkEntity();
-        jdCkEntityQuery.setCk(ck);
-        JdCkEntity jdCkEntity = jdCkMapper.queryCk(jdCkEntityQuery);
-        if (jdCkEntity != null) {
+        jdCkEntityQuery.setCk(jdCkEntity.getCk());
+        JdCkEntity jdck = jdCkMapper.queryCk(jdCkEntityQuery);
+        if (jdck != null) {
             throw new RuntimeException("ck已经添加过");
         }
 
         //校验ck是否有效
-        JSONObject jsonObject = queryDetail(ck);
+        JSONObject jsonObject = queryDetail(jdCkEntity.getCk());
         if (jsonObject==null){
             throw new RuntimeException("ck不存在或者ck已失效");
         }
 
         String pt_pin = "";
         Pattern compile = Pattern.compile("pt_pin=(.+?);");
-        Matcher matcher = compile.matcher(ck);
+        Matcher matcher = compile.matcher(jdCkEntity.getCk());
         if (matcher.find()){
             pt_pin = matcher.group(1);
         }
+        jdCkEntity.setPtPin(pt_pin);
 
         //判断pt_pin是否存在
         jdCkEntityQuery = new JdCkEntity();
         jdCkEntityQuery.setPtPin(pt_pin);
-        jdCkEntity = jdCkMapper.queryCk(jdCkEntityQuery);
-        if (jdCkEntity == null) {
+        jdck = jdCkMapper.queryCk(jdCkEntityQuery);
+        if (jdck == null) {
             //添加
-            jdCkEntity = new JdCkEntity();
-            jdCkEntity.setCk(ck);
-            jdCkEntity.setLevel(level);
-            jdCkEntity.setPtPin(pt_pin);
             int i = jdCkMapper.addCk(jdCkEntity);
             if (i != 0) {
                 return true;
@@ -118,9 +116,12 @@ public class CkServiceImpl implements CkService {
             return false;
         }else {
             //更新
-            jdCkEntity.setCk(ck);
-            jdCkEntity.setUpdatedTime(new Date());
-            int i = jdCkMapper.updateCk(jdCkEntity);
+            jdck.setCk(jdCkEntity.getCk());
+            jdck.setUpdatedTime(new Date());
+            if (StringUtils.isNotEmpty(jdCkEntity.getRemark())){
+                jdck.setRemark(jdCkEntity.getRemark());
+            }
+            int i = jdCkMapper.updateCk(jdck);
             if (i != 0) {
                 return true;
             }
@@ -187,5 +188,35 @@ public class CkServiceImpl implements CkService {
             }
         }
         log.info("定时清理过期ck结束。。。");
+    }
+
+    @Override
+    public List<JdCkEntity> getJdCks(String ck,String ptPin,Integer level,Integer status) {
+        JdCkEntity jdCkEntity = new JdCkEntity();
+        jdCkEntity.setCk(ck);
+        jdCkEntity.setPtPin(ptPin);
+        jdCkEntity.setLevel(level);
+        jdCkEntity.setStatus(status);
+        return jdCkMapper.queryCks(jdCkEntity);
+    }
+
+    @Override
+    public Result updateJdCk(JdCkEntity jdCkEntity) {
+        int i = jdCkMapper.updateCk(jdCkEntity);
+        if (i==1){
+            return Result.success();
+        }else {
+            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"数据库操作异常");
+        }
+    }
+
+    @Override
+    public Result deleteJdCks(List<Integer> ids) {
+        int i = jdCkMapper.deleteCks(ids);
+        if (i>0){
+            return Result.success();
+        }else {
+            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"数据库操作异常");
+        }
     }
 }

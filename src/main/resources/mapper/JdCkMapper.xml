@@ -27,8 +27,14 @@
         <if test="ck != null and ck != ''">
             AND ck = #{ck}
         </if>
+        <if test="ptPin != null and ptPin != ''">
+            AND pt_pin = #{ptPin}
+        </if>
         <if test="level != null">
             AND level = #{level}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
         </if>
         order by level
     </select>
@@ -38,7 +44,7 @@
     </select>
 
     <insert id="addCk" parameterType="jdCkEntity">
-        insert into jdck(ck,pt_pin,remark,level) values (#{ck},#{ptPin},#{remark},#{level});
+        insert into jdck(ck,pt_pin,remark,level,expiry_time) values (#{ck},#{ptPin},#{remark},#{level},#{expiryTime});
     </insert>
 
     <update id="updateCk" parameterType="jdCkEntity">
@@ -71,7 +77,10 @@
     </update>
 
     <delete id="deleteCk" parameterType="jdCkEntity">
-        delete from jdck where id = #{id};
+        delete from jdck where 1=1 and id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
     </delete>
 
 

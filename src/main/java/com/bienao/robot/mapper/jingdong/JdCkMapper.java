@@ -50,10 +50,10 @@ public interface JdCkMapper {
     List<JdCkEntity> queryCksAndActivity();
 
     /**
-     * 清理过期ck
+     * 删除ck
      * @return
      */
-    int deleteCk(JdCkEntity jdCkEntity);
+    int deleteCks(List<Integer> ids);
 
     /**
      * 查询ck数量

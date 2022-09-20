@@ -71,9 +71,9 @@ create table if not exists `jdck` (
                                       `status` INTEGER DEFAULT '0',
                                       `level` INTEGER DEFAULT '2',
                                       `jd` INTEGER DEFAULT '0',
-                                      `created_time` datetime DEFAULT (datetime('now', 'localtime')),
-                                      `expiry_time` datetime,
-                                      `updated_time` datetime DEFAULT (datetime('now', 'localtime'))
+                                      `created_time` timestamp DEFAULT (timestamp('now', 'localtime')),
+                                      `expiry_time` timestamp,
+                                      `updated_time` timestamp DEFAULT (timestamp('now', 'localtime'))
 );
 create table if not exists `jdFruit` (
                            `id` INTEGER PRIMARY KEY AUTOINCREMENT,

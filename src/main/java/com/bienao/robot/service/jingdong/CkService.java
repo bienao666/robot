@@ -1,6 +1,10 @@
 package com.bienao.robot.service.jingdong;
 
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.entity.Result;
+import com.bienao.robot.entity.jingdong.JdCkEntity;
+
+import java.util.List;
 
 public interface CkService {
 
@@ -13,11 +17,10 @@ public interface CkService {
 
     /**
      * 添加ck
-     * @param ck
-     * @param level
+     * @param jdCkEntity
      * @return
      */
-    boolean addCk(String ck,int level);
+    boolean addCk(JdCkEntity jdCkEntity);
 
     /**
      * 每天凌晨重置ck的助力数据
@@ -28,4 +31,10 @@ public interface CkService {
      * 检查ck是否过期
      */
     void checkCk();
+
+    List<JdCkEntity> getJdCks(String ck,String ptPin,Integer level,Integer status);
+
+    Result updateJdCk(JdCkEntity jdCkEntity);
+
+    Result deleteJdCks(List<Integer> ids);
 }
