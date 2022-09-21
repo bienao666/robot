@@ -120,4 +120,14 @@ create table if not exists `ylgy` (
                                          `times` INTEGER DEFAULT '100000',
                                          `created_time` varchar DEFAULT (datetime('now', 'localtime')),
                                          `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
-    );
+);
+create table if not exists `wxbs` (
+                                      `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+                                      `username` varchar,
+                                      `password` varchar,
+                                      `minstep` INTEGER DEFAULT 30000,
+                                      `maxstep` INTEGER DEFAULT 90000,
+                                      `created_time` varchar DEFAULT (datetime('now', 'localtime')),
+                                      `expiry_time` varchar,
+                                      `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
+);

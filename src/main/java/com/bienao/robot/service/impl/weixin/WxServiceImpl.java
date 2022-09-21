@@ -13,17 +13,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.FunctionType;
 import com.bienao.robot.Constants.weixin.WXConstant;
-import com.bienao.robot.entity.Festival;
-import com.bienao.robot.entity.Group;
-import com.bienao.robot.entity.SystemParam;
+import com.bienao.robot.entity.*;
 import com.bienao.robot.mapper.GroupMapper;
-import com.bienao.robot.entity.Weather;
+import com.bienao.robot.mapper.WxbsMapper;
 import com.bienao.robot.mapper.YlgyMapper;
 import com.bienao.robot.service.ql.QlService;
 import com.bienao.robot.service.weixin.WxService;
 import com.bienao.robot.utils.*;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
-import com.bienao.robot.utils.weixin.QingLongGuanLiUtil;
 import com.bienao.robot.utils.weixin.WeChatUtil;
 import com.google.common.collect.EvictingQueue;
 import com.nlf.calendar.Lunar;
@@ -66,6 +63,9 @@ public class WxServiceImpl implements WxService {
 
     @Autowired
     private YlgyMapper ylgyMapper;
+
+    @Autowired
+    private WxbsMapper wxbsMapper;
 
     private Cache<String, String> redis = WXConstant.redis;
 
@@ -1308,6 +1308,27 @@ public class WxServiceImpl implements WxService {
             }
         }
     }
+
+    /**
+     * 发送刷步数请求
+     * @param username 用户名手机号
+     * @param password 密码
+     * @param step    步数
+     * @param minstep
+     * @param maxstep
+     * @param expiryTime
+     * @return
+     */
+    @Override
+    public Result updateStep(String username, String password, Integer step, boolean istime, Integer minstep, Integer maxstep, String expiryTime) {
+        Result res = XiaoMiUtil.sport(username, password, String.valueOf(step));
+        if (res.getCode().equals("200") && istime){
+            //添加数据库
+            wxbsMapper.addZh(username,password,minstep,maxstep,expiryTime);
+        }
+        return res;
+    }
+
 
     /**
      * 早上好
