@@ -55,9 +55,6 @@
             <if test="script !=null and script !=''">
                 script=#{script},
             </if>
-            <if test="status !=null and status !=''">
-                status=#{status},
-            </if>
             <if test="updatedTime !=null">
                 updated_time=#{updatedTime},
             </if>
