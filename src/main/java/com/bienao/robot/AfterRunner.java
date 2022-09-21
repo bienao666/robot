@@ -295,6 +295,9 @@ public class AfterRunner implements ApplicationRunner {
 
                 keys.add("jd_inv_authorCode");
                 wireService.addWire("邀好友赢大礼","jd_inviteFriendsGift.py",keys);
+
+                keys.add("categoryUnion_activityId");
+                wireService.addWire("品类联合-通用脚本","jd_lzdz_categoryUnion.js",keys);
             }
         }).start();
     }
