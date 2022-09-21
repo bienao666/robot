@@ -291,8 +291,4 @@ public class QlController {
         return result;
     }
 
-    public static void main(String[] args) {
-        String body = HttpRequest.get("https://api.iyk0.com/yq/?msg=南京").execute().body();
-        System.out.println(body);
-    }
 }

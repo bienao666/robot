@@ -76,7 +76,7 @@
         where id=#{id};
     </update>
 
-    <delete id="deleteCk" parameterType="jdCkEntity">
+    <delete id="deleteCks" parameterType="jdCkEntity">
         delete from jdck where 1=1 and id in
         <foreach collection="list" item="id" open="(" close=")" separator=",">
             #{id}

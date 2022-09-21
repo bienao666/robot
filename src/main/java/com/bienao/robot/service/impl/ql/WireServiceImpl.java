@@ -10,6 +10,7 @@ import com.bienao.robot.mapper.WireKeyMapper;
 import com.bienao.robot.mapper.WireMapper;
 import com.bienao.robot.mapper.WirelistMapper;
 import com.bienao.robot.entity.Result;
+import com.bienao.robot.service.ql.QlService;
 import com.bienao.robot.service.ql.WireService;
 import com.bienao.robot.utils.ql.QlUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,9 @@ public class WireServiceImpl implements WireService {
 
     @Autowired
     private WirelistMapper wirelistMapper;
+
+    @Autowired
+    private QlService qlService;
 
     /**
      * 添加线报活动
@@ -197,7 +201,7 @@ public class WireServiceImpl implements WireService {
                         crons = qlUtil.getCrons(url, ql.getTokenType(), ql.getToken());
                     }
                     if (crons != null) {
-                        Integer old = list.size();
+                        Integer old = result.size();
                         for (QlCron cron : crons) {
                             if (cron.getCommand().contains(script)) {
                                 Integer id = cron.getId();
@@ -214,7 +218,7 @@ public class WireServiceImpl implements WireService {
                             }
                         }
                         Integer now = result.size();
-                        if (now.equals(old)) {
+                        if (old==now) {
                             result.add(url + "(" + remark + ")" + script + " 脚本不存在，请拉库后执行");
                         }
                     } else {
@@ -351,8 +355,16 @@ public class WireServiceImpl implements WireService {
         }
         //该任务都是未运行中
         if (!status.contains(0)){
+            //配置大车头
+            qlService.oneKeyHead();
             //执行该任务
-            handleActivity(id,script,content);
+            try {
+                handleActivity(id,script,content);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            //取消大车头
+            qlService.cancelHead();
         }
     }
 
