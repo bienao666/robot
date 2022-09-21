@@ -1,6 +1,7 @@
 package com.bienao.robot.service.impl.ql;
 
 import cn.hutool.cache.Cache;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.PageUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.weixin.WXConstant;
@@ -173,7 +174,7 @@ public class QlServiceImpl implements QlService {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "head长度异常");
         }
 
-        ql.setUpdatedTime(new Date());
+        ql.setUpdatedTime(DateUtil.formatTime(new Date()));
         if ("******".equals(ql.getClientSecret())) {
             ql.setClientSecret("");
         }
