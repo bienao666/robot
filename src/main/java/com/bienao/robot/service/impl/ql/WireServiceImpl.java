@@ -10,6 +10,7 @@ import com.bienao.robot.mapper.WireKeyMapper;
 import com.bienao.robot.mapper.WireMapper;
 import com.bienao.robot.mapper.WirelistMapper;
 import com.bienao.robot.entity.Result;
+import com.bienao.robot.redis.Redis;
 import com.bienao.robot.service.ql.QlService;
 import com.bienao.robot.service.ql.WireService;
 import com.bienao.robot.utils.ql.QlUtil;
@@ -257,6 +258,12 @@ public class WireServiceImpl implements WireService {
                 //export 参数名
                 String s1 = config.split("=")[0];
                 String key = s1.replace("export", "").replace(" ", "");
+                String value = config.split("=")[1];
+                String redis = Redis.wireRedis.get(key + value);
+                if (StringUtils.isNotEmpty(redis)){
+                    return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"该线报活动已存在，添加失败");
+                }
+                Redis.wireRedis.put(key + value,"1",24 * 60 * 60 * 1000);
                 String s = wireKeyMapper.queryScript(key);
                 if (s!=null){
                     script = s;
@@ -271,7 +278,7 @@ public class WireServiceImpl implements WireService {
         try {
             i = wirelistMapper.addActivity(script,wire);
         } catch (Exception e) {
-            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"线报已存在，添加失败");
+            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"该线报活动已存在，添加失败");
         }
         Integer maxId = wirelistMapper.queryMaxId();
         handleWire(maxId,script,wire);
