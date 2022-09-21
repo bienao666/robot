@@ -2,6 +2,7 @@ package com.bienao.robot.utils.systemParam;
 
 import cn.hutool.cache.Cache;
 import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import com.bienao.robot.Constants.systemParam.SysConstant;
 import com.bienao.robot.entity.SystemParam;
 import com.bienao.robot.enums.ErrorCodeConstant;
@@ -96,7 +97,7 @@ public class SystemParamUtil {
         systemParam.setCode(code);
         systemParam.setCodeName(codeName);
         systemParam.setValue(value);
-        systemParam.setUpdatedTime(new Date());
+        systemParam.setUpdatedTime(DateUtil.formatTime(new Date()));
         int i = systemParamMapper.updateSystemParam(systemParam);
         if (i==1){
             sysParamRedis.put(code,value);
@@ -104,6 +105,10 @@ public class SystemParamUtil {
         }else {
             return false;
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(DateUtil.formatTime(new Date()));
     }
 
     /**

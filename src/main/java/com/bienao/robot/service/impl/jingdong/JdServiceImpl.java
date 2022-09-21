@@ -624,7 +624,7 @@ public class JdServiceImpl implements JdService {
             }while (t==0);
             log.info("统计"+jdCkEntity.getRemark()+"京豆结果：{}",yesterday);
             jdCkEntity.setJd(yesterday);
-            jdCkEntity.setUpdatedTime(new Date());
+            jdCkEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
             jdCkMapper.updateCk(jdCkEntity);
         }
         log.info("统计京豆收益结束！！！");
@@ -894,7 +894,7 @@ public class JdServiceImpl implements JdService {
             } else if (resultObject.getString("code").equals("3")) {
                 log.info("ck已过期 ‼️‼️");
                 toHelpJdCk.setStatus(1);
-                toHelpJdCk.setUpdatedTime(new Date());
+                toHelpJdCk.setUpdatedTime(DateUtil.formatDateTime(new Date()));
                 jdCkMapper.updateCk(toHelpJdCk);
             }else {
                 log.info("东东农场助力失败 ‼️‼️");
@@ -959,7 +959,7 @@ public class JdServiceImpl implements JdService {
                 } else if (resultObject.getString("code").equals("3")) {
                     log.info("ck已过期 ‼️‼️");
                     toHelpJdCk.setStatus(1);
-                    toHelpJdCk.setUpdatedTime(new Date());
+                    toHelpJdCk.setUpdatedTime(DateUtil.formatDateTime(new Date()));
                     jdCkMapper.updateCk(toHelpJdCk);
                 }else {
                     log.info("东东农场天天抽奖助力失败 ‼️‼️");

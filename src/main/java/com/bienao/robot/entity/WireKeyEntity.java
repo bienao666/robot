@@ -28,10 +28,10 @@ public class WireKeyEntity {
     private String key;
 
     //新增时间
-    private Date createdTime;
+    private String createdTime;
 
     //更新时间
-    private Date updatedTime;
+    private String updatedTime;
 
     public WireKeyEntity(Integer wireid, String key) {
         this.wireId = wireId;

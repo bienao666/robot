@@ -19,8 +19,8 @@ public class Group {
     private Integer functionType;
 
     //新增时间
-    private Date createdTime;
+    private String createdTime;
 
     //更新时间
-    private Date updatedTime;
+    private String updatedTime;
 }

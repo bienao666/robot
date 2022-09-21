@@ -1,5 +1,6 @@
 package com.bienao.robot.service.impl.jingdong;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONObject;
@@ -117,7 +118,7 @@ public class CkServiceImpl implements CkService {
         }else {
             //更新
             jdck.setCk(jdCkEntity.getCk());
-            jdck.setUpdatedTime(new Date());
+            jdck.setUpdatedTime(DateUtil.formatDateTime(new Date()));
             if (StringUtils.isNotEmpty(jdCkEntity.getRemark())){
                 jdck.setRemark(jdCkEntity.getRemark());
             }
@@ -165,16 +166,16 @@ public class CkServiceImpl implements CkService {
                     JSONObject baseInfo = jsonObject.getJSONObject("baseInfo");
                     if (baseInfo != null) {
                         jdCkEntity.setRemark(baseInfo.getString("nickname"));
-                        jdCkEntity.setUpdatedTime(new Date());
+                        jdCkEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
                         jdCkMapper.updateCk(jdCkEntity);
                     }
                 }
                 //查看助力超级vip是否过期
-                if (jdCkEntity.getLevel()==1 && jdCkEntity.getExpiryTime() != null){
-                    Date expiryTime = jdCkEntity.getExpiryTime();
+                if (jdCkEntity.getLevel()==1 && StringUtils.isNotEmpty(jdCkEntity.getExpiryTime())){
+                    DateTime expiryTime = DateUtil.parse(jdCkEntity.getExpiryTime());
                     if (expiryTime.getTime() < DateUtil.date().getTime()){
                         jdCkEntity.setLevel(2);
-                        jdCkEntity.setUpdatedTime(new Date());
+                        jdCkEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
                         jdCkEntity.setExpiryTime(null);
                         jdCkMapper.updateCk(jdCkEntity);
                     }

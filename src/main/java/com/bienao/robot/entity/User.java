@@ -31,8 +31,8 @@ public class User {
     private String functionType;
 
     //新增时间
-    private Date createdTime;
+    private String createdTime;
 
     //更新时间
-    private Date updatedTime;
+    private String updatedTime;
 }

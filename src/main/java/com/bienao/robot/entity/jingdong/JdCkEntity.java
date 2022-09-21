@@ -34,15 +34,13 @@ public class JdCkEntity {
     private Integer jd;
 
     //新增时间
-    private Date createdTime;
+    private String createdTime;
 
     //过期时间
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    private Date expiryTime;
+    private String expiryTime;
 
     //更新时间
-    private Date updatedTime;
+    private String updatedTime;
 
     //东东农场
     private JdFruitEntity jdFruitEntity;

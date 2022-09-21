@@ -1,5 +1,6 @@
 package com.bienao.robot.service.impl.ql;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.PageUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.*;
@@ -89,7 +90,7 @@ public class WireServiceImpl implements WireService {
      */
     @Override
     public Result updateWire(WireEntity wireEntity) {
-        wireEntity.setUpdatedTime(new Date());
+        wireEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
         wireMapper.updateWire(wireEntity);
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(wireEntity.getId());

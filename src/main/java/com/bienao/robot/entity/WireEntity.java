@@ -36,10 +36,10 @@ public class WireEntity {
     private List<WireKeyEntity> keys;
 
     //新增时间
-    private Date createdTime;
+    private String createdTime;
 
     //更新时间
-    private Date updatedTime;
+    private String updatedTime;
 
     public WireEntity(String activityName, String script) {
         this.activityName = activityName;
