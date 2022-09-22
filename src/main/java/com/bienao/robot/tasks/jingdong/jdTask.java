@@ -121,7 +121,7 @@ public class jdTask {
     /**
      * 维护助力码
      */
-    @Scheduled(cron = "0 0 23 * * ?")
+    @Scheduled(cron = "0 0 12,18,23 * * ?")
     public void updateShareCode(){
         if (updateShareCode){
             List<JdCkEntity> cks = jdService.queryCksAndActivity();
