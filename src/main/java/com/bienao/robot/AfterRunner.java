@@ -298,6 +298,18 @@ public class AfterRunner implements ApplicationRunner {
 
                 keys.add("categoryUnion_activityId");
                 wireService.addWire("品类联合-通用脚本","jd_lzdz_categoryUnion.js",keys);
+
+                keys.add("jd_wxCollectionActivityUrl");
+                wireService.addWire("加购有礼-JK","jd_wxCollectionActivity.py",keys);
+
+                keys.add("jinggengInviteJoin");
+                wireService.addWire("jinggeng邀请入会有礼","jd_jinggengInvite.py",keys);
+
+                keys.add("jd_wxBirthGiftsId");
+                wireService.addWire("生日礼包","jd_wxBirthGifts.py",keys);
+
+                keys.add("jd_wxCompleteInfoId");
+                wireService.addWire("完善信息有礼","jd_wxCompleteInfo.py",keys);
             }
         }).start();
     }
