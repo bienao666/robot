@@ -97,7 +97,7 @@ public class SystemParamUtil {
         systemParam.setCode(code);
         systemParam.setCodeName(codeName);
         systemParam.setValue(value);
-        systemParam.setUpdatedTime(DateUtil.formatTime(new Date()));
+        systemParam.setUpdatedTime(DateUtil.formatDateTime(new Date()));
         int i = systemParamMapper.updateSystemParam(systemParam);
         if (i==1){
             sysParamRedis.put(code,value);
@@ -105,10 +105,6 @@ public class SystemParamUtil {
         }else {
             return false;
         }
-    }
-
-    public static void main(String[] args) {
-        System.out.println(DateUtil.formatTime(new Date()));
     }
 
     /**

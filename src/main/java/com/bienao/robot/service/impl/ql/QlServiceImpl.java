@@ -174,7 +174,7 @@ public class QlServiceImpl implements QlService {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "head长度异常");
         }
 
-        ql.setUpdatedTime(DateUtil.formatTime(new Date()));
+        ql.setUpdatedTime(DateUtil.formatDateTime(new Date()));
         if ("******".equals(ql.getClientSecret())) {
             ql.setClientSecret("");
         }
