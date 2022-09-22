@@ -14,22 +14,22 @@ public interface JdService {
     /**
      * 东东农场互助
      */
-    void fruitShareHelp(List<JdCkEntity> cks);
+    void fruitShareHelp(List<JdCkEntity> cks,int zlcwaittime);
 
     /**
      * 东东农场天天抽奖互助
      */
-    void fruitLotteryShareHelp(List<JdCkEntity> cks);
+    void fruitLotteryShareHelp(List<JdCkEntity> cks,int zlcwaittime);
 
     /**
      * 东东萌宠互助
      */
-    void petShareHelp(List<JdCkEntity> cks);
+    void petShareHelp(List<JdCkEntity> cks,int zlcwaittime);
 
     /**
      * 种豆得豆互助
      */
-    void plantShareHelp(List<JdCkEntity> cks);
+    void plantShareHelp(List<JdCkEntity> cks,int zlcwaittime);
 
     /**
      * 维护助力码

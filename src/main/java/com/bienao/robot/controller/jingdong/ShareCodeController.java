@@ -38,7 +38,7 @@ public class ShareCodeController {
                 public void run() {
                     //查询所有ck
                     List<JdCkEntity> cks = jdCkMapper.queryCksAndActivity();
-                    jdService.fruitShareHelp(cks);
+                    jdService.fruitShareHelp(cks,10);
                 }
             }).start();
             return Result.success("东东农场互助开始");
@@ -59,7 +59,7 @@ public class ShareCodeController {
                 public void run() {
                     //查询所有ck
                     List<JdCkEntity> cks = jdCkMapper.queryCksAndActivity();
-                    jdService.fruitLotteryShareHelp(cks);
+                    jdService.fruitLotteryShareHelp(cks,10);
                 }
             }).start();
             return Result.success("东东农场天天抽奖互助开始");
@@ -80,7 +80,7 @@ public class ShareCodeController {
                 public void run() {
                     //查询所有ck
                     List<JdCkEntity> cks = jdCkMapper.queryCksAndActivity();
-                    jdService.petShareHelp(cks);
+                    jdService.petShareHelp(cks,10);
                 }
             }).start();
             return Result.success("东东萌宠互助开始");
@@ -101,7 +101,7 @@ public class ShareCodeController {
                 public void run() {
                     //查询所有ck
                     List<JdCkEntity> cks = jdCkMapper.queryCksAndActivity();
-                    jdService.plantShareHelp(cks);
+                    jdService.plantShareHelp(cks,10);
                 }
             }).start();
             return Result.success("东东萌宠互助开始");

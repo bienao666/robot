@@ -16,6 +16,7 @@ import com.bienao.robot.service.jingdong.CkService;
 import com.bienao.robot.service.jingdong.JdService;
 import com.bienao.robot.utils.jingdong.CommonUtil;
 import com.bienao.robot.utils.jingdong.GetUserAgentUtil;
+import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,9 @@ public class JdServiceImpl implements JdService {
     @Autowired
     private CkService ckService;
 
+    @Autowired
+    private SystemParamUtil systemParamUtil;
+
     /**
      * 互助
      */
@@ -58,6 +62,15 @@ public class JdServiceImpl implements JdService {
             //重置助力
             ckService.resetCkStatus();
         }
+        //接口调用等待时间
+        int zlcwaittime = 0;
+        String zlcwaittimeStr = systemParamUtil.querySystemParam("ZLCWAITTIME");
+        if (StringUtils.isEmpty(zlcwaittimeStr)){
+            zlcwaittime = 10;
+        }else {
+            zlcwaittime = Integer.parseInt(zlcwaittimeStr);
+        }
+        int finalZlcwaittime = zlcwaittime;
         //查询所有ck
         List<JdCkEntity> cks = jdCkMapper.queryCksAndActivity();
 
@@ -65,7 +78,7 @@ public class JdServiceImpl implements JdService {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                fruitShareHelp(cks);
+                fruitShareHelp(cks, finalZlcwaittime);
             }
         }).start();
 
@@ -81,7 +94,7 @@ public class JdServiceImpl implements JdService {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                petShareHelp(cks);
+                petShareHelp(cks, finalZlcwaittime);
             }
         }).start();
 
@@ -89,7 +102,7 @@ public class JdServiceImpl implements JdService {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                plantShareHelp(cks);
+                plantShareHelp(cks,finalZlcwaittime);
             }
         }).start();
     }
@@ -97,7 +110,7 @@ public class JdServiceImpl implements JdService {
     /**
      * 东东农场互助
      */
-    public void fruitShareHelp(List<JdCkEntity> cks) {
+    public void fruitShareHelp(List<JdCkEntity> cks,int zlcwaittime) {
         //需要被助力的ck集合
         List<JdCkEntity> jdCks = new ArrayList<>();
         //查询所有的svipck 未助力满
@@ -147,8 +160,14 @@ public class JdServiceImpl implements JdService {
 
         Collections.shuffle(toHelpJdCks);
 
-        log.info("查询到需要被助力的ck：{}个", jdCks.size());
-        log.info("查询到可以去助力的ck：{}个", toHelpJdCks.size());
+        Integer limit = null;
+        String ddncHelpStr = systemParamUtil.querySystemParam("DDNCHELP");
+        if (StringUtils.isNotEmpty(ddncHelpStr)){
+            limit = Integer.parseInt(ddncHelpStr);
+            log.info("查询到东东农场助力上限：{}个", limit);
+        }
+        log.info("查询到东东农场需要被助力的ck：{}个", jdCks.size());
+        log.info("查询到东东农场可以去助力的ck：{}个", toHelpJdCks.size());
         log.info("东东农场助力开始。。。");
 
         for (JdCkEntity jdCk : jdCks) {
@@ -177,11 +196,17 @@ public class JdServiceImpl implements JdService {
                     //助力
                     helpFruit(toHelpJdCk, jdCk);
                     try {
-                        log.info("东东农场助力休息10s防止黑ip...");
-                        Thread.sleep(10000);
+                        log.info("东东农场助力休息"+zlcwaittime*1000+"s防止黑ip...");
+                        Thread.sleep(zlcwaittime*1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                }
+            }
+            if (limit!=null){
+                int fruitHelp = jdFruitMapper.getHelpTimes();
+                if (fruitHelp>=limit){
+                    return;
                 }
             }
         }
@@ -191,7 +216,7 @@ public class JdServiceImpl implements JdService {
     /**
      * 东东农场天天抽奖互助
      */
-    public void fruitLotteryShareHelp(List<JdCkEntity> cks) {
+    public void fruitLotteryShareHelp(List<JdCkEntity> cks,int zlcwaittime) {
         //需要被助力的ck集合
         List<JdCkEntity> jdCks = new ArrayList<>();
         //查询所有的svipck 未助力满
@@ -284,6 +309,12 @@ public class JdServiceImpl implements JdService {
                 if (toHelpJdFruitEntity.getToHelpLotteryStatus() == 1) {
                     //助力
                     helpFruitLottery(toHelpJdCk, jdCk);
+                    log.info("东东农场天天抽奖助力休息"+zlcwaittime*1000+"s防止黑ip...");
+                    try {
+                        Thread.sleep(zlcwaittime*1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -293,7 +324,7 @@ public class JdServiceImpl implements JdService {
     /**
      * 东东萌宠互助
      */
-    public void petShareHelp(List<JdCkEntity> cks) {
+    public void petShareHelp(List<JdCkEntity> cks,int zlcwaittime) {
         //需要被助力的ck集合
         List<JdCkEntity> jdCks = new ArrayList<>();
         //查询所有的svipck 未助力满
@@ -343,8 +374,15 @@ public class JdServiceImpl implements JdService {
 
         Collections.shuffle(toHelpJdCks);
 
-        log.info("查询到需要被助力的ck：{}个", jdCks.size());
-        log.info("查询到可以去助力的ck：{}个", toHelpJdCks.size());
+        Integer limit = null;
+        String ddmcHelpStr = systemParamUtil.querySystemParam("DDMCHELP");
+        if (StringUtils.isNotEmpty(ddmcHelpStr)){
+            limit = Integer.parseInt(ddmcHelpStr);
+            log.info("查询到东东萌宠助力上限：{}个", limit);
+        }
+
+        log.info("查询到东东萌宠需要被助力的ck：{}个", jdCks.size());
+        log.info("查询到东东萌宠可以去助力的ck：{}个", toHelpJdCks.size());
         log.info("东东萌宠助力开始。。。");
 
         for (JdCkEntity jdCk : jdCks) {
@@ -373,11 +411,17 @@ public class JdServiceImpl implements JdService {
                     //助力
                     helpPet(toHelpJdCk, jdCk);
                     try {
-                        log.info("东东萌宠助力休息10s防止黑ip...");
-                        Thread.sleep(10000);
+                        log.info("东东萌宠助力休息"+zlcwaittime*1000+"s防止黑ip...");
+                        Thread.sleep(zlcwaittime*1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                }
+            }
+            if (limit!=null){
+                int petTimes = jdPetMapper.getHelpTimes();
+                if (petTimes>=limit){
+                    return;
                 }
             }
         }
@@ -385,7 +429,7 @@ public class JdServiceImpl implements JdService {
     }
 
     @Override
-    public void plantShareHelp(List<JdCkEntity> cks) {
+    public void plantShareHelp(List<JdCkEntity> cks,int zlcwaittime) {
         //需要被助力的ck集合
         List<JdCkEntity> jdCks = new ArrayList<>();
         //查询所有的svipck 未助力满
@@ -435,8 +479,15 @@ public class JdServiceImpl implements JdService {
 
         Collections.shuffle(toHelpJdCks);
 
-        log.info("查询到需要被助力的ck：{}个", jdCks.size());
-        log.info("查询到可以去助力的ck：{}个", toHelpJdCks.size());
+        Integer limit = null;
+        String zdddHelpStr = systemParamUtil.querySystemParam("ZDDDHELP");
+        if (StringUtils.isNotEmpty(zdddHelpStr)){
+            limit = Integer.parseInt(zdddHelpStr);
+            log.info("查询到种豆得豆助力上限：{}个", limit);
+        }
+
+        log.info("查询到种豆得豆需要被助力的ck：{}个", jdCks.size());
+        log.info("查询到种豆得豆可以去助力的ck：{}个", toHelpJdCks.size());
         log.info("种豆得豆助力开始。。。");
 
         for (JdCkEntity jdCk : jdCks) {
@@ -465,11 +516,17 @@ public class JdServiceImpl implements JdService {
                     //助力
                     helpPlant(toHelpJdCk, jdCk);
                     try {
-                        log.info("种豆得豆助力休息10s防止黑ip...");
-                        Thread.sleep(10000);
+                        log.info("种豆得豆助力休息"+zlcwaittime*1000+"s防止黑ip...");
+                        Thread.sleep(zlcwaittime*1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                }
+            }
+            if (limit!=null){
+                int plantTimes = jdPlantMapper.getHelpTimes();
+                if (plantTimes>=limit){
+                    return;
                 }
             }
         }
