@@ -126,7 +126,7 @@ create table if not exists `wxbs` (
                                       `username` varchar,
                                       `password` varchar,
                                       `minstep` INTEGER DEFAULT 30000,
-                                      `maxstep` INTEGER DEFAULT 90000,
+                                      `maxstep` INTEGER DEFAULT 60000,
                                       `created_time` varchar DEFAULT (datetime('now', 'localtime')),
                                       `expiry_time` varchar,
                                       `updated_time` varchar DEFAULT (datetime('now', 'localtime'))

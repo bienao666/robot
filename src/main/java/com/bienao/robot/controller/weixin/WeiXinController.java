@@ -64,4 +64,15 @@ public class WeiXinController {
 
         return wxService.updateStep(username,password,step,istime,minstep,maxstep,expiryTime);
     }
+
+    /**
+     * 修改微信步数(数据库全部账号)
+     * @return
+     */
+    @GetMapping("/updateSteps")
+    @PassToken
+    public Result updateSteps() {
+        wxService.timeWxbs();
+        return Result.success();
+    }
 }
