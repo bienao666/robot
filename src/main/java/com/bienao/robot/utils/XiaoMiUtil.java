@@ -125,7 +125,7 @@ public class XiaoMiUtil {
         }
         JSONObject res = JSONObject.parseObject(resStr);
         if (res.getInteger("code") ==1 && res.getString("message").equals("success")){
-            Result.success();
+            return Result.success();
         }
         return Result.error(ErrorCodeConstant.SERVICE_ERROR,"服务异常,修改失败，请联系管理员或者稍后重试");
     }

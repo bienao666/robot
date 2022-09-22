@@ -1,5 +1,7 @@
 package com.bienao.robot.mapper;
 
+import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.entity.Wxbs;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.List;
 public interface WxbsMapper {
 
     /**
-     * 添加羊了个羊
+     * 添加微信刷步数
      * @param
      * @return
      */
@@ -18,5 +20,7 @@ public interface WxbsMapper {
      * 删除
      * @param id
      */
-    void delete(String id);
+    void delete(Integer id);
+
+    List<Wxbs> queryZhs();
 }

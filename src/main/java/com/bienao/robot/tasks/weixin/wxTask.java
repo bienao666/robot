@@ -66,4 +66,12 @@ public class wxTask {
     public void timeHandleELM() {
         wxServicel.timeHandleELM();
     }
+
+    /**
+     * 微信步数
+     */
+    @Scheduled(cron = "0 0 13,15 * * ?")
+    public void timeWxbs() {
+        wxServicel.timeWxbs();
+    }
 }

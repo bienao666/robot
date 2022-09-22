@@ -8,7 +8,7 @@
         insert into wxbs(username,password,minstep,maxstep,expiry_time) values (#{username},#{password},#{minstep},#{maxstep},#{expiryTime})
     </insert>
 
-    <select id="queryZh" resultType="com.alibaba.fastjson.JSONObject">
+    <select id="queryZhs" resultType="wxbs">
         select * from wxbs order by created_time
     </select>
 

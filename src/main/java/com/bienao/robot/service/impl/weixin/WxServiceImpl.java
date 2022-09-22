@@ -7,6 +7,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -1327,6 +1328,27 @@ public class WxServiceImpl implements WxService {
             wxbsMapper.addZh(username,password,minstep,maxstep,expiryTime);
         }
         return res;
+    }
+
+    @Async("asyncServiceExecutor")
+    @Override
+    public void timeWxbs() {
+        List<Wxbs> zhs = wxbsMapper.queryZhs();
+        for (Wxbs zh : zhs) {
+            try {
+                //判断是否过期
+                String expiryTime = zh.getExpiryTime();
+                if (StringUtils.isNotEmpty(expiryTime) && DateUtil.parse(expiryTime).getTime()<DateUtil.date().getTime()){
+                    wxbsMapper.delete(zh.getId());
+                    continue;
+                }
+                Integer minstep = zh.getMinstep();
+                Integer maxstep = zh.getMaxstep();
+                XiaoMiUtil.sport(zh.getUserName(), zh.getPassWord(), String.valueOf(RandomUtil.randomInt(minstep, maxstep)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
