@@ -37,6 +37,7 @@ public class YlgyServiceImpl implements YlgyService {
      * @param token
      * @param times
      */
+    @Override
     @Async("asyncServiceExecutor")
     public void handleBrush(String id, String uid, String token, Integer times) {
         if (idList.contains(id)) {
@@ -61,7 +62,6 @@ public class YlgyServiceImpl implements YlgyService {
                         .header("Referer", "https://servicewechat.com/wx141bfb9b73c970a9/14/page-frame.html")
                         .timeout(3000)
                         .execute().body();
-//                                    log.info("羊了个羊代刷：{}",resStr);
                 if (StringUtils.isNotEmpty(resStr)) {
                     JSONObject res = JSONObject.parseObject(resStr);
                     if (0 == res.getInteger("err_code")) {

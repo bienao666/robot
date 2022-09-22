@@ -53,7 +53,8 @@ public class OpenCardServiceImpl implements OpenCardService {
     /**
      * 开卡助力ck
      */
-    public void openCard(String id,String shopId,String authorCode){
+    @Override
+    public void openCard(String id, String shopId, String authorCode){
         activityShopId = shopId;
         activityId = id;
         activityUrl = activityUrl.replace("【activityId】",activityId);

@@ -6,10 +6,6 @@ import com.bienao.robot.entity.jingdong.JdCkEntity;
 import java.util.List;
 
 public interface JdService {
-    /**
-     * 互助
-     */
-    void shareHelp(boolean reset);
 
     /**
      * 东东农场互助
@@ -32,9 +28,9 @@ public interface JdService {
     void plantShareHelp(List<JdCkEntity> cks,int zlcwaittime);
 
     /**
-     * 维护助力码
+     * 查询所有ck
      */
-    void updateShareCode();
+    List<JdCkEntity> queryCksAndActivity();
 
     /**
      * 获取助力信息
@@ -45,4 +41,10 @@ public interface JdService {
      * 统计京豆收益
      */
     void countJd();
+
+    void updateFruitShareCode(List<JdCkEntity> cks);
+
+    void updatePetShareCode(List<JdCkEntity> cks);
+
+    void updatePlantShareCode(List<JdCkEntity> cks);
 }

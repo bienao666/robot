@@ -5,6 +5,8 @@ import com.bienao.robot.entity.Result;
 
 public interface WxService {
 
+    void wxListener();
+
     void handleMessage(JSONObject jsonObject);
 
     void timeHandleELM();

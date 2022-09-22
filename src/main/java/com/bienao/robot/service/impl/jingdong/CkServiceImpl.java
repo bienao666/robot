@@ -40,12 +40,15 @@ public class CkServiceImpl implements CkService {
     @Autowired
     private JdPlantMapper jdPlantMapper;
 
+    private Pattern jdPinPattern = Pattern.compile("pt_pin=(.+?);");
+
     /**
      * 查询当前ck信息
      *
      * @param ck
      * @return
      */
+    @Override
     public JSONObject queryDetail(String ck) {
         String result = HttpRequest.get("https://me-api.jd.com/user_new/info/GetJDUserInfoUnion")
                 .header("Host", "me-api.jd.com")
@@ -63,11 +66,11 @@ public class CkServiceImpl implements CkService {
             throw new RuntimeException("京东服务器返回空数据");
         } else {
             JSONObject resultObject = JSONObject.parseObject(result);
-            if (resultObject.getString("retcode").equals("1001")) {
+            if ("1001".equals(resultObject.getString("retcode"))) {
                 //ck过期
                 return null;
             }
-            if (resultObject.getString("retcode").equals("0") && resultObject.getJSONObject("data").getJSONObject("userInfo") != null) {
+            if ("0".equals(resultObject.getString("retcode")) && resultObject.getJSONObject("data").getJSONObject("userInfo") != null) {
                 return resultObject.getJSONObject("data").getJSONObject("userInfo");
             }
             return new JSONObject();
@@ -96,17 +99,16 @@ public class CkServiceImpl implements CkService {
             throw new RuntimeException("ck不存在或者ck已失效");
         }
 
-        String pt_pin = "";
-        Pattern compile = Pattern.compile("pt_pin=(.+?);");
-        Matcher matcher = compile.matcher(jdCkEntity.getCk());
+        String ptPin = "";
+        Matcher matcher = jdPinPattern.matcher(jdCkEntity.getCk());
         if (matcher.find()){
-            pt_pin = matcher.group(1);
+            ptPin = matcher.group(1);
         }
-        jdCkEntity.setPtPin(pt_pin);
+        jdCkEntity.setPtPin(ptPin);
 
         //判断pt_pin是否存在
         jdCkEntityQuery = new JdCkEntity();
-        jdCkEntityQuery.setPtPin(pt_pin);
+        jdCkEntityQuery.setPtPin(ptPin);
         jdck = jdCkMapper.queryCk(jdCkEntityQuery);
         if (jdck == null) {
             //添加
@@ -133,6 +135,7 @@ public class CkServiceImpl implements CkService {
     /**
      * 每天凌晨重置ck的助力数据
      */
+    @Override
     public void resetCkStatus() {
         log.info("开始重置所有ck助力数据。。。");
         int fruit = jdFruitMapper.resetFruitStatus();

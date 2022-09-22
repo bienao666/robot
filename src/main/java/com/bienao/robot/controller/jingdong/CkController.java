@@ -1,6 +1,7 @@
 package com.bienao.robot.controller.jingdong;
 
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.annotation.PassToken;
 import com.bienao.robot.entity.Result;
 import com.bienao.robot.entity.jingdong.JdCkEntity;
 import com.bienao.robot.enums.ErrorCodeConstant;
@@ -30,6 +31,7 @@ public class CkController {
      * @param jdCkEntity
      * @return
      */
+    @PassToken
     @PostMapping("/addCk")
     public Result addCk(@RequestBody JdCkEntity jdCkEntity) {
         log.info("京东ck上传参数：{}", JSONObject.toJSONString(jdCkEntity));
@@ -42,10 +44,10 @@ public class CkController {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            if (e.getMessage().equals("ck不存在或者ck已失效")){
+            if ("ck不存在或者ck已失效".equals(e.getMessage())){
                 return Result.error("-1","添加失败，ck不存在或者ck已失效");
             }
-            if (e.getMessage().equals("ck已经添加过")){
+            if ("ck已经添加过".equals(e.getMessage())){
                 return Result.error("-1","添加失败，ck已经添加过");
             }
             return Result.error("-1","添加失败，请联系管理员");

@@ -192,6 +192,7 @@ public class QlServiceImpl implements QlService {
      * @param ids
      * @return
      */
+    @Override
     public Result deleteQls(List<Integer> ids) {
         int i = qlMapper.deleteQls(ids);
         if (i == 0) {
@@ -372,7 +373,7 @@ public class QlServiceImpl implements QlService {
                         }
                     }
                     Integer now = list.size();
-                    if (now == old) {
+                    if (now.equals(old)) {
                         list.add(url + "(" + remark + ")" + command + " 脚本不存在");
                     }
                 } else {
@@ -425,7 +426,7 @@ public class QlServiceImpl implements QlService {
                         }
                     }
                     Integer now = list.size();
-                    if (now == old) {
+                    if (now.equals(old)) {
                         list.add(url + "(" + remark + ")" + command + " 脚本不存在");
                     }
                 } else {
@@ -478,7 +479,7 @@ public class QlServiceImpl implements QlService {
                         }
                     }
                     Integer now = list.size();
-                    if (now == old) {
+                    if (now.equals(old)) {
                         list.add(url + "(" + remark + ")" + command + " 脚本不存在");
                     }
                 } else {
@@ -531,7 +532,7 @@ public class QlServiceImpl implements QlService {
                         }
                     }
                     Integer now = list.size();
-                    if (now == old) {
+                    if (now.equals(old)) {
                         list.add(url + "(" + remark + ")" + command + " 脚本不存在");
                     }
                 } else {
@@ -637,7 +638,7 @@ public class QlServiceImpl implements QlService {
                         }
                     }
                     Integer now = list.size();
-                    if (now == old) {
+                    if (now.equals(old)) {
                         list.add(url + "(" + remark + ")" + command + " 脚本不存在");
                     }
                 } else {
@@ -680,7 +681,7 @@ public class QlServiceImpl implements QlService {
             Integer ckCount = 0;
             List<QlEnv> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
             for (QlEnv env : envs) {
-                if (env.getName().equals("JD_COOKIE")) {
+                if ("JD_COOKIE".equals(env.getName())) {
                     ckCount++;
                     if (env.getValue().contains(ptPin)) {
                         //更新ck

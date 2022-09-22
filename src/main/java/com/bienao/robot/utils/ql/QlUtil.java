@@ -36,7 +36,7 @@ public class QlUtil {
                 return null;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙获取用户秘钥失败");
                 return null;
             }
@@ -67,7 +67,7 @@ public class QlUtil {
                 return null;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙获取所有环境变量详情失败");
                 return null;
             }
@@ -109,7 +109,7 @@ public class QlUtil {
                 return null;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙添加环境变量失败");
                 return null;
             }
@@ -155,7 +155,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙更新环境变量失败");
                 return false;
             }
@@ -188,7 +188,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙删除环境变量失败");
                 return false;
             }
@@ -220,7 +220,7 @@ public class QlUtil {
                 return null;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙查询环境变量失败");
                 return null;
             }
@@ -259,7 +259,7 @@ public class QlUtil {
                 return null;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙移动环境变量失败");
                 return null;
             }
@@ -293,7 +293,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙禁用环境变量失败");
                 return false;
             }
@@ -326,7 +326,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙启用环境变量失败");
                 return false;
             }
@@ -357,7 +357,7 @@ public class QlUtil {
                 return null;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙获取配置文件列表失败");
                 return null;
             }
@@ -390,7 +390,7 @@ public class QlUtil {
                 return null;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙获取配置文件内容失败");
                 return null;
             }
@@ -427,7 +427,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙保存配置文件失败");
                 return false;
             }
@@ -458,7 +458,7 @@ public class QlUtil {
                 return null;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙获取所有日志列表失败");
                 return null;
             }
@@ -492,7 +492,7 @@ public class QlUtil {
                 return null;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙获取任务日志列表失败");
                 return null;
             }
@@ -525,7 +525,7 @@ public class QlUtil {
                 return null;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙获取任务日志列表失败");
                 return null;
             }
@@ -557,7 +557,7 @@ public class QlUtil {
                 return null;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙获取所有任务详情失败：{}",resStr);
                 return null;
             }
@@ -599,7 +599,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙添加任务失败");
                 return false;
             }
@@ -642,7 +642,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙更新任务失败");
                 return false;
             }
@@ -675,7 +675,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙删除任务失败");
                 return false;
             }
@@ -707,7 +707,7 @@ public class QlUtil {
                 return null;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙根据id获取定时任务详情失败");
                 return null;
             }
@@ -741,7 +741,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙根据id运行任务失败");
                 return false;
             }
@@ -774,7 +774,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙根据id停止任务失败");
                 return false;
             }
@@ -811,7 +811,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙根据id添加标签失败");
                 return false;
             }
@@ -848,7 +848,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙根据id删除标签失败");
                 return false;
             }
@@ -881,7 +881,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙根据id禁用定时任务失败");
                 return false;
             }
@@ -914,7 +914,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙根据id启用定时任务失败");
                 return false;
             }
@@ -947,7 +947,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙根据id置顶定时任务失败");
                 return false;
             }
@@ -980,7 +980,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙根据id取消置顶定时任务失败");
                 return false;
             }
@@ -1011,7 +1011,7 @@ public class QlUtil {
                 return null;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙获取所有脚本列表失败");
                 return null;
             }
@@ -1053,7 +1053,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙添加脚本失败");
                 return false;
             }
@@ -1092,7 +1092,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙更新脚本失败");
                 return false;
             }
@@ -1129,7 +1129,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙删除脚本失败");
                 return false;
             }
@@ -1164,7 +1164,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙下载脚本失败");
                 return false;
             }
@@ -1201,7 +1201,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙运行脚本失败");
                 return false;
             }
@@ -1238,7 +1238,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙停止运行脚本失败");
                 return false;
             }
@@ -1269,7 +1269,7 @@ public class QlUtil {
                 return null;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙获取已安装的依赖失败");
                 return null;
             }
@@ -1311,7 +1311,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙添加依赖失败");
                 return false;
             }
@@ -1344,7 +1344,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙删除依赖失败");
                 return false;
             }
@@ -1377,7 +1377,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙暴力删除依赖失败");
                 return false;
             }
@@ -1410,7 +1410,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙重装依赖失败");
                 return false;
             }
@@ -1441,7 +1441,7 @@ public class QlUtil {
                 return null;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙查询日志删除频率失败");
                 return null;
             }
@@ -1477,7 +1477,7 @@ public class QlUtil {
                 return false;
             }
             JSONObject res = JSONObject.parseObject(resStr);
-            if (!res.getString("code").equals("200")){
+            if (!"200".equals(res.getString("code"))){
                 log.info("青龙修改日志删除频率失败");
                 return false;
             }

@@ -63,4 +63,6 @@ public interface WireService {
     Result queryActivity(Integer pageNo,Integer pageSize);
 
     void handleWire(Integer id,String script,String content);
+
+    void initializeWire();
 }

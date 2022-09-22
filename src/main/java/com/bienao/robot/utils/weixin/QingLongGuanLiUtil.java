@@ -496,6 +496,8 @@ public class QingLongGuanLiUtil {
                     updateRedisTime(content);
                     sendQlglMsg(content);
                     break;
+                default:
+                    weChatUtil.sendTextMsg("命令有误", content);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -70,7 +70,23 @@ public class WxServiceImpl implements WxService {
 
     private Cache<String, String> redis = WXConstant.redis;
 
-    @Async
+    private Pattern lowerDatePattern = Pattern.compile("/Date\\((\\d+)\\+");
+
+    @Async("asyncServiceExecutor")
+    @Override
+    public void wxListener(){
+        log.info("开始监听微信信息。。。");
+        while (true){
+            EvictingQueue<JSONObject> messageLists = WXConstant.messageList;
+            if (messageLists.size()>0){
+                JSONObject message = messageLists.poll();
+                if (message != null) {
+                    handleMessage(message);
+                }
+            }
+        }
+    }
+
     @Override
     public void handleMessage(JSONObject message) {
         JSONObject content = message.getJSONObject("content");
@@ -88,7 +104,7 @@ public class WxServiceImpl implements WxService {
         String from_group = content.getString("from_group");
 
         //监听群
-        if (msg.trim().equals("监听") && StringUtils.isNotEmpty(from_group) && weChatUtil.isMaster(content)){
+        if ("监听".equals(msg.trim()) && StringUtils.isNotEmpty(from_group) && weChatUtil.isMaster(content)){
             Group group = groupMapper.queryGroupByGroupIdAndFunctionType(from_group, FunctionType.wxqjk);
             if (group==null){
                 group = new Group();
@@ -108,7 +124,7 @@ public class WxServiceImpl implements WxService {
         }
 
         //取消监听群
-        if (msg.trim().equals("取消监听") && StringUtils.isNotEmpty(from_group) && weChatUtil.isMaster(content)){
+        if ("取消监听".equals(msg.trim()) && StringUtils.isNotEmpty(from_group) && weChatUtil.isMaster(content)){
             int i = groupMapper.deleteGroupByGroupIdAndFunctionType(from_group, FunctionType.wxqjk);
             if (i > 0) {
                 weChatUtil.sendTextMsg("取消监听成功", content);
@@ -152,7 +168,7 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //功能列表
-        if (msg.equals("菜单")) {
+        if ("菜单".equals(msg)) {
             handleFunctionList(content);
             return;
         }
@@ -167,67 +183,67 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //博客
-        if (msg.equals("博客")) {
+        if ("博客".equals(msg)) {
             handleFunctionBoKe(content);
             return;
         }
         //加群
-        if (msg.equals("加群") || msg.equals("进群")) {
+        if ("加群".equals(msg) || "进群".equals(msg)) {
             handleAddGroup(content);
             return;
         }
         //登陆
-        if (msg.equals("登陆") || msg.equals("登录"))  {
+        if ("登陆".equals(msg) || "登录".equals(msg))  {
             handleJdLogin(content);
             return;
         }
         //饿了么
-        if (msg.trim().equals("饿了么") || msg.trim().equals("elm")) {
+        if ("饿了么".equals(msg.trim()) || "elm".equals(msg.trim())) {
             handleELM(content);
             return;
         }
         //微博
-        if (msg.trim().equals("微博") || msg.trim().equals("wb")) {
+        if ("微博".equals(msg.trim()) || "wb".equals(msg.trim())) {
             handleWeiBo(content);
             return;
         }
         //监控茅台洋河
-        if (msg.trim().equals("监控茅台洋河")) {
+        if ("监控茅台洋河".equals(msg.trim())) {
             handleJkMtYh(content);
             return;
         }
         //取消茅台洋河监控
-        if (msg.trim().equals("取消监控茅台洋河")) {
+        if ("取消监控茅台洋河".equals(msg.trim())) {
             handleQxMtYhJk(content);
             return;
         }
         //饿了么推送
-        if (msg.trim().equals("推送饿了么")) {
+        if ("推送饿了么".equals(msg.trim())) {
             handleElmTs(content);
             return;
         }
         //取消饿了么推送
-        if (msg.trim().equals("取消推送饿了么")) {
+        if ("取消推送饿了么".equals(msg.trim())) {
             handleQxElmTs(content);
             return;
         }
         //推送摸鱼
-        if (msg.trim().equals("推送摸鱼")) {
+        if ("推送摸鱼".equals(msg.trim())) {
             handleTsMy(content);
             return;
         }
         //取消推送摸鱼
-        if (msg.trim().equals("取消推送摸鱼")) {
+        if ("取消推送摸鱼".equals(msg.trim())) {
             handleQxTsWb(content);
             return;
         }
         //推送微博
-        if (msg.trim().equals("推送微博")) {
+        if ("推送微博".equals(msg.trim())) {
             handleTsWb(content);
             return;
         }
         //取消推送微博
-        if (msg.trim().equals("取消推送微博")) {
+        if ("取消推送微博".equals(msg.trim())) {
             handleQxTsMy(content);
             return;
         }
@@ -242,17 +258,17 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //买家秀
-        if (msg.trim().equals("mjx") || msg.trim().equals("买家秀")) {
+        if ("mjx".equals(msg.trim()) || "买家秀".equals(msg.trim())) {
             handleMJX(content);
             return;
         }
         //老色批
-        if (msg.trim().equals("lsp") || msg.trim().equals("老色批")) {
+        if ("lsp".equals(msg.trim()) || "老色批".equals(msg.trim())) {
             handleLSP(content);
             return;
         }
         //摸鱼
-        if (msg.trim().equals("my") || msg.trim().equals("摸鱼")) {
+        if ("my".equals(msg.trim()) || "摸鱼".equals(msg.trim())) {
             handleMoYu(content);
             return;
         }
@@ -262,7 +278,7 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //比价
-        if (msg.equals("比价")) {
+        if ("比价".equals(msg)) {
             weChatUtil.sendTextMsg("请直接发送商品连接，我会自动识别", content);
         }
         if (msg.contains("item.m.jd.com") || msg.contains("m.tb.cn") || msg.contains("mobile.yangkeduo.com")) {
@@ -275,17 +291,17 @@ public class WxServiceImpl implements WxService {
             return;
         }*/
         //查询我的uid
-        if (msg.trim().equals("我的uid") || msg.trim().equals("myuid")) {
+        if ("我的uid".equals(msg.trim()) || "myuid".equals(msg.trim())) {
             handleMyUid(content);
             return;
         }
         //查询群id
-        if (msg.trim().equals("群号") || msg.trim().equals("groupCode")) {
+        if ("群号".equals(msg.trim()) || "groupCode".equals(msg.trim())) {
             handleMyUid(content);
             return;
         }
         //查询微信管理员
-        if (msg.trim().equals("微信管理员列表")) {
+        if ("微信管理员列表".equals(msg.trim())) {
             handleQueryWXMasters(content);
             return;
         }
@@ -732,7 +748,7 @@ public class WxServiceImpl implements WxService {
         String msg = content.getString("msg").replace("设置", "").replace("启用", "").replace("关闭", "").trim();
         String[] split = msg.split(" ");
         if (split.length >= 1) {
-            if (StringUtils.isEmpty(systemParamUtil.querySystemParam("WXMASTERS")) && split[0].equals("微信管理员")) {
+            if (StringUtils.isEmpty(systemParamUtil.querySystemParam("WXMASTERS")) && "微信管理员".equals(split[0])) {
                 //第一次设置管理员
                 handleSetParam("WXMASTERS", "微信管理员", split[1], content);
             } else {
@@ -776,6 +792,8 @@ public class WxServiceImpl implements WxService {
                             systemParamUtil.updateSystemParam("WXPUSHERTOKEN","wxpusher token", split[1]);
                             weChatUtil.sendTextMsg("设置成功", content);
                             break;
+                        default:
+                            weChatUtil.sendTextMsg("命令有误", content);
                     }
                 }
             }
@@ -850,7 +868,7 @@ public class WxServiceImpl implements WxService {
     }
 
     public void handleLast(JSONObject content, Integer num, String publicKey) {
-        if (publicKey.equals("微博")) {
+        if ("微博".equals(publicKey)) {
             handleLastWeiBo(content, num);
         }
 
@@ -931,8 +949,7 @@ public class WxServiceImpl implements WxService {
         result += "最低价格：" + lowerPrice + "\r\n";
         //最低日期  lowerDate -> /Date(1599753600000+0800)/
         String lowerDate = single.getString("lowerDate");
-        Pattern compile = Pattern.compile("/Date\\((\\d+)\\+");
-        Matcher matcher = compile.matcher(lowerDate);
+        Matcher matcher = lowerDatePattern.matcher(lowerDate);
         if (matcher.find()) {
             Date date = new Date(Long.valueOf(matcher.group(1)));
             lowerDate = DateUtil.format(date, "yyyy.MM.dd");
@@ -1136,6 +1153,7 @@ public class WxServiceImpl implements WxService {
      * @param content
      * @return
      */
+    @Override
     public void handleMoYu(JSONObject content) {
         // 获取当前日期
         Date now = new Date();
@@ -1172,10 +1190,11 @@ public class WxServiceImpl implements WxService {
         stringBuffer.append("【摸鱼办】提醒您：").append(DateUtil.format(now, "MM月dd日,")).append(this.timeOfDay(now)).append("好,摸鱼人!\r\n");
         stringBuffer.append("工作再累，一定不要忘记摸鱼哦！有事没事起身去茶水间， 去厕所， 去廊道走走别老在工位上坐着， 钱是老板的, 但命是自己的!\r\n");
         festivalList.forEach(festival -> {
-            if (!festival.getToday())
+            if (!festival.getToday()) {
                 stringBuffer.append("距离").append(festival.getName()).append("还有不到：").append(festival.getDiff()).append("天\r\n");
-            else
+            } else {
                 stringBuffer.append("今天是").append(festival.getName()).append("，好好享受吧！\r\n");
+            }
         });
         stringBuffer.append("为了放假加油吧！\n" +
                 "上班是帮老板赚钱，摸鱼是赚老板的钱！\n" +
@@ -1323,7 +1342,7 @@ public class WxServiceImpl implements WxService {
     @Override
     public Result updateStep(String username, String password, Integer step, boolean istime, Integer minstep, Integer maxstep, String expiryTime) {
         Result res = XiaoMiUtil.sport(username, password, String.valueOf(step));
-        if (res.getCode().equals("200") && istime){
+        if ("200".equals(res.getCode()) && istime){
             //添加数据库
             wxbsMapper.addZh(username,password,minstep,maxstep,expiryTime);
         }
@@ -1379,18 +1398,18 @@ public class WxServiceImpl implements WxService {
         templateMessage.addData(new WxMpTemplateData("winddir",weather.getWind_dir()+ "","#B95EA3" ));
         templateMessage.addData(new WxMpTemplateData("caihongpi",CaiHongPiUtils.getCaiHongPi(),"#FF69B4"));
         templateMessage.addData(new WxMpTemplateData("lianai", JiNianRiUtils.getLianAi()+"","#FF1493"));
-        templateMessage.addData(new WxMpTemplateData("shengri1",JiNianRiUtils.getBirthday_Jo()+"","#FFA500"));
-        templateMessage.addData(new WxMpTemplateData("shengri2",JiNianRiUtils.getBirthday_Hui()+"","#FFA500"));
+        templateMessage.addData(new WxMpTemplateData("shengri1",JiNianRiUtils.getBirthdayJo()+"","#FFA500"));
+        templateMessage.addData(new WxMpTemplateData("shengri2",JiNianRiUtils.getBirthdayHui()+"","#FFA500"));
         templateMessage.addData(new WxMpTemplateData("en",map.get("en") +"","#C71585"));
         templateMessage.addData(new WxMpTemplateData("zh",map.get("zh") +"","#C71585"));
         String beizhu = "❤";
         if(JiNianRiUtils.getLianAi() % 365 == 0){
             beizhu = "今天是恋爱" + (JiNianRiUtils.getLianAi() / 365) + "周年纪念日！";
         }
-        if(JiNianRiUtils.getBirthday_Jo()  == 0){
+        if(JiNianRiUtils.getBirthdayJo()  == 0){
             beizhu = "今天是生日，生日快乐呀！";
         }
-        if(JiNianRiUtils.getBirthday_Hui()  == 0){
+        if(JiNianRiUtils.getBirthdayHui()  == 0){
             beizhu = "今天是生日，生日快乐呀！";
         }
         templateMessage.addData(new WxMpTemplateData("beizhu",beizhu,"#FF0000"));

@@ -17,6 +17,7 @@ import com.bienao.robot.utils.ql.QlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -219,7 +220,7 @@ public class WireServiceImpl implements WireService {
                             }
                         }
                         Integer now = result.size();
-                        if (old==now) {
+                        if (old.equals(now)) {
                             result.add(url + "(" + remark + ")" + script + " 脚本不存在，请拉库后执行");
                         }
                     } else {
@@ -373,6 +374,184 @@ public class WireServiceImpl implements WireService {
             //取消大车头
             qlService.cancelHead();
         }
+    }
+    @Async("asyncServiceExecutor")
+    @Override
+    public void initializeWire() {
+        log.info("初始化线报活动。。。");
+        ArrayList<String> keys = new ArrayList<>();
+
+        keys.add("jd_cjhy_activityId");
+        addWire("CJ组队瓜分京豆","jd_cjzdgf.js",keys);
+
+        keys.add("jd_redrain_activityId");
+        keys.add("jd_redrain_url");
+        addWire("整点京豆雨","jd_redrain.js",keys);
+
+        keys.add("jd_redrain_half_url");
+        addWire("超级直播间半点雨","jd_live_redrain.js",keys);
+
+        keys.add("wish_appIdArrList");
+        keys.add("wish_appNameArrList");
+        addWire("许愿池","jd_wish.js",keys);
+
+        keys.add("jd_zdjr_activityId");
+        keys.add("jd_zdjr_activityUrl");
+        addWire("zdjr","jd_zdjr.js",keys);
+
+        keys.add("M_WX_LUCK_DRAW_URL");
+        addWire("M幸运抽奖","m_jd_wx_luckDraw.js",keys);
+
+        keys.add("SHOP_TOKENS");
+        keys.add("DPQDTK");
+        addWire("店铺签到","jd_shop_sign.js",keys);
+
+        keys.add("jd_nzmhurl");
+        addWire("女装盲盒","jd_nzmh.js",keys);
+
+        keys.add("WXGAME_ACT_ID");
+        addWire("通用游戏任务","jd_game.js",keys);
+
+        keys.add("M_WX_COLLECT_CARD_URL");
+        addWire("M抽奖集卡","m_jd_wx_collectCard.js",keys);
+
+        keys.add("M_WX_ADD_CART_URL");
+        addWire("M加购有礼","m_jd_wx_addCart.js",keys);
+
+        keys.add("jd_mhurlList");
+        addWire("盲盒任务抽京豆","jd_mhtask.js",keys);
+
+        keys.add("jd_wdz_activityId");
+        addWire("微定制","jd_wdz.js",keys);
+
+        keys.add("VENDER_ID");
+        addWire("入会开卡领取礼","jd_OpenCard_Force.js",keys);
+
+        keys.add("jd_wxShareActivity_activityId");
+        keys.add("jd_wxShareActivity_helpnum");
+        addWire("分享有礼","jd_wxShareActivity.js",keys);
+
+        keys.add("M_FOLLOW_SHOP_ARGV");
+        addWire("M关注有礼","m_jd_follow_shop.js",keys);
+
+        keys.add("comm_activityIDList");
+        addWire("joy开卡","jd_joyjd_open.js",keys);
+
+        keys.add("computer_activityIdList");
+        addWire("电脑城配件ID任务","jd_computer.js",keys);
+
+        keys.add("PKC_TXGZYL");
+        addWire("pkc特效关注有礼","jd_pkc_txgzyl.js",keys);
+
+        keys.add("PKC_GZYL");
+        addWire("pkc关注有礼","jd_pkc_gzyl.js",keys);
+
+        keys.add("jd_fxyl_activityId");
+        addWire("LZ分享有礼","jd_lzshare.js",keys);
+
+        keys.add("jd_wxSecond_activityId");
+        addWire("读秒拼手速","jd_wxSecond.js",keys);
+
+        keys.add("SEVENDAY_LIST");
+        addWire("超级店铺签到","jd_sevenDay.js",keys);
+
+        keys.add("jd_wxCollectCard_activityId");
+        addWire("集卡抽奖","jd_wxCollectCard.js",keys);
+
+        keys.add("JD_Lottery");
+        addWire("通用抽奖机","jd_lottery.js",keys);
+
+        keys.add("JD_JOYOPEN");
+        addWire("JOY通用开卡活动","jd_joyopen.js",keys);
+
+        keys.add("jd_drawCenter_activityId");
+        keys.add("jd_drawCenter_addCart");
+        addWire("LZ刮刮乐抽奖","jd_drawCenter.js",keys);
+
+        keys.add("jd_wxCartKoi_activityId");
+        addWire("LZ购物车锦鲤/购物车锦鲤通用活动","jd_wxCartKoi.js",keys);
+
+        keys.add("jd_wxFansInterActionActivity_activityId");
+        addWire("LZ粉丝互动","jd_wxFansInterActionActivity.js",keys);
+
+        keys.add("yhyactivityId");
+        keys.add("yhyauthorCode");
+        addWire("邀请赢大礼/邀好友赢大礼","jd_yqhy.py",keys);
+
+        keys.add("jd_wxShopFollowActivity_activityId");
+        addWire("关注抽奖","jd_wxShopFollowActivity.js",keys);
+
+        keys.add("jd_wxUnPackingActivity_activityId");
+        addWire("LZ让福袋飞通用活动","jd_wxUnPackingActivity.js",keys);
+
+        keys.add("LUCK_DRAW_URL");
+        keys.add("LUCK_DRAW_OPENCARD");
+        keys.add("LUCK_DRAW_NUM");
+        addWire("店铺抽奖通用活动","jd_luck_draw.js",keys);
+
+        keys.add("jd_lzaddCart_activityId");
+        addWire("LZ加购有礼","jd_lzaddCart.js",keys);
+
+        keys.add("jd_wxgame_activityId");
+        keys.add("jd_wxgame_addCart");
+        addWire("LZ店铺游戏","jd_wxgame.js",keys);
+
+        keys.add("jd_shopCollectGiftId");
+        addWire("一键领取京豆-店铺会员礼包","jd_shopCollectGift.py",keys);
+
+        keys.add("jd_shopLeagueId");
+        addWire("通用开卡-shopLeague系列","jd_shopLeague_opencard.py",keys);
+
+        keys.add("jd_joinCommonId");
+        addWire("通用开卡-joinCommon","jd_joinCommon_opencard.py",keys);
+
+        keys.add("jd_wxShopGiftId");
+        addWire("特效关注有礼","jd_wxShopGift.py",keys);
+
+        keys.add("jd_cjwxShopFollowActivity_activityId");
+        addWire("CJ关注店铺有礼","jd_cjwxShopFollowActivity.js",keys);
+
+        keys.add("jd_wxKnowledgeActivity_activityId");
+        addWire("LZ知识超人通用活动","jd_wxKnowledgeActivity.js",keys);
+
+        keys.add("jd_cjwxKnowledgeActivity_activityId");
+        addWire("CJ知识超人通用活动","jd_cjwxKnowledgeActivity.js",keys);
+
+        keys.add("jd_wxBuildActivity_activityId");
+        addWire("LZ盖楼有礼","jd_wxBuildActivity.js",keys);
+
+        keys.add("jd_wxMcLevelAndBirthGifts_activityId");
+        keys.add("jd_wxMcLevelAndBirthGifts_activityUrl");
+        addWire("生日礼包和会员等级礼包","jd_wxMcLevelAndBirthGifts.js",keys);
+
+        keys.add("jd_completeInfoActivity_activityId");
+        keys.add("jd_completeInfoActivity_venderId");
+        keys.add("jd_completeInfoActivity_activityUrl");
+        addWire("完善信息有礼","jd_completeInfoActivity.js",keys);
+
+        keys.add("DPLHTY");
+        addWire("大牌联合通用开卡","jd_opencardDPLHTY.js",keys);
+
+        keys.add("jd_wxCollectionActivity_activityUrl");
+        addWire("加购物车抽奖","jd_wxCollectionActivity.js",keys);
+
+        keys.add("jd_inv_authorCode");
+        addWire("邀好友赢大礼","jd_inviteFriendsGift.py",keys);
+
+        keys.add("categoryUnion_activityId");
+        addWire("品类联合-通用脚本","jd_lzdz_categoryUnion.js",keys);
+
+        keys.add("jd_wxCollectionActivityUrl");
+        addWire("加购有礼-JK","jd_wxCollectionActivity.py",keys);
+
+        keys.add("jinggengInviteJoin");
+        addWire("jinggeng邀请入会有礼","jd_jinggengInvite.py",keys);
+
+        keys.add("jd_wxBirthGiftsId");
+        addWire("生日礼包","jd_wxBirthGifts.py",keys);
+
+        keys.add("jd_wxCompleteInfoId");
+        addWire("完善信息有礼","jd_wxCompleteInfo.py",keys);
     }
 
 

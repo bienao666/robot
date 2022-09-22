@@ -9,7 +9,7 @@ public class JiNianRiUtils {
     public static int getLianAi(){
         return calculationLianAi("2022-12-11");
     }
-    public static int getBirthday_Jo(){
+    public static int getBirthdayJo(){
         try {
             return calculationBirthday("2009-03-09");
         } catch (ParseException e) {
@@ -17,7 +17,7 @@ public class JiNianRiUtils {
         }
         return 0;
     }
-    public static int getBirthday_Hui(){
+    public static int getBirthdayHui(){
         try {
             return calculationBirthday("2020-01-11");
         } catch (ParseException e) {

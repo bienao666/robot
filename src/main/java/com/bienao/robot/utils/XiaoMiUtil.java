@@ -18,12 +18,12 @@ import java.util.List;
 @Slf4j
 public class XiaoMiUtil {
 
-    private static final HashMap<String, String> headers;
+    private static final HashMap<String, String> HEADERS;
 
     static {
-        headers = new HashMap<>();
-        headers.put("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
-        headers.put("User-Agent", "MiFit/4.6.0 (iPhone; iOS 14.0.1; Scale/2.00)");
+        HEADERS = new HashMap<>();
+        HEADERS.put("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+        HEADERS.put("User-Agent", "MiFit/4.6.0 (iPhone; iOS 14.0.1; Scale/2.00)");
     }
 
     /**
@@ -32,7 +32,7 @@ public class XiaoMiUtil {
     public static String[] login(String username, String password) {
         String[] login = new String[3];
         HttpResponse response = HttpRequest.post("https://api-user.huami.com/registrations/+86" + username + "/tokens")
-                .headerMap(headers, true)
+                .headerMap(HEADERS, true)
                 .form("client_id", "HuaMi")
                 .form("password", password)
                 .form("redirect_uri", "https://s3-us-west-2.amazonaws.com/hm-registration/successsignin.html")
@@ -48,7 +48,7 @@ public class XiaoMiUtil {
         }
 
         String body = HttpRequest.post("https://account.huami.com/v2/client/login")
-                .headerMap(headers, true)
+                .headerMap(HEADERS, true)
                 .form("app_name", "com.xiaomi.hm.health")
                 .form("app_version", "4.6.0")
                 .form("code", login[0])
@@ -80,7 +80,7 @@ public class XiaoMiUtil {
      */
     public static String getAppToken(String loginToken) {
         String body = HttpRequest.get("https://account-cn.huami.com/v1/client/app_tokens?app_name=com.xiaomi.hm.health&dn=api-user.huami.com%2Capi-mifit.huami.com%2Capp-analytics.huami.com&login_token=" + loginToken)
-                .headerMap(headers, true)
+                .headerMap(HEADERS, true)
                 .execute().body();
         String app_token = JSONUtil.parseObj(JSONUtil.parseObj(body).getStr("token_info")).getStr("app_token");
         log.info("app_token获取成功...");
@@ -124,7 +124,7 @@ public class XiaoMiUtil {
             return Result.error(ErrorCodeConstant.SERVICE_ERROR,"服务异常,修改失败，请联系管理员或者稍后重试");
         }
         JSONObject res = JSONObject.parseObject(resStr);
-        if (res.getInteger("code") ==1 && res.getString("message").equals("success")){
+        if (res.getInteger("code") ==1 && "success".equals(res.getString("message"))){
             return Result.success();
         }
         return Result.error(ErrorCodeConstant.SERVICE_ERROR,"服务异常,修改失败，请联系管理员或者稍后重试");

@@ -5,7 +5,9 @@ import com.bienao.robot.entity.jingdong.JdCkEntity;
 import com.bienao.robot.mapper.jingdong.JdCkMapper;
 import com.bienao.robot.entity.Result;
 import com.bienao.robot.service.jingdong.JdService;
+import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,45 +29,22 @@ public class ShareCodeController {
     @Autowired
     private JdCkMapper jdCkMapper;
 
+    @Autowired
+    private SystemParamUtil systemParamUtil;
+
     /**
      * 东东农场互助
      */
     @GetMapping("/fruitShareHelp")
     public Result fruitShareHelp(){
         try {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    //查询所有ck
-                    List<JdCkEntity> cks = jdCkMapper.queryCksAndActivity();
-                    jdService.fruitShareHelp(cks,10);
-                }
-            }).start();
+            //查询所有ck
+            List<JdCkEntity> cks = jdCkMapper.queryCksAndActivity();
+            jdService.fruitShareHelp(cks,10);
             return Result.success("东东农场互助开始");
         } catch (Exception e) {
             e.printStackTrace();
             return Result.error("-1","东东农场互助异常");
-        }
-    }
-
-    /**
-     * 东东农场天天抽奖互助
-     */
-    @GetMapping("/fruitLotteryShareHelp")
-    public Result fruitLotteryShareHelp(){
-        try {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    //查询所有ck
-                    List<JdCkEntity> cks = jdCkMapper.queryCksAndActivity();
-                    jdService.fruitLotteryShareHelp(cks,10);
-                }
-            }).start();
-            return Result.success("东东农场天天抽奖互助开始");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Result.error("-1","东东农场天天抽奖互助异常");
         }
     }
 
@@ -75,14 +54,9 @@ public class ShareCodeController {
     @GetMapping("/petShareHelp")
     public Result petShareHelp(){
         try {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    //查询所有ck
-                    List<JdCkEntity> cks = jdCkMapper.queryCksAndActivity();
-                    jdService.petShareHelp(cks,10);
-                }
-            }).start();
+            //查询所有ck
+            List<JdCkEntity> cks = jdCkMapper.queryCksAndActivity();
+            jdService.petShareHelp(cks,10);
             return Result.success("东东萌宠互助开始");
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,14 +70,9 @@ public class ShareCodeController {
     @GetMapping("/plantShareHelp")
     public Result plantShareHelp(){
         try {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    //查询所有ck
-                    List<JdCkEntity> cks = jdCkMapper.queryCksAndActivity();
-                    jdService.plantShareHelp(cks,10);
-                }
-            }).start();
+            //查询所有ck
+            List<JdCkEntity> cks = jdCkMapper.queryCksAndActivity();
+            jdService.plantShareHelp(cks,10);
             return Result.success("东东萌宠互助开始");
         } catch (Exception e) {
             e.printStackTrace();
@@ -117,12 +86,13 @@ public class ShareCodeController {
     @GetMapping("/updateShareCode")
     public Result updateShareCode(){
         try {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jdService.updateShareCode();
-                }
-            }).start();
+            List<JdCkEntity> cks = jdService.queryCksAndActivity();
+            log.info("开始维护东东农场互助码...");
+            jdService.updateFruitShareCode(cks);
+            log.info("开始维护东东萌宠互助码...");
+            jdService.updatePetShareCode(cks);
+            log.info("开始维护种豆得豆互助码...");
+            jdService.updatePlantShareCode(cks);
             return Result.success("维护助力码开始");
         } catch (Exception e) {
             e.printStackTrace();
@@ -136,12 +106,25 @@ public class ShareCodeController {
     @GetMapping("/shareHelp")
     public Result shareHelp(){
         try {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    jdService.shareHelp(false);
-                }
-            }).start();
+            //接口调用等待时间
+            int zlcwaittime = 0;
+            String zlcwaittimeStr = systemParamUtil.querySystemParam("ZLCWAITTIME");
+            if (StringUtils.isEmpty(zlcwaittimeStr)){
+                zlcwaittime = 10;
+            }else {
+                zlcwaittime = Integer.parseInt(zlcwaittimeStr);
+            }
+            //查询所有ck
+            List<JdCkEntity> cks = jdCkMapper.queryCksAndActivity();
+
+            //东东农场
+            jdService.fruitShareHelp(cks,zlcwaittime);
+
+            //东东萌宠
+            jdService.petShareHelp(cks, zlcwaittime);
+
+            //种豆得豆
+            jdService.plantShareHelp(cks,zlcwaittime);
             return Result.success("互助开始");
         } catch (Exception e) {
             e.printStackTrace();
