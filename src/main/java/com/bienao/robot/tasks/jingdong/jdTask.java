@@ -27,6 +27,7 @@ public class jdTask {
     @Autowired
     private CkService ckService;
 
+    @Autowired
     private SystemParamUtil systemParamUtil;
 
     @Value("${task-function.shareHelp}")
