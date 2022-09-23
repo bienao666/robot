@@ -70,7 +70,7 @@ public class wxTask {
     /**
      * 支付宝红包定时推送
      */
-    @Scheduled(cron = "0 8 * * * ?")
+    @Scheduled(cron = "0 0 8 * * ?")
     public void timeHandleZfbHb() {
         wxServicel.timeHandleZfbHb();
     }
