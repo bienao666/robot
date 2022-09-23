@@ -88,10 +88,10 @@ create table if not exists `jdFruit` (
                            `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );
 create table if not exists `jdjd` (
-                                      `date` timestamp PRIMARY KEY,
+                                      `date` varchar PRIMARY KEY,
                                       `jdCount` INTEGER DEFAULT '0',
-                                      `created_time` datetime DEFAULT (datetime('now', 'localtime')),
-                                      `updated_time` datetime DEFAULT (datetime('now', 'localtime'))
+                                      `created_time` varchar DEFAULT (datetime('now', 'localtime')),
+                                      `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );
 create table if not exists `jdPet` (
                          `id` INTEGER PRIMARY KEY AUTOINCREMENT,

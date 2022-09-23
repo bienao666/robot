@@ -202,6 +202,11 @@ public class WxServiceImpl implements WxService {
             handleELM(content);
             return;
         }
+        //支付宝红包
+        if (msg.trim().equals("支付宝红包") || msg.trim().equals("zfb")) {
+            handleZfbHb(content);
+            return;
+        }
         //微博
         if ("微博".equals(msg.trim()) || "wb".equals(msg.trim())) {
             handleWeiBo(content);
@@ -245,6 +250,16 @@ public class WxServiceImpl implements WxService {
         //取消推送微博
         if ("取消推送微博".equals(msg.trim())) {
             handleQxTsMy(content);
+            return;
+        }
+        //推送支付宝红包
+        if (msg.trim().equals("推送支付宝红包")) {
+            handleTsZfbHb(content);
+            return;
+        }
+        //取消推送支付宝红包
+        if (msg.trim().equals("取消推送支付宝红包")) {
+            handleQxTsZfbHb(content);
             return;
         }
         //举牌
@@ -311,6 +326,68 @@ public class WxServiceImpl implements WxService {
             String publicKey = redis.get("publicKey");
             if (num <= 50 && StringUtils.isNotEmpty(publicKey)) {
                 handleLast(content, num, publicKey);
+            }
+        }
+    }
+
+    /**
+     * 支付宝红包
+     * @param content
+     */
+    private void handleZfbHb(JSONObject content) {
+        String elmurl = systemParamUtil.querySystemParam("ZFBHBUL");
+        if (StringUtils.isEmpty(elmurl)) {
+            weChatUtil.sendTextMsg("请先设置支付宝红包图片 设置 饿了么图片 你的饿了么图片地址", content);
+        } else {
+            weChatUtil.sendTextMsg("扫描下方二维码获取支付宝大额现金红包", content);
+            weChatUtil.sendImageMsg(elmurl, content);
+        }
+    }
+
+    /**
+     * 推送支付宝红包
+     * @param content
+     */
+    private void handleTsZfbHb(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag) {
+            //获取微信群号
+            String from_group = content.getString("from_group");
+            if (StringUtils.isNotEmpty(from_group)) {
+                Group group = groupMapper.queryGroupByGroupIdAndFunctionType(from_group, FunctionType.zfbhbts);
+                if (group != null) {
+                    weChatUtil.sendTextMsg("已开启支付宝红包推送", content);
+                } else {
+                    group = new Group();
+                    group.setGroupid(from_group);
+                    group.setGroupName(content.getString("from_group_name"));
+                    group.setFunctionType(FunctionType.zfbhbts);
+                    int i = groupMapper.addGroup(group);
+                    if (i == 0) {
+                        weChatUtil.sendTextMsg("开启推送失败", content);
+                    } else {
+                        weChatUtil.sendTextMsg("开启推送成功", content);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 取消推送支付宝红包
+     *
+     * @param content
+     */
+    private void handleQxTsZfbHb(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag) {
+            //获取微信群号
+            String from_group = content.getString("from_group");
+            int i = groupMapper.deleteGroupByGroupIdAndFunctionType(from_group, FunctionType.zfbhbts);
+            if (i > 0) {
+                weChatUtil.sendTextMsg("取消推送支付宝红包成功", content);
+            } else {
+                weChatUtil.sendTextMsg("此群并未设置推送支付宝红包，无法取消", content);
             }
         }
     }
@@ -1069,6 +1146,7 @@ public class WxServiceImpl implements WxService {
         if (StringUtils.isEmpty(elmurl)) {
             weChatUtil.sendTextMsg("请先设置饿了么推广图片 设置 饿了么图片 你的饿了么图片地址", content);
         } else {
+            weChatUtil.sendTextMsg("扫描下方二维码获取饿了么大额红包红包", content);
             weChatUtil.sendImageMsg(elmurl, content);
         }
     }
@@ -1367,6 +1445,17 @@ public class WxServiceImpl implements WxService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    @Override
+    public void timeHandleZfbHb() {
+        List<Group> groups = groupMapper.queryGroupByFunctionType(FunctionType.zfbhbts);
+        for (Group group : groups) {
+            JSONObject content = new JSONObject();
+            content.put("from_group", group.getGroupid());
+            content.put("robot_wxid", systemParamUtil.querySystemParam("ROBORTWXID"));
+            handleZfbHb(content);
         }
     }
 

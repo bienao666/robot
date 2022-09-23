@@ -26,3 +26,4 @@ INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ZLCWAITTIME', '助
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('DDNCHELP', '东东农场助力个数(为空不限制，用于号太多的防风控)','',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('DDMCHELP', '东东萌宠助力个数(为空不限制，用于号太多的防风控)','',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ZDDDHELP', '种豆得豆助力个数(为空不限制，用于号太多的防风控)','',1);
+INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ZFBHBUL', '支付宝红包二维码图片地址','',1);

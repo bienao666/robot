@@ -10,5 +10,7 @@ public class FunctionType {
     //摸鱼推送
     public static Integer myts = 3;
     //微博推送
-    public static Integer wbts = 3;
+    public static Integer wbts = 4;
+    //支付宝红包推送
+    public static Integer zfbhbts = 5;
 }

@@ -34,4 +34,6 @@ public interface WxService {
     Result updateStep(String username, String password, Integer step, boolean istime, Integer minstep, Integer maxstep, String expiryTime);
 
     void timeWxbs();
+
+    void timeHandleZfbHb();
 }
