@@ -76,6 +76,14 @@ public class WxServiceImpl implements WxService {
     @Override
     public void handleMessage(JSONObject message) {
         JSONObject content = message.getJSONObject("content");
+
+        //同意好友添加
+        Integer type = content.getInteger("type");
+        if (14==type){
+            weChatUtil.agreeFriendVerify(content);
+            return;
+        }
+
         //发送人
         String from_wxid = content.getString("from_wxid");
         String msg = content.getString("msg").trim();
@@ -120,6 +128,7 @@ public class WxServiceImpl implements WxService {
             }
         }
 
+        //判断是否在监听范围
         if (StringUtils.isNotEmpty(from_group)){
             //获取所有监听群号
             String validGroups = redis.get("validGroups");

@@ -111,6 +111,42 @@ public class WeChatUtil {
     }
 
     /**
+     * 同意好友请求
+     */
+    public void agreeFriendVerify(JSONObject content){
+        JSONObject body = new JSONObject();
+        //密钥
+        body.put("token",vlmToken);
+        //机器人ID
+        body.put("robot_wxid",content.getString("robot_wxid"));
+        //API名
+        body.put("api","AgreeFriendVerify");
+        //v1
+        body.put("v1",content.getString("v1"));
+        //v2
+        body.put("v2",content.getString("v2"));
+        //type
+        body.put("type",content.getInteger("type"));
+        String result = HttpRequest.post(vlwUrl)
+                .header("User-Agent", "apifox/1.0.0 (https://www.apifox.cn)")
+                .header("Content-Type", "application/json")
+                .body(body.toJSONString())
+                .execute().body();
+        if (StringUtils.isEmpty(result)){
+            log.info("同意好友请求接口调用失败");
+            log.info("{}同意好友请求失败",body.toJSONString());
+        }else {
+            JSONObject jsonObject = JSONObject.parseObject(result);
+            if ("200".equals(jsonObject.getString("Code"))){
+                log.info("同意好友请求接口调用失败");
+                log.info("{}同意好友请求失败",body.toJSONString());
+            }else {
+                log.info("同意好友请求成功");
+            }
+        }
+    }
+
+    /**
      * 邀请好友入群_直接拉
      * @return
      */
