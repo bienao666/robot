@@ -74,20 +74,6 @@ public class WxServiceImpl implements WxService {
 
     @Async("asyncServiceExecutor")
     @Override
-    public void wxListener(){
-        log.info("开始监听微信信息。。。");
-        while (true){
-            EvictingQueue<JSONObject> messageLists = WXConstant.messageList;
-            if (messageLists.size()>0){
-                JSONObject message = messageLists.poll();
-                if (message != null) {
-                    handleMessage(message);
-                }
-            }
-        }
-    }
-
-    @Override
     public void handleMessage(JSONObject message) {
         JSONObject content = message.getJSONObject("content");
         //发送人

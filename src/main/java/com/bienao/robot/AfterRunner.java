@@ -114,9 +114,6 @@ public class AfterRunner implements ApplicationRunner {
             log.info("tgbot连接失败，请检查配置");
         }
 
-        //启动监听
-        wxService.wxListener();
-
         //初始化线报活动
         wireService.initializeWire();
     }

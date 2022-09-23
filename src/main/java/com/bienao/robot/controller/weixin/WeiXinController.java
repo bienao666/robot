@@ -30,8 +30,7 @@ public class WeiXinController {
     @PassToken
     public JSONObject message(@RequestBody JSONObject jsonObject) {
         log.info("接收消息：{}", jsonObject.toJSONString());
-        EvictingQueue<JSONObject> messageLists = WXConstant.messageList;
-        messageLists.add(jsonObject);
+        wxService.handleMessage(jsonObject);
         JSONObject result = new JSONObject();
         result.put("Code", "0");
         return result;

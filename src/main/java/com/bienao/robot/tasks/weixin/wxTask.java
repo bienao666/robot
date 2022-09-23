@@ -26,14 +26,14 @@ public class wxTask {
     /**
      * 消费微信信息
      */
-    @Scheduled(cron = "* * * * * ?")
+    /*@Scheduled(cron = "* * * * * ?")
     public void handleMessage() {
         EvictingQueue<JSONObject> messageLists = WXConstant.messageList;
         JSONObject message = messageLists.poll();
         if (message != null) {
             wxServicel.handleMessage(message);
         }
-    }
+    }*/
 
     /**
      * 推送微博
