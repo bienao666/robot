@@ -141,6 +141,13 @@ public class ShareCodeController {
         return Result.success(helpInfo);
     }
 
-
+    /**
+     * 統計京豆
+     */
+    @GetMapping("/countJd")
+    public Result countJd(){
+        jdService.countJd();
+        return Result.success();
+    }
 
 }

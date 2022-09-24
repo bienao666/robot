@@ -13,5 +13,5 @@ public interface JdJdMapper {
     List<JSONObject> queryJd();
 
     //更新京豆数据
-    int addJdDate(DateTime date, int jdCount);
+    int addJdDate(String date, int jdCount);
 }

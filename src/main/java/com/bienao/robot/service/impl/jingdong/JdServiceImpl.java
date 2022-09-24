@@ -542,6 +542,7 @@ public class JdServiceImpl implements JdService {
     /**
      * 统计京豆收益
      */
+    @Async("asyncServiceExecutor")
     @Override
     public void countJd() {
         log.info("统计京豆收益开始！！！");
@@ -614,7 +615,7 @@ public class JdServiceImpl implements JdService {
         log.info("统计京豆收益结束！！！");
         log.info("更新京豆数据！！！");
         int jdCount = jdCkMapper.sumJdCount();
-        int i = jdJdMapper.addJdDate(date, jdCount);
+        int i = jdJdMapper.addJdDate(DateUtil.formatDateTime(date), jdCount);
         if (i==1){
             log.info("京豆数据更新成功！！！");
         }else {
