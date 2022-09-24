@@ -116,5 +116,8 @@ public class AfterRunner implements ApplicationRunner {
 
         //初始化线报活动
         wireService.initializeWire();
+
+        //初始化命令
+
     }
 }

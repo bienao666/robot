@@ -24,14 +24,13 @@ public class WxpusherUtil {
     @Autowired
     private WeChatUtil weChatUtil;
 
-    private String wxpusherToken = systemParamUtil.querySystemParam("WXPUSHERTOKEN");
-
     /**
      * 获取wxpusher关注二维码
      * @param content
      * @return
      */
     public boolean getWxpusherCode(JSONObject content){
+        String wxpusherToken = systemParamUtil.querySystemParam("WXPUSHERTOKEN");
         if (StringUtils.isEmpty(wxpusherToken)){
             return false;
         }
@@ -93,6 +92,7 @@ public class WxpusherUtil {
      * @param url 原文链接，可选参数
      */
     public boolean sendMessage(String content, String summary, Integer contentType, List topicIds,List uids,String url){
+        String wxpusherToken = systemParamUtil.querySystemParam("WXPUSHERTOKEN");
         if (StringUtils.isEmpty(wxpusherToken)){
             return false;
         }

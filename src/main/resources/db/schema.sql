@@ -131,3 +131,11 @@ create table if not exists `wxbs` (
                                       `expiry_time` varchar,
                                       `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );
+create table if not exists `command` (
+                                      `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+                                      `command` varchar UNIQUE,
+                                      `function` varchar,
+                                      `reply` varchar,
+                                      `created_time` varchar DEFAULT (datetime('now', 'localtime')),
+                                      `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
+);

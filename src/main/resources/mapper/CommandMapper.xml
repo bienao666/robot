@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bienao.robot.mapper.CommandMapper">
+
+    <insert id="addCommand" parameterType="commandEntity">
+        insert into command(command,`function`,reply) values (#{command},#{function},#{reply})
+    </insert>
+
+    <insert id="addCommands" >
+        insert into command(command,`function`,reply)
+        values
+        <foreach collection="commandEntitList" item="com" separator=",">
+            (#{com.command},#{com.function}, #{com.reply})
+        </foreach>
+    </insert>
+
+    <select id="queryCommand" resultType="commandEntity">
+        select * from command where 1=1
+        <if test="command != null and command != ''">
+            AND ((command like ('%'||#{command}||'%') or (`function` like ('%'||#{function}||'%'))
+        </if>
+    </select>
+
+    <select id="queryAllCommand" resultType="string">
+        select command from command
+    </select>
+
+    <update id="updateCommand" parameterType="commandEntity">
+        update command
+        <set>
+            <if test="command !=null and command !=''">
+                command=#{command},
+            </if>
+            <if test="function !=null and function !=''">
+                `function`=#{function},
+            </if>
+            <if test="reply !=null and reply !=''">
+                reply=#{reply},
+            </if>
+            <if test="updatedTime !=null">
+                updated_time=#{updatedTime},
+            </if>
+        </set>
+        where id=#{id};
+    </update>
+
+    <delete id="deleteCommand" parameterType="list">
+        delete from command where 1=1 and id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
