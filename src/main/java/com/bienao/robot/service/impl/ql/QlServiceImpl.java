@@ -13,6 +13,7 @@ import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.mapper.QlMapper;
 import com.bienao.robot.entity.Result;
 import com.bienao.robot.service.ql.QlService;
+import com.bienao.robot.utils.WxpusherUtil;
 import com.bienao.robot.utils.ql.QlUtil;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import com.bienao.robot.utils.weixin.WeChatUtil;
@@ -40,6 +41,9 @@ public class QlServiceImpl implements QlService {
 
     @Autowired
     private SystemParamUtil systemParamUtil;
+
+    @Autowired
+    private WxpusherUtil wxpusherUtil;
 
     private Cache<String, String> redis = WXConstant.redis;
 
@@ -703,7 +707,14 @@ public class QlServiceImpl implements QlService {
                             }
                         }
                         if (qlUtil.updateEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), env.getName(), env.getValue(), env.getRemarks())){
-                            weChatUtil.sendTextMsg("更新成功",content);
+                            //微信推送消息
+                            weChatUtil.sendTextMsg("用户"+ptPin+"更新成功",content);
+                            //wxpusher推送消息
+                            try {
+                                wxpusherUtil.sendLogin(ptPin,wxPusherUid,ql.getRemark());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }else {
                             weChatUtil.sendTextMsg("更新失败，请联系管理员",content);
                         }

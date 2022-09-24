@@ -68,6 +68,9 @@ public class WxServiceImpl implements WxService {
     @Autowired
     private WxbsMapper wxbsMapper;
 
+    @Autowired
+    private WxpusherUtil wxpusherUtil;
+
     private Cache<String, String> redis = WXConstant.redis;
 
     private Pattern lowerDatePattern = Pattern.compile("/Date\\((\\d+)\\+");
@@ -466,7 +469,7 @@ public class WxServiceImpl implements WxService {
                 weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试",content);
             }else {
                 //生成wxpusher二维码
-                if (getWxpusherCode(content)){
+                if (wxpusherUtil.getWxpusherCode(content)){
                     try {
                         Thread.sleep(11 * 1000);
                     } catch (InterruptedException e) {
@@ -475,7 +478,7 @@ public class WxServiceImpl implements WxService {
                     String wxpusherUid = "";
                     for (int i = 0; i < 2; i++) {
                         weChatUtil.sendTextMsg("正在配置资产推送中，请稍后。。。",content);
-                        wxpusherUid = getWxpusherUid(content);
+                        wxpusherUid = wxpusherUtil.getWxpusherUid(content);
                         if (StringUtils.isNotEmpty(wxpusherUid)){
                             break;
                         }
@@ -1566,51 +1569,7 @@ public class WxServiceImpl implements WxService {
         }
     }
 
-    public boolean getWxpusherCode(JSONObject content){
-        String wxpusherToken = systemParamUtil.querySystemParam("WXPUSHERTOKEN");
-        if (StringUtils.isEmpty(wxpusherToken)){
-            return false;
-        }
-        JSONObject body = new JSONObject();
-        body.put("appToken","AT_upaWvmZ7ScZDe4k1N7fBMAPWC4dEn7n0");
-        body.put("extra","bienao");
-        body.put("validTime",40);
-        String resStr = HttpRequest.post("http://wxpusher.zjiecode.com/api/fun/create/qrcode")
-                .body(body.toJSONString())
-                .execute().body();
-        if (StringUtils.isEmpty(resStr)){
-            return false;
-        }
-        JSONObject res = JSONObject.parseObject(resStr);
-        if (res.getInteger("code")==1000 && "处理成功".equals(res.getString("msg"))){
-            JSONObject data = res.getJSONObject("data");
-            String code = data.getString("code");
-            String url = data.getString("url");
-            weChatUtil.sendTextMsg("请在30s内扫描下方二维码：",content);
-            weChatUtil.sendImageMsg(url,content);
-            //发送人
-            String from_wxid = content.getString("from_wxid");
-            redis.put(from_wxid+"code",code,40 * 1000);
-            return true;
-        }else {
-            return false;
-        }
-    }
 
-    public String getWxpusherUid(JSONObject content){
-        //发送人
-        String from_wxid = content.getString("from_wxid");
-        String code = redis.get(from_wxid + "code");
-        String resStr = HttpRequest.get("https://wxpusher.zjiecode.com/api/fun/scan-qrcode-uid?code="+code)
-                .execute().body();
-        if (StringUtils.isEmpty(resStr)){
-            return null;
-        }
-        JSONObject res = JSONObject.parseObject(resStr);
-        if (res.getInteger("code")==1000 && "处理成功".equals(res.getString("msg"))){
-            return res.getString("data");
-        }else {
-            return null;
-        }
-    }
+
+
 }
