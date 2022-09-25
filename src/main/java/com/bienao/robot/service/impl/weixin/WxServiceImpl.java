@@ -237,7 +237,7 @@ public class WxServiceImpl implements WxService {
         }
         //取消推送摸鱼
         if ("取消推送摸鱼".equals(msg.trim())) {
-            handleQxTsWb(content);
+            handleQxTsMy(content);
             return;
         }
         //推送微博
@@ -247,7 +247,7 @@ public class WxServiceImpl implements WxService {
         }
         //取消推送微博
         if ("取消推送微博".equals(msg.trim())) {
-            handleQxTsMy(content);
+            handleQxTsWb(content);
             return;
         }
         //推送支付宝红包

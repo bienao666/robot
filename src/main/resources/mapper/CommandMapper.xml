@@ -5,21 +5,24 @@
 <mapper namespace="com.bienao.robot.mapper.CommandMapper">
 
     <insert id="addCommand" parameterType="commandEntity">
-        insert into command(command,`function`,reply) values (#{command},#{function},#{reply})
+        insert into command(command,`function`,reply,is_built_in) values (#{command},#{function},#{reply},#{isBuiltIn})
     </insert>
 
     <insert id="addCommands" >
-        insert into command(command,`function`,reply)
+        insert into command(command,`function`,reply,is_built_in)
         values
         <foreach collection="commandEntitList" item="com" separator=",">
-            (#{com.command},#{com.function}, #{com.reply})
+            (#{com.command},#{com.function}, #{com.reply}, #{com.isBuiltIn})
         </foreach>
     </insert>
 
     <select id="queryCommand" resultType="commandEntity">
         select * from command where 1=1
         <if test="command != null and command != ''">
-            AND ((command like ('%'||#{command}||'%') or (`function` like ('%'||#{function}||'%'))
+            and command like ('%'||#{command}||'%')
+        </if>
+        <if test="function != null and function != ''">
+            and `function` like ('%'||#{function}||'%')
         </if>
     </select>
 

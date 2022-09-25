@@ -10,6 +10,7 @@ import com.bienao.robot.entity.WireEntity;
 import com.bienao.robot.entity.WireKeyEntity;
 import com.bienao.robot.mapper.WireKeyMapper;
 import com.bienao.robot.mapper.WireMapper;
+import com.bienao.robot.service.command.CommandService;
 import com.bienao.robot.service.ql.WireService;
 import com.bienao.robot.service.weixin.WxService;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
@@ -35,7 +36,7 @@ import java.util.TreeMap;
 public class AfterRunner implements ApplicationRunner {
 
     @Autowired
-    private WxService wxService;
+    private CommandService commandService;
 
     private Cache<String, String> redis = WXConstant.redis;
 
@@ -50,23 +51,6 @@ public class AfterRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-
-        log.info("=================================================");
-        log.info("===================web页面地址=====================");
-        log.info("     http://127.0.0.1:8899/robot/index.html");
-        log.info("=================================================");
-
-        //添加功能列表
-        String msg = "菜单列表：\r\n";
-        msg += "————功能区————\r\n";
-        msg += "           比价  |  油价  \r\n";
-        msg += "           监控茅台洋河    \r\n";
-        msg += "————娱乐区————\r\n";
-        msg += "           摸鱼  |  微博  \r\n";
-        msg += "           举牌  |  天气  \r\n";
-        msg += "           买家秀     \r\n";
-        redis.put("functionList",msg);
-
         //初始化tgbot
         try {
             DefaultBotOptions botOptions = new DefaultBotOptions();
@@ -119,8 +103,14 @@ public class AfterRunner implements ApplicationRunner {
         wireService.initializeWire();
 
         //初始化命令
+        commandService.initializeCommand();
 
         //启动成功通知
         weChatUtil.sendTextMsgToMaster("robot已开启，微信对接成功。。。");
+
+        log.info("=================================================");
+        log.info("===================web页面地址=====================");
+        log.info("     http://127.0.0.1:8899/robot/index.html");
+        log.info("=================================================");
     }
 }

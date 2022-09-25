@@ -136,6 +136,7 @@ create table if not exists `command` (
                                       `command` varchar UNIQUE,
                                       `function` varchar,
                                       `reply` varchar,
+                                      `is_built_in` INTEGER DEFAULT 0,
                                       `created_time` varchar DEFAULT (datetime('now', 'localtime')),
                                       `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );

@@ -31,6 +31,9 @@ public class CommandEntity {
     @Size(max = 100, message = "回复长度不能超过100个字符")
     private String reply;
 
+    //是否内置 0自定义 1内置
+    private Integer isBuiltIn;
+
     //新增时间
     private String createdTime;
 
