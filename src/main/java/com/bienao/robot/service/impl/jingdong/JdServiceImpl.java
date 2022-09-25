@@ -671,7 +671,7 @@ public class JdServiceImpl implements JdService {
                             JSONObject farmUserPro = farmInfo.getJSONObject("farmUserPro");
                             if (farmUserPro == null) {
                                 log.info("{}ck的东东农场互助码更新失败，活动没开或者活动已黑", ck.getCk());
-                                jdFruitEntity.setIsFruitHei(1);
+//                                jdFruitEntity.setIsFruitHei(1);
                             } else {
                                 //互助码
                                 String fruitShareCode = farmUserPro.getString("shareCode");
@@ -731,7 +731,7 @@ public class JdServiceImpl implements JdService {
                                         || "0".equals(petUserPro.getString("petStatus"))
                                         || StringUtils.isEmpty(petUserPro.getString("goodsInfo"))){
                                     log.info("{}ck的东东萌宠互助码更新失败，活动没开或者活动已黑", ck.getCk());
-                                    jdPetEntity.setIsPetHei(1);
+//                                    jdPetEntity.setIsPetHei(1);
                                 }else {
                                     //互助码
                                     String petShareCode = petUserPro.getString("shareCode");
@@ -786,7 +786,7 @@ public class JdServiceImpl implements JdService {
                         }else {
                             if ("PB101".equals(plantInfo.getString("errorCode")) || "3".equals(plantInfo.getString("code"))){
                                 log.info("{}ck的种豆得豆互助码更新失败，活动没开或者活动已黑", ck.getCk());
-                                jdPlantEntity.setIsPlantHei(1);
+//                                jdPlantEntity.setIsPlantHei(1);
                             }else {
                                 if ("0".equals(plantInfo.getString("code")) && StringUtils.isNotEmpty(plantInfo.getString("data"))){
                                     String shareUrl = plantInfo.getJSONObject("data").getJSONObject("jwordShareInfo").getString("shareUrl");
@@ -875,7 +875,7 @@ public class JdServiceImpl implements JdService {
             } else if ("400".equals(resultObject.getString("code"))) {
                 log.info("东东农场火爆 ‼️‼️");
                 toHelpJdFruitEntity.setIsFruitHei(1);
-                jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
+//                jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
             } else if ("3".equals(resultObject.getString("code"))) {
                 log.info("ck已过期 ‼️‼️");
                 toHelpJdCk.setStatus(1);
@@ -938,7 +938,7 @@ public class JdServiceImpl implements JdService {
                 log.info("东东农场天天抽奖火爆 ‼️‼️");
                 JdFruitEntity update = new JdFruitEntity();
                 update.setIsFruitHei(1);
-                jdFruitMapper.updateJdFruit(update);
+//                jdFruitMapper.updateJdFruit(update);
             } else if ("3".equals(resultObject.getString("code"))) {
                 log.info("ck已过期 ‼️‼️");
                 toHelpJdCk.setStatus(1);
@@ -998,7 +998,7 @@ public class JdServiceImpl implements JdService {
                 log.info("此账号今天已经跑过助力了，跳出....");
             } else if ("1002".equals(resultObject.getString("resultCode"))) {
                 toHelpJdPetEntity.setIsPetHei(1);
-                jdPetMapper.updateJdPet(toHelpJdPetEntity);
+//                jdPetMapper.updateJdPet(toHelpJdPetEntity);
                 log.info("此账号风控，跳出....");
             } else {
                 log.info("东东萌宠助力失败:{}",resultObject.toJSONString());
@@ -1214,6 +1214,58 @@ public class JdServiceImpl implements JdService {
             e.printStackTrace();
         }
         return res;
+    }
+
+    /**
+     * 查询京东资产详情
+     * @param ptPin
+     */
+    public void getJdBeanChange(String ptPin){
+        String cookie = "";
+
+        /*JdCkEntity jdCk = jdCkMapper.queryCk();
+        $.overdue = "";
+        var overdueDate = moment(cookiesArr[i].CreateTime);
+        var day = moment(new Date()).diff(overdueDate, 'day');
+        $.overdue = `【挂机天数】${day}天`
+        $.pt_pin = (cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
+        $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
+        $.CryptoJS = $.isNode() ? require('crypto-js') : CryptoJS;
+        $.index = i + 1;
+        $.beanCount = 0;
+        $.incomeBean = 0;
+        $.expenseBean = 0;
+        $.todayIncomeBean = 0;
+        $.todayOutcomeBean = 0;
+        $.errorMsg = '';
+        $.isLogin = true;
+        $.nickName = '';
+        $.levelName = '';
+        $.message = '';
+        $.balance = 0;
+        $.expiredBalance = 0;
+        $.JdzzNum = 0;
+        $.JdMsScore = 0;
+        $.JdFarmProdName = '';
+        $.JdtreeEnergy = 0;
+        $.JdtreeTotalEnergy = 0;
+        $.treeState = 0;
+        $.JdwaterTotalT = 0;
+        $.JdwaterD = 0;
+        $.JDwaterEveryDayT = 0;
+        $.JDtotalcash = 0;
+        $.JDEggcnt = 0;
+        $.Jxmctoken = '';
+        $.DdFactoryReceive = '';
+        $.jxFactoryInfo = '';
+        $.jxFactoryReceive = '';
+        $.jdCash = 0;
+        $.isPlusVip = 0;
+        $.JingXiang = "";
+        $.allincomeBean = 0; //月收入
+        $.allexpenseBean = 0; //月支出
+        $.joylevel = 0;
+        TempBaipiao = "";*/
     }
 
 }
