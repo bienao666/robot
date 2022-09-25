@@ -68,6 +68,20 @@ public class WeChatUtil {
         }
     }
 
+    public void sendTextMsgToMaster(String msg){
+        JSONObject content = new JSONObject();
+        String robortwxid = systemParamUtil.querySystemParam("ROBORTWXID");
+        String wxmasters = systemParamUtil.querySystemParam("WXMASTERS");
+        String[] split = wxmasters.split("#");
+        for (String master : split) {
+            if (StringUtils.isNotEmpty(master)){
+                content.put("robot_wxid",robortwxid);
+                content.put("from_wxid",master);
+                sendTextMsg(msg,content);
+            }
+        }
+    }
+
     /**
      * 发送图片消息
      */

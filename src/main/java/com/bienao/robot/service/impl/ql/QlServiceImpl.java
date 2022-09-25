@@ -679,7 +679,7 @@ public class QlServiceImpl implements QlService {
         boolean isReturn = false;
 
         for (QlEntity ql : qls) {
-            if (isReturn){
+            if (isReturn) {
                 return;
             }
             Integer ckCount = 0;
@@ -706,17 +706,28 @@ public class QlServiceImpl implements QlService {
                                 env.setRemarks(split[0] + "@@" + System.currentTimeMillis() + "@@" + (StringUtils.isEmpty(wxPusherUid) ? split[2] : wxPusherUid));
                             }
                         }
-                        if (qlUtil.updateEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), env.getName(), env.getValue(), env.getRemarks())){
-                            //微信推送消息
-                            weChatUtil.sendTextMsg("用户"+ptPin+"更新成功",content);
-                            //wxpusher推送消息
+                        if (qlUtil.updateEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), env.getName(), env.getValue(), env.getRemarks())) {
+                            //微信推送给用户消息
+                            weChatUtil.sendTextMsg("robot通知：用户" + ptPin + "更新成功", content);
+                            //微信推送给master消息
+                            weChatUtil.sendTextMsgToMaster("robot通知：用户" + ptPin + "更新成功");
+                            //wxpusher推送用户消息
                             try {
-                                wxpusherUtil.sendLogin(ptPin,wxPusherUid,ql.getRemark());
+                                wxpusherUtil.sendLogin(ptPin, wxPusherUid, ql.getRemark());
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                        }else {
-                            weChatUtil.sendTextMsg("更新失败，请联系管理员",content);
+                            //wxpusher推送master消息
+                            String wxpusheruid = systemParamUtil.querySystemParam("WXPUSHERUID");
+                            if (StringUtils.isNotEmpty(wxpusheruid) && !wxPusherUid.equals(wxpusheruid)) {
+                                try {
+                                    wxpusherUtil.sendLogin(ptPin, wxpusheruid, ql.getRemark());
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        } else {
+                            weChatUtil.sendTextMsg("更新失败，请联系管理员", content);
                         }
                         isReturn = true;
                         break;
@@ -730,10 +741,10 @@ public class QlServiceImpl implements QlService {
         int i = qlCkCountList.indexOf(min);
         QlEntity ql = qls.get(i);
         JSONObject env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), "JD_COOKIE", ck, ptPin + "@@" + System.currentTimeMillis() + "@@" + wxPusherUid);
-        if (env!=null){
-            weChatUtil.sendTextMsg("添加成功",content);
-        }else{
-            weChatUtil.sendTextMsg("添加失败，请联系管理员",content);
+        if (env != null) {
+            weChatUtil.sendTextMsg("添加成功", content);
+        } else {
+            weChatUtil.sendTextMsg("添加失败，请联系管理员", content);
         }
     }
 }

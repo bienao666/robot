@@ -13,6 +13,7 @@ import com.bienao.robot.mapper.WireMapper;
 import com.bienao.robot.service.ql.WireService;
 import com.bienao.robot.service.weixin.WxService;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
+import com.bienao.robot.utils.weixin.WeChatUtil;
 import com.google.common.collect.EvictingQueue;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +40,7 @@ public class AfterRunner implements ApplicationRunner {
     private Cache<String, String> redis = WXConstant.redis;
 
     @Autowired
-    private WireMapper wireMapper;
+    private WeChatUtil weChatUtil;
 
     @Autowired
     private WireService wireService;
@@ -119,5 +120,7 @@ public class AfterRunner implements ApplicationRunner {
 
         //初始化命令
 
+        //启动成功通知
+        weChatUtil.sendTextMsgToMaster("robot已开启，微信对接成功。。。");
     }
 }
