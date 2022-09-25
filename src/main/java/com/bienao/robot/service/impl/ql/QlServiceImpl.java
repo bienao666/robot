@@ -708,7 +708,7 @@ public class QlServiceImpl implements QlService {
                         }
                         if (qlUtil.updateEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), env.getName(), env.getValue(), env.getRemarks())) {
                             //微信推送给用户消息
-                            weChatUtil.sendTextMsg("robot通知：用户" + ptPin + "更新成功", content);
+                            weChatUtil.sendTextMsg("robot通知：您已更新成功", content);
                             //微信推送给master消息
                             weChatUtil.sendTextMsgToMaster("robot通知：用户" + ptPin + "更新成功");
                             //wxpusher推送用户消息
