@@ -552,6 +552,24 @@ public class WireServiceImpl implements WireService {
 
         keys.add("jd_wxCompleteInfoId");
         addWire("完善信息有礼","jd_wxCompleteInfo.py",keys);
+
+        keys.add("jd_cjdaily_activityId");
+        addWire("CJ每日抢好礼通用活动","jd_cjdaily.js",keys);
+
+        keys.add("jd_daily_activityId");
+        addWire("LZ每日抢好礼通用活动","jd_daily.js",keys);
+
+        keys.add("LZKJ_SEVENDAY");
+        addWire("超级无线店铺签到","jd_sevenDay.js",keys);
+
+        keys.add("LZKJ_SIGN");
+        addWire("超级无线店铺签到","jd_sevenDay.js",keys);
+
+        keys.add("CJHY_SEVENDAY");
+        addWire("超级无线店铺签到","jd_sevenDay.js",keys);
+
+        keys.add("CJHY_SIGN");
+        addWire("超级无线店铺签到","jd_sevenDay.js",keys);
     }
 
 
