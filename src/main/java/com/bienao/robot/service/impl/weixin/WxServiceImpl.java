@@ -15,6 +15,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.FunctionType;
 import com.bienao.robot.Constants.weixin.WXConstant;
 import com.bienao.robot.entity.*;
+import com.bienao.robot.mapper.CommandMapper;
 import com.bienao.robot.mapper.GroupMapper;
 import com.bienao.robot.mapper.WxbsMapper;
 import com.bienao.robot.mapper.YlgyMapper;
@@ -70,6 +71,9 @@ public class WxServiceImpl implements WxService {
 
     @Autowired
     private WxpusherUtil wxpusherUtil;
+
+    @Autowired
+    private CommandMapper commandMapper;
 
     private Cache<String, String> redis = WXConstant.redis;
 
@@ -317,6 +321,14 @@ public class WxServiceImpl implements WxService {
         if ("微信管理员列表".equals(msg.trim())) {
             handleQueryWXMasters(content);
             return;
+        }
+
+        List<CommandEntity> commandEntities = commandMapper.queryCommand("", "");
+        for (CommandEntity commandEntity : commandEntities) {
+            if (msg.trim().contains(commandEntity.getCommand())){
+                weChatUtil.sendTextMsg(commandEntity.getReply(),content);
+                return;
+            }
         }
 
         if (NumberUtil.isInteger(msg)) {
