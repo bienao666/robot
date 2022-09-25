@@ -14,6 +14,7 @@ create table if not exists user (
                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
                                            wxid varchar,
                                            wxName varchar,
+                                           wxpusherUid varchar,
                                            city varchar,
                                            ip varchar,
                                            functionType INTEGER,
