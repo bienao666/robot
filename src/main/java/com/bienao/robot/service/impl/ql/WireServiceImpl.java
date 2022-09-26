@@ -570,6 +570,9 @@ public class WireServiceImpl implements WireService {
 
         keys.add("CJHY_SIGN");
         addWire("超级无线店铺签到","jd_sevenDay.js",keys);
+
+        keys.add("jd_wxShopGift_activityUrl");
+        addWire("店铺礼包特效","jd_wxShopGift.js",keys);
     }
 
 
