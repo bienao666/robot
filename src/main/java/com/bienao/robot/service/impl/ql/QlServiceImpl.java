@@ -710,7 +710,7 @@ public class QlServiceImpl implements QlService {
                             //微信推送给用户消息
                             weChatUtil.sendTextMsg("robot通知：您已更新成功", content);
                             //微信推送给master消息
-                            weChatUtil.sendTextMsgToMaster("robot通知：用户" + ptPin + "更新成功");
+                            weChatUtil.sendTextMsgToMaster("robot通知：用户" + ptPin + "在"+ql.getRemark()+"上更新成功");
                             //wxpusher推送用户消息
                             try {
                                 wxpusherUtil.sendLogin(ptPin, wxPusherUid, ql.getRemark());

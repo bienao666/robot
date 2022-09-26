@@ -1,9 +1,12 @@
 package com.bienao.robot.service.impl.jingdong;
 
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.net.URLDecoder;
 import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.core.net.URLEncoder;
+import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.EscapeUtil;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONObject;
@@ -1222,50 +1225,45 @@ public class JdServiceImpl implements JdService {
      */
     public void getJdBeanChange(String ptPin){
         String cookie = "";
-
-        /*JdCkEntity jdCk = jdCkMapper.queryCk();
-        $.overdue = "";
-        var overdueDate = moment(cookiesArr[i].CreateTime);
-        var day = moment(new Date()).diff(overdueDate, 'day');
-        $.overdue = `【挂机天数】${day}天`
-        $.pt_pin = (cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
-        $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
-        $.CryptoJS = $.isNode() ? require('crypto-js') : CryptoJS;
-        $.index = i + 1;
-        $.beanCount = 0;
-        $.incomeBean = 0;
-        $.expenseBean = 0;
-        $.todayIncomeBean = 0;
-        $.todayOutcomeBean = 0;
-        $.errorMsg = '';
-        $.isLogin = true;
-        $.nickName = '';
-        $.levelName = '';
-        $.message = '';
-        $.balance = 0;
-        $.expiredBalance = 0;
-        $.JdzzNum = 0;
-        $.JdMsScore = 0;
-        $.JdFarmProdName = '';
-        $.JdtreeEnergy = 0;
-        $.JdtreeTotalEnergy = 0;
-        $.treeState = 0;
-        $.JdwaterTotalT = 0;
-        $.JdwaterD = 0;
-        $.JDwaterEveryDayT = 0;
-        $.JDtotalcash = 0;
-        $.JDEggcnt = 0;
-        $.Jxmctoken = '';
-        $.DdFactoryReceive = '';
-        $.jxFactoryInfo = '';
-        $.jxFactoryReceive = '';
-        $.jdCash = 0;
-        $.isPlusVip = 0;
-        $.JingXiang = "";
-        $.allincomeBean = 0; //月收入
-        $.allexpenseBean = 0; //月支出
-        $.joylevel = 0;
-        TempBaipiao = "";*/
+        JdCkEntity jdCkQuery = new JdCkEntity();
+        jdCkQuery.setPtPin(ptPin);
+        JdCkEntity jdCk = jdCkMapper.queryCk(jdCkQuery);
+        String overdue = "【挂机天数】"+DateUtil.between(DateUtil.parseDate(jdCk.getCreatedTime()), DateUtil.date(), DateUnit.DAY)+"天";
+        String userName = URLDecoder.decode(ptPin, CharsetUtil.defaultCharset());
+        int beanCount = 0;
+        int incomeBean = 0;
+        int expenseBean = 0;
+        int todayIncomeBean = 0;
+        int todayOutcomeBean = 0;
+        String errorMsg = "";
+        boolean isLogin = true;
+        String nickName = "";
+        String levelName = "";
+        String message = "";
+        int balance = 0;
+        int expiredBalance = 0;
+        int JdzzNum = 0;
+        int JdMsScore = 0;
+        String jdFarmProdName = "";
+        int JdtreeEnergy = 0;
+        int JdtreeTotalEnergy = 0;
+        int treeState = 0;
+        int JdwaterTotalT = 0;
+        int JdwaterD = 0;
+        int JDwaterEveryDayT = 0;
+        int JDtotalcash = 0;
+        int JDEggcnt = 0;
+        String Jxmctoken = "";
+        String DdFactoryReceive = "";
+        String jxFactoryInfo = "";
+        String jxFactoryReceive = "";
+        int jdCash = 0;
+        int isPlusVip = 0;
+        String JingXiang = "";
+        int allincomeBean = 0; //月收入
+        int allexpenseBean = 0; //月支出
+        int joylevel = 0;
+        String TempBaipiao = "";
     }
 
 }
