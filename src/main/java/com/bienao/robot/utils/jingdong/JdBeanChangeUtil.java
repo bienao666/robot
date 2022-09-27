@@ -11,6 +11,7 @@ import cn.hutool.core.util.EscapeUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpRequest;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.jingdong.JdCkEntity;
 import com.bienao.robot.mapper.jingdong.JdCkMapper;
@@ -42,8 +43,8 @@ public class JdBeanChangeUtil {
     private String nickName = "";
     private String levelName = "";
     private String message = "";
-    private int balance = 0;
-    private int expiredBalance = 0;
+    private Float balance = 0.00F;
+    private Float expiredBalance = 0.00F;
     private int JdzzNum = 0;
     private int JdMsScore = 0;
     private String JdFarmProdName = "";
@@ -105,9 +106,209 @@ public class JdBeanChangeUtil {
         requestAlgo();
         //
 //        JxmcGetRequest();
+        bean();
+
+        redPacket();
+
+        showMsg();
     }
 
-    public void bean(){
+    public void showMsg() {
+        String ReturnMessage = "【京东账号】" + (StringUtils.isEmpty(nickName) ? userName : nickName) + "\n";
+        if (StringUtils.isNotEmpty(levelName) || StringUtils.isNotEmpty(JingXiang)){
+            ReturnMessage += "【账号信息】";
+        }
+        if (StringUtils.isNotEmpty(levelName)){
+            if (levelName.length()>2){
+                levelName = levelName.substring(0,2);
+            }
+            if (isPlusVip==1){
+                ReturnMessage += levelName + "Plus,";
+            }else {
+                ReturnMessage += levelName + "会员,";
+            }
+        }
+        if (StringUtils.isNotEmpty(JingXiang)){
+            ReturnMessage += JingXiang;
+        }
+        ReturnMessage += "\n【今日京豆】收"+todayIncomeBean+"豆";
+        if (todayOutcomeBean != 0) {
+            ReturnMessage += ",支"+todayOutcomeBean+"豆";
+        }
+        ReturnMessage += "\n【昨日京豆】收"+incomeBean+"豆";
+        if (expenseBean != 0) {
+            ReturnMessage += ",支"+expenseBean+"豆";
+        }
+        ReturnMessage += "\n【当前京豆】"+beanCount+"豆(≈"+beanCount/100+"元)\n";
+
+        /*if (JDEggcnt == 0) {
+            ReturnMessage += "【京喜牧场】未开通或提示火爆.\n";
+        } else {
+            ReturnMessage += "【京喜牧场】"+JDEggcnt+"枚鸡蛋\n";
+        }*/
+
+        if (JDtotalcash != 0) {
+            ReturnMessage += "【极速金币】"+JDtotalcash+"币(≈"+JDtotalcash / 10000+"元)\n";
+        }
+        if (JdzzNum != 0) {
+            ReturnMessage += "【京东赚赚】"+JdzzNum+"币(≈$"+JdzzNum / 10000+"元)\n";
+        }
+        if (JdMsScore != 0) {
+            ReturnMessage += "【京东秒杀】"+JdMsScore+"币(≈"+JdMsScore / 1000+"元)\n";
+        }
+
+        if (joylevel != 0|| jdCash != 0) {
+            ReturnMessage += "【其他信息】";
+            if (joylevel != 0) {
+                ReturnMessage += "汪汪:"+joylevel+"级";
+                if (jdCash != 0) {
+                    ReturnMessage += ",";
+                }
+            }
+            if (jdCash != 0) {
+                ReturnMessage += "领现金:"+jdCash+"元";
+            }
+            ReturnMessage += "\n";
+        }
+//
+//        if ($.JdFarmProdName != "") {
+//            if ($.JdtreeEnergy != 0) {
+//                if ($.treeState === 2 || $.treeState === 3) {
+//                    ReturnMessage += `【东东农场】${$.JdFarmProdName} 可以兑换了!\n`;
+//                    TempBaipiao += `【东东农场】${$.JdFarmProdName} 可以兑换了!\n`;
+//                    allReceiveMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】${$.JdFarmProdName} (东东农场)\n`;
+//                } else {
+//                    if ($.JdwaterD != 'Infinity' && $.JdwaterD != '-Infinity') {
+//                        ReturnMessage += `【东东农场】${$.JdFarmProdName}(${(($.JdtreeEnergy / $.JdtreeTotalEnergy) * 100).toFixed(0)}%,${$.JdwaterD}天)\n`;
+//                    } else {
+//                        ReturnMessage += `【东东农场】${$.JdFarmProdName}(${(($.JdtreeEnergy / $.JdtreeTotalEnergy) * 100).toFixed(0)}%)\n`;
+//                    }
+//                }
+//            } else {
+//                if ($.treeState === 0) {
+//                    TempBaipiao += `【东东农场】水果领取后未重新种植!\n`;
+//                    allWarnMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】水果领取后未重新种植! (东东农场)\n`;
+//
+//                } else if ($.treeState === 1) {
+//                    ReturnMessage += `【东东农场】${$.JdFarmProdName}种植中...\n`;
+//                } else {
+//                    TempBaipiao += `【东东农场】状态异常!\n`;
+//                    allWarnMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】状态异常! (东东农场)\n`;
+//                }
+//            }
+//        }
+//        if ($.jxFactoryInfo) {
+//            ReturnMessage += `【京喜工厂】${$.jxFactoryInfo}\n`
+//        }
+//        if ($.jxFactoryReceive) {
+//            allReceiveMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】${$.jxFactoryReceive} (京喜工厂)\n`;
+//            TempBaipiao += `【京喜工厂】${$.jxFactoryReceive} 可以兑换了!\n`;
+//        }
+//    const response = await PetRequest('energyCollect');
+//    const initPetTownRes = await PetRequest('initPetTown');
+//        if (initPetTownRes.code === '0' && initPetTownRes.resultCode === '0' && initPetTownRes.message === 'success') {
+//            $.petInfo = initPetTownRes.result;
+//            if ($.petInfo.userStatus === 0) {
+//                ReturnMessage += `【东东萌宠】活动未开启!\n`;
+//            } else if ($.petInfo.petStatus === 5) {
+//                ReturnMessage += `【东东萌宠】${$.petInfo.goodsInfo.goodsName}已可领取!\n`;
+//                TempBaipiao += `【东东萌宠】${$.petInfo.goodsInfo.goodsName}已可领取!\n`;
+//                allReceiveMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】${$.petInfo.goodsInfo.goodsName}可以兑换了! (东东萌宠)\n`;
+//            } else if ($.petInfo.petStatus === 6) {
+//                TempBaipiao += `【东东萌宠】未选择物品! \n`;
+//                allWarnMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】未选择物品! (东东萌宠)\n`;
+//            } else if (response.resultCode === '0') {
+//                ReturnMessage += `【东东萌宠】${$.petInfo.goodsInfo.goodsName}`;
+//                ReturnMessage += `(${(response.result.medalPercent).toFixed(0)}%,${response.result.medalNum}/${response.result.medalNum + response.result.needCollectMedalNum}块)\n`;
+//            } else if (!$.petInfo.goodsInfo) {
+//                ReturnMessage += `【东东萌宠】暂未选购新的商品!\n`;
+//                TempBaipiao += `【东东萌宠】暂未选购新的商品! \n`;
+//                allWarnMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】暂未选购新的商品! (东东萌宠)\n`;
+//            }
+//        }
+//
+//        if ($.overdue) {
+//            ReturnMessage += `${$.overdue}\n`;
+//        }
+//        ReturnMessage += `${$.message}`;
+//        allMessage += ReturnMessage + `\n`;
+
+    }
+
+    public void redPacket() {
+        try {
+            String result = HttpRequest.get("https://m.jingxi.com/user/info/QueryUserRedEnvelopesV2?type=1&orgFlag=JD_PinGou_New&page=1&cashRedType=1&redBalanceFlag=1&channel=1&_=" + System.currentTimeMillis() + "&sceneval=2&g_login_type=1&g_ty=ls")
+                    .header("Host", "m.jingxi.com")
+                    .header("Accept", "*/*")
+                    .header("Connection", "keep-alive")
+                    .header("Accept-Language", "zh-cn")
+                    .header("Referer", "https://st.jingxi.com/my/redpacket.shtml?newPg=App&jxsid=16156262265849285961")
+                    .header("Accept-Encoding", "gzip, deflate, br")
+                    .header("Cookie", cookie)
+                    .header("User-Agent", GetUserAgentUtil.getUserAgent())
+                    .timeout(3000)
+                    .execute().body();
+            if (StringUtils.isNotEmpty(result)) {
+                JSONObject res = JSONObject.parseObject(result);
+                String redListStr = res.getJSONObject("data").getJSONObject("useRedInfo").getString("redList");
+                if (StringUtils.isNotEmpty(redListStr)) {
+                    Float jxRed = 0.00F;
+                    Float jsRed = 0.00F;
+                    Float jdRed = 0.00F;
+                    Float jdhRed = 0.00F;
+                    Float jxRedExpire = 0.00F;
+                    Float jsRedExpire = 0.00F;
+                    Float jdRedExpire = 0.00F;
+                    Float jdhRedExpire = 0.00F;
+                    long t = DateUtil.tomorrow().getTime() / 1000;
+                    List<JSONObject> redList = JSONArray.parseArray(redListStr, JSONObject.class);
+                    for (JSONObject red : redList) {
+                        String orgLimitStr = red.getString("orgLimitStr");
+                        if (StringUtils.isNotEmpty(red.getString("orgLimitStr")) && red.getString("orgLimitStr").contains("京喜")) {
+                            jxRed += Float.parseFloat(red.getString("balance"));
+                            if (red.getLong("'endTime'") <= t) {
+                                jxRedExpire += Float.parseFloat(red.getString("balance"));
+                            }
+                        } else if (red.getString("activityName").contains("极速版")) {
+                            jsRed += Float.parseFloat(red.getString("balance"));
+                            if (red.getLong("'endTime'") <= t) {
+                                jsRedExpire += Float.parseFloat(red.getString("balance"));
+                            }
+                        } else if (StringUtils.isNotEmpty(red.getString("orgLimitStr")) && red.getString("orgLimitStr").contains("京东健康")) {
+                            jdhRed += Float.parseFloat(red.getString("balance"));
+                            if (red.getLong("'endTime'") <= t) {
+                                jdhRedExpire += Float.parseFloat(red.getString("balance"));
+                            }
+                        } else {
+                            jdRed += Float.parseFloat(red.getString("balance"));
+                            if (red.getLong("'endTime'") <= t) {
+                                jdRedExpire += Float.parseFloat(red.getString("balance"));
+                            }
+                        }
+                    }
+                    balance = res.getFloat("balance");
+                    expiredBalance = (jxRedExpire + jsRedExpire + jdRedExpire);
+                    message += "【红包总额】" + balance + "(总过期" + expiredBalance + ")元";
+                    if (jxRed > 0) {
+                        message += "\n【京喜红包】" + jxRed + "(将过期" + jxRedExpire + ")元";
+                    }
+                    if (jsRed > 0) {
+                        message += "\n【极速红包】" + jsRed + "(将过期" + jsRedExpire + ")元";
+                    }
+                    if (jdRed > 0) {
+                        message += "\n【京东红包】" + jdRed + "(将过期" + jdRedExpire + ")元";
+                    }
+                    if (jdhRed > 0) {
+                        message += "\n【健康红包】" + jdhRed + "(将过期" + jdhRedExpire + ")元";
+                    }
+                }
+            }
+        } catch (HttpException e) {
+            log.error("TotalBean方法异常：" + e.getMessage());
+        }
+    }
+
+    public void bean() {
         //昨天
         DateTime date = DateUtil.offsetDay(DateUtil.date(), -1);
         Long begin = DateUtil.beginOfDay(date).getTime();
@@ -116,55 +317,55 @@ public class JdBeanChangeUtil {
         int page = 1;
         int t = 0;
         do {
-            JSONObject jingBeanBalanceDetail = getJingBeanBalanceDetail(cookie,page,pageSize);
-            if (jingBeanBalanceDetail != null){
-                if ("0".equals(jingBeanBalanceDetail.getString("code"))){
+            JSONObject jingBeanBalanceDetail = getJingBeanBalanceDetail(cookie, page, pageSize);
+            if (jingBeanBalanceDetail != null) {
+                if ("0".equals(jingBeanBalanceDetail.getString("code"))) {
                     page++;
                     List<JSONObject> detailList = jingBeanBalanceDetail.getJSONArray("detailList").toJavaList(JSONObject.class);
                     for (JSONObject detail : detailList) {
                         Long time = DateUtil.parse(detail.getString("date")).getTime();
-                        if (time >= end){
+                        if (time >= end) {
                             //今天
                             String eventMassage = detail.getString("eventMassage");
-                            if (!eventMassage.contains("退还") && !eventMassage.contains("物流") && !eventMassage.contains("扣赠")){
+                            if (!eventMassage.contains("退还") && !eventMassage.contains("物流") && !eventMassage.contains("扣赠")) {
                                 int amount = Integer.parseInt(detail.getString("amount"));
-                                if (amount>0){
+                                if (amount > 0) {
                                     todayIncomeBean += amount;
                                 }
-                                if (amount<0){
+                                if (amount < 0) {
                                     todayOutcomeBean += amount;
                                 }
                             }
                         }
-                        if (time <= end && time >= begin){
+                        if (time <= end && time >= begin) {
                             //昨天
                             String eventMassage = detail.getString("eventMassage");
-                            if (!eventMassage.contains("退还") && !eventMassage.contains("物流") && !eventMassage.contains("扣赠")){
+                            if (!eventMassage.contains("退还") && !eventMassage.contains("物流") && !eventMassage.contains("扣赠")) {
                                 int amount = Integer.parseInt(detail.getString("amount"));
-                                if (amount>0){
+                                if (amount > 0) {
                                     incomeBean += amount;
                                 }
-                                if (amount<0){
+                                if (amount < 0) {
                                     expenseBean += amount;
                                 }
                             }
                         }
-                        if (time < begin){
+                        if (time < begin) {
                             //前天跳出
-                            t=1;
+                            t = 1;
                         }
                     }
-                }else if ("3".equals(jingBeanBalanceDetail.getString("code"))){
+                } else if ("3".equals(jingBeanBalanceDetail.getString("code"))) {
                     log.info("ck已过期，或者填写不规范");
                     //跳出
-                    t=1;
-                }else {
-                    log.info("未知情况：{}",jingBeanBalanceDetail.toJSONString());
-                    t=1;
+                    t = 1;
+                } else {
+                    log.info("未知情况：{}", jingBeanBalanceDetail.toJSONString());
+                    t = 1;
                 }
-            }else {
+            } else {
                 //跳出
-                t=1;
+                t = 1;
             }
             try {
                 log.info("休息5s防止黑ip...");
@@ -172,7 +373,7 @@ public class JdBeanChangeUtil {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }while (t==0);
+        } while (t == 0);
 
     }
 
@@ -183,19 +384,19 @@ public class JdBeanChangeUtil {
 
     }*/
 
-    public String generateFp(){
-        return (RandomUtil.randomNumbers(13)+System.currentTimeMillis()).substring(0,16);
+    public String generateFp() {
+        return (RandomUtil.randomNumbers(13) + System.currentTimeMillis()).substring(0, 16);
     }
 
     public void requestAlgo() {
         try {
             JSONObject body = new JSONObject();
-            body.put("version","1.0");
-            body.put("fp",generateFp());
-            body.put("appId",10028);
-            body.put("timestamp",System.currentTimeMillis());
-            body.put("platform","web");
-            body.put("expandParams","");
+            body.put("version", "1.0");
+            body.put("fp", generateFp());
+            body.put("appId", 10028);
+            body.put("timestamp", System.currentTimeMillis());
+            body.put("platform", "web");
+            body.put("expandParams", "");
             String resultStr = HttpRequest.post("https://cactus.jd.com/request_algo?g_ty=ajax")
                     .header("Authority", "cactus.jd.com")
                     .header("Pragma", "no-cache")
@@ -264,7 +465,7 @@ public class JdBeanChangeUtil {
                     int waterEveryDayT = JDwaterEveryDayT;
                     //一共还需浇多少次水
                     int waterTotalT = (farmUserPro.getInteger("treeTotalEnergy") - farmUserPro.getInteger("treeEnergy") - farmUserPro.getInteger("totalEnergy")) / 10;
-                    int waterD = new BigDecimal(waterTotalT).divide(new BigDecimal(waterEveryDayT),0,BigDecimal.ROUND_HALF_UP).intValue();
+                    int waterD = new BigDecimal(waterTotalT).divide(new BigDecimal(waterEveryDayT), 0, BigDecimal.ROUND_HALF_UP).intValue();
                     JdwaterTotalT = waterTotalT;
                     JdwaterD = waterD;
                 }
@@ -447,9 +648,9 @@ public class JdBeanChangeUtil {
         }
     }
 
-    public JSONObject getJingBeanBalanceDetail(String ck,int page,int pageSize){
+    public JSONObject getJingBeanBalanceDetail(String ck, int page, int pageSize) {
         String result = HttpRequest.post("https://api.m.jd.com/client.action?functionId=getJingBeanBalanceDetail")
-                .body("body=%7B%22pageSize%22%3A%22"+pageSize+"%22%2C%22page%22%3A%22"+page+"%22%7D&appid=ld")
+                .body("body=%7B%22pageSize%22%3A%22" + pageSize + "%22%2C%22page%22%3A%22" + page + "%22%7D&appid=ld")
                 .header("User-Agent", GetUserAgentUtil.getUserAgent())
                 .header("Host", "api.m.jd.com")
                 .header("Content-Type", "application/x-www-form-urlencoded")
@@ -460,7 +661,7 @@ public class JdBeanChangeUtil {
         if (StringUtils.isEmpty(result)) {
             log.info("查询京豆详情请求失败 ‼️‼️");
             return null;
-        }else if(result.contains("response status: 403")){
+        } else if (result.contains("response status: 403")) {
             return null;
         } else {
             return JSONObject.parseObject(result);
