@@ -1,5 +1,6 @@
 package com.bienao.robot.utils.jingdong;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.net.URLDecoder;
@@ -19,8 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.util.List;
 
 @Component
 @Slf4j
@@ -100,12 +104,84 @@ public class JdBeanChangeUtil {
         //
         requestAlgo();
         //
-        JxmcGetRequest();
+//        JxmcGetRequest();
     }
 
-    public void JxmcGetRequest() {
+    public void bean(){
+        //昨天
+        DateTime date = DateUtil.offsetDay(DateUtil.date(), -1);
+        Long begin = DateUtil.beginOfDay(date).getTime();
+        Long end = DateUtil.endOfDay(date).getTime();
+        int pageSize = 50;
+        int page = 1;
+        int t = 0;
+        do {
+            JSONObject jingBeanBalanceDetail = getJingBeanBalanceDetail(cookie,page,pageSize);
+            if (jingBeanBalanceDetail != null){
+                if ("0".equals(jingBeanBalanceDetail.getString("code"))){
+                    page++;
+                    List<JSONObject> detailList = jingBeanBalanceDetail.getJSONArray("detailList").toJavaList(JSONObject.class);
+                    for (JSONObject detail : detailList) {
+                        Long time = DateUtil.parse(detail.getString("date")).getTime();
+                        if (time >= end){
+                            //今天
+                            String eventMassage = detail.getString("eventMassage");
+                            if (!eventMassage.contains("退还") && !eventMassage.contains("物流") && !eventMassage.contains("扣赠")){
+                                int amount = Integer.parseInt(detail.getString("amount"));
+                                if (amount>0){
+                                    todayIncomeBean += amount;
+                                }
+                                if (amount<0){
+                                    todayOutcomeBean += amount;
+                                }
+                            }
+                        }
+                        if (time <= end && time >= begin){
+                            //昨天
+                            String eventMassage = detail.getString("eventMassage");
+                            if (!eventMassage.contains("退还") && !eventMassage.contains("物流") && !eventMassage.contains("扣赠")){
+                                int amount = Integer.parseInt(detail.getString("amount"));
+                                if (amount>0){
+                                    incomeBean += amount;
+                                }
+                                if (amount<0){
+                                    expenseBean += amount;
+                                }
+                            }
+                        }
+                        if (time < begin){
+                            //前天跳出
+                            t=1;
+                        }
+                    }
+                }else if ("3".equals(jingBeanBalanceDetail.getString("code"))){
+                    log.info("ck已过期，或者填写不规范");
+                    //跳出
+                    t=1;
+                }else {
+                    log.info("未知情况：{}",jingBeanBalanceDetail.toJSONString());
+                    t=1;
+                }
+            }else {
+                //跳出
+                t=1;
+            }
+            try {
+                log.info("休息5s防止黑ip...");
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }while (t==0);
 
     }
+
+    /*public void JxmcGetRequest() {
+        String myRequest = "";
+        String url = "https://m.jingxi.com/jxmc/queryservice/GetHomePageInfo?channel=7&sceneid=1001&activeid=null&activekey=null&isgift=1&isquerypicksite=1&_stk=channel%2Csceneid&_ste=1";
+        url = url + "&h5st=${decrypt(Date.now(), '', '', url)}&_=${Date.now() + 2}&sceneval=2&g_login_type=1&callback=jsonpCBK${String.fromCharCode(Math.floor(Math.random() * 26) + \"A\".charCodeAt(0))}&g_ty=ls";
+
+    }*/
 
     public String generateFp(){
         return (RandomUtil.randomNumbers(13)+System.currentTimeMillis()).substring(0,16);
@@ -371,4 +447,23 @@ public class JdBeanChangeUtil {
         }
     }
 
+    public JSONObject getJingBeanBalanceDetail(String ck,int page,int pageSize){
+        String result = HttpRequest.post("https://api.m.jd.com/client.action?functionId=getJingBeanBalanceDetail")
+                .body("body=%7B%22pageSize%22%3A%22"+pageSize+"%22%2C%22page%22%3A%22"+page+"%22%7D&appid=ld")
+                .header("User-Agent", GetUserAgentUtil.getUserAgent())
+                .header("Host", "api.m.jd.com")
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .header("cookie", ck)
+                .timeout(10000)
+                .execute().body();
+        log.info("查询京豆详情结果：{}", result);
+        if (StringUtils.isEmpty(result)) {
+            log.info("查询京豆详情请求失败 ‼️‼️");
+            return null;
+        }else if(result.contains("response status: 403")){
+            return null;
+        } else {
+            return JSONObject.parseObject(result);
+        }
+    }
 }
