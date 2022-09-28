@@ -488,17 +488,24 @@ public class WxServiceImpl implements WxService {
                         e.printStackTrace();
                     }
                     String wxpusherUid = "";
-                    for (int i = 0; i < 2; i++) {
-                        weChatUtil.sendTextMsg("正在配置资产推送中，请稍后。。。",content);
-                        wxpusherUid = wxpusherUtil.getWxpusherUid(content);
-                        if (StringUtils.isNotEmpty(wxpusherUid)){
-                            break;
+                    try {
+                        for (int i = 0; i < 2; i++) {
+                            weChatUtil.sendTextMsg("正在配置资产推送中，请稍后。。。",content);
+                            wxpusherUid = wxpusherUtil.getWxpusherUid(content);
+                            if (StringUtils.isNotEmpty(wxpusherUid)){
+                                break;
+                            }
+                            try {
+                                Thread.sleep(11 * 1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
-                        try {
-                            Thread.sleep(11 * 1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (StringUtils.isEmpty(wxpusherUid)){
+                        weChatUtil.sendTextMsg("资产推送配置失败，可重新登陆或者联系管理员手动配置",content);
                     }
                     //保存ck
                     qlService.addJdCk(content,ck, wxpusherUid);

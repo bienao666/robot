@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.weixin.WXConstant;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import com.bienao.robot.utils.weixin.WeChatUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Slf4j
 public class WxpusherUtil {
 
     private Cache<String, String> redis = WXConstant.redis;
@@ -70,7 +72,9 @@ public class WxpusherUtil {
         String from_wxid = content.getString("from_wxid");
         String code = redis.get(from_wxid + "code");
         String resStr = HttpRequest.get("https://wxpusher.zjiecode.com/api/fun/scan-qrcode-uid?code="+code)
+                .timeout(3)
                 .execute().body();
+        log.info("获取wxpusheruid接口返回：{}",resStr);
         if (StringUtils.isEmpty(resStr)){
             return null;
         }
