@@ -72,7 +72,7 @@ public class WxpusherUtil {
         String from_wxid = content.getString("from_wxid");
         String code = redis.get(from_wxid + "code");
         String resStr = HttpRequest.get("https://wxpusher.zjiecode.com/api/fun/scan-qrcode-uid?code="+code)
-                .timeout(3)
+                .timeout(3000)
                 .execute().body();
         log.info("获取wxpusheruid接口返回：{}",resStr);
         if (StringUtils.isEmpty(resStr)){

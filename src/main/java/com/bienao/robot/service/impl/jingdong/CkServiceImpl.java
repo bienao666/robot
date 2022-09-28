@@ -133,6 +133,55 @@ public class CkServiceImpl implements CkService {
     }
 
     /**
+     * 添加ck无需验证
+     *
+     * @param jdCkEntity
+     * @return
+     */
+    @Override
+    public boolean addCkWithOutCheck(JdCkEntity jdCkEntity) {
+        //判断ck是否已经添加
+        JdCkEntity jdCkEntityQuery = new JdCkEntity();
+        jdCkEntityQuery.setCk(jdCkEntity.getCk());
+        JdCkEntity jdck = jdCkMapper.queryCk(jdCkEntityQuery);
+        if (jdck != null) {
+            return true;
+        }
+
+        String ptPin = "";
+        Matcher matcher = jdPinPattern.matcher(jdCkEntity.getCk());
+        if (matcher.find()){
+            ptPin = matcher.group(1);
+        }
+        jdCkEntity.setPtPin(ptPin);
+
+        //判断pt_pin是否存在
+        jdCkEntityQuery = new JdCkEntity();
+        jdCkEntityQuery.setPtPin(ptPin);
+        jdck = jdCkMapper.queryCk(jdCkEntityQuery);
+        if (jdck == null) {
+            //添加
+            int i = jdCkMapper.addCk(jdCkEntity);
+            if (i != 0) {
+                return true;
+            }
+            return false;
+        }else {
+            //更新
+            jdck.setCk(jdCkEntity.getCk());
+            jdck.setUpdatedTime(DateUtil.formatDateTime(new Date()));
+            if (StringUtils.isNotEmpty(jdCkEntity.getRemark())){
+                jdck.setRemark(jdCkEntity.getRemark());
+            }
+            int i = jdCkMapper.updateCk(jdck);
+            if (i != 0) {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    /**
      * 每天凌晨重置ck的助力数据
      */
     @Override
@@ -161,7 +210,6 @@ public class CkServiceImpl implements CkService {
             JSONObject jsonObject = queryDetail(jdCkEntity.getCk());
             if (jsonObject == null) {
                 //清理过期ck
-                log.info("{}已过期，删除！！！",jdCkEntity.getCk());
                 jdCkEntity.setStatus(1);
                 jdCkMapper.updateCk(jdCkEntity);
             } else {

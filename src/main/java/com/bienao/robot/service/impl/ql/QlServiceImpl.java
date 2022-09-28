@@ -234,20 +234,24 @@ public class QlServiceImpl implements QlService {
             boolean isContainBigHead = false;
             List<QlEnv> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
             for (QlEnv env : envs) {
-                String name = env.getName();
-                String value = env.getValue();
-                if ("JD_COOKIE".equals(name) && value.contains(qlBigHead)) {
-                    //该青龙存在大车头
-                    isContainBigHead = true;
-                    qlBigHeadJson = env;
-                    systemParamUtil.updateSystemParam("BIGHEADLOCATION", "", ql.getId().toString());
-                    JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId().toString(), env.getId(), 0);
-                    if (jsonObject == null) {
-                        results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置失败");
-                    } else {
-                        results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置成功");
+                try {
+                    String name = env.getName();
+                    String value = env.getValue();
+                    if ("JD_COOKIE".equals(name) && value.contains(qlBigHead)) {
+                        //该青龙存在大车头
+                        isContainBigHead = true;
+                        qlBigHeadJson = env;
+                        systemParamUtil.updateSystemParam("BIGHEADLOCATION", "", ql.getId().toString());
+                        JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId().toString(), env.getId(), 0);
+                        if (jsonObject == null) {
+                            results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置失败");
+                        } else {
+                            results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置成功");
+                        }
+                        break;
                     }
-                    break;
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             if (isContainBigHead) {
@@ -261,29 +265,33 @@ public class QlServiceImpl implements QlService {
 
         //设置大车头
         for (QlEntity ql : qls) {
-            //大车头是否存在
-            boolean isContainBigHead = false;
-            List<QlEnv> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
-            for (QlEnv env : envs) {
-                String name = env.getName();
-                String value = env.getValue();
-                if ("JD_COOKIE".equals(name) && value.contains(qlBigHead)) {
-                    //该青龙存在大车头
-                    isContainBigHead = true;
+            try {
+                //大车头是否存在
+                boolean isContainBigHead = false;
+                List<QlEnv> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
+                for (QlEnv env : envs) {
+                    String name = env.getName();
+                    String value = env.getValue();
+                    if ("JD_COOKIE".equals(name) && value.contains(qlBigHead)) {
+                        //该青龙存在大车头
+                        isContainBigHead = true;
+                    }
                 }
-            }
-            //该青龙没有大车头
-            if (!isContainBigHead) {
-                //设置大车头
-                JSONObject env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), qlBigHeadJson.getName(),
-                        qlBigHeadJson.getValue(),
-                        qlBigHeadJson.getRemarks());
-                JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getString("id"), env.getInteger("id"), 0);
-                if (jsonObject == null) {
-                    results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置失败");
-                } else {
-                    results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置成功");
+                //该青龙没有大车头
+                if (!isContainBigHead) {
+                    //设置大车头
+                    JSONObject env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), qlBigHeadJson.getName(),
+                            qlBigHeadJson.getValue(),
+                            qlBigHeadJson.getRemarks());
+                    JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getString("id"), env.getInteger("id"), 0);
+                    if (jsonObject == null) {
+                        results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置失败");
+                    } else {
+                        results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置成功");
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return Result.success(results);
@@ -663,15 +671,7 @@ public class QlServiceImpl implements QlService {
      * @return
      */
     @Override
-    public void addJdCk(JSONObject content, String ck, String wxPusherUid) {
-        String ptPin = "";
-        Matcher matcher = ckPattern.matcher(ck);
-        if (matcher.find()) {
-            ptPin = matcher.group(1);
-        }
-        if (StringUtils.isEmpty(ptPin)) {
-
-        }
+    public void addJdCk(JSONObject content, String ck, String ptPin, String wxPusherUid) {
         //青龙ck数
         ArrayList<Integer> qlCkCountList = new ArrayList<>();
         //查询所有青龙

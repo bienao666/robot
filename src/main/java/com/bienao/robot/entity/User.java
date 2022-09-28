@@ -21,6 +21,10 @@ public class User {
     //微信名称
     private String wxName;
 
+    private String jdPtPin;
+
+    private String wxpusheruid;
+
     //所在城市
     private String city;
 

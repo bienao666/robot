@@ -99,5 +99,5 @@ public interface QlService {
      * 添加京东ck
      * @return
      */
-    void addJdCk(JSONObject content,String ck,String wxPusherUid);
+    void addJdCk(JSONObject content,String ck, String ptPin, String wxPusherUid);
 }

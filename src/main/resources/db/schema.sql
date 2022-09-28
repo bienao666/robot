@@ -15,7 +15,7 @@ create table if not exists user (
                                            wxid varchar,
                                            wxName varchar,
                                            jd_pt_pin varchar,
-                                           wxpusherUid varchar,
+                                           wxpusheruid varchar,
                                            city varchar,
                                            ip varchar,
                                            functionType INTEGER,

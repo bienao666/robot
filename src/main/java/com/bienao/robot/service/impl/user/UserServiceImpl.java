@@ -1,10 +1,12 @@
 package com.bienao.robot.service.impl.user;
 
+import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.SystemParam;
 import com.bienao.robot.entity.User;
 import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.mapper.SystemParamMapper;
 import com.bienao.robot.entity.Result;
+import com.bienao.robot.mapper.UserMapper;
 import com.bienao.robot.service.user.UserService;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +21,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private SystemParamMapper systemParamMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
     public User getUser(String username, String password){
@@ -81,6 +86,59 @@ public class UserServiceImpl implements UserService {
             return Result.success();
         }else {
             return Result.error(ErrorCodeConstant.REGISTER_ERROR,"已注册过，注册失败");
+        }
+    }
+
+    /**
+     * 添加用户
+     * @param user
+     * @return
+     */
+    @Override
+    public int addUser(User user){
+        return userMapper.addUser(user);
+    }
+
+    /**
+     * 查询用户
+     * @param user
+     * @return
+     */
+    @Override
+    public User queryUser(User user){
+        return userMapper.queryUser(user);
+    }
+
+    /**
+     * 修改用户
+     * @param user
+     * @return
+     */
+    @Override
+    public int updateUser(User user){
+        return userMapper.updateUser(user);
+    }
+
+    @Override
+    public void saveUser(JSONObject content, String from_wxid, String ptPin, String wxpusherUid){
+        User userQuery = new User();
+        userQuery.setWxid(from_wxid);
+        User user = userMapper.queryUser(userQuery);
+        if (user == null) {
+            user = new User();
+            user.setWxid(from_wxid);
+            user.setWxName(content.getString("from_name"));
+            user.setJdPtPin(ptPin);
+            user.setWxpusheruid(wxpusherUid);
+            userMapper.addUser(user);
+        } else {
+            if (!user.getJdPtPin().contains(ptPin)) {
+                user.setJdPtPin(user.getJdPtPin() + "#" + ptPin);
+            }
+            if (StringUtils.isNotEmpty(wxpusherUid) && wxpusherUid.equals(user.getWxpusheruid())) {
+                user.setWxpusheruid(wxpusherUid);
+            }
+            userMapper.updateUser(user);
         }
     }
 }
