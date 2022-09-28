@@ -23,7 +23,7 @@ INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('USERNAME', '用户
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('PASSWORD', '密码','',0);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('WXPUSHERTOKEN', 'wxpusher token','',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('WXPUSHERUID', 'wxpusher uid','',1);
-INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ZLCWAITTIME', '助力池接口等待时间(秒)(防风控)','10',1);
+INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ZLCWAITTIME', '助力池接口等待时间(秒)(防风控)','20',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('DDNCHELP', '东东农场助力个数(为空不限制，用于号太多的防风控)','',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('DDMCHELP', '东东萌宠助力个数(为空不限制，用于号太多的防风控)','',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ZDDDHELP', '种豆得豆助力个数(为空不限制，用于号太多的防风控)','',1);
