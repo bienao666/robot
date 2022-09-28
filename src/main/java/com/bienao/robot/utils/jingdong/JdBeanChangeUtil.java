@@ -82,7 +82,7 @@ public class JdBeanChangeUtil {
      *
      * @param ptPin
      */
-    public void getJdBeanChange(String ptPin) {
+    public String getJdBeanChange(String ptPin) {
         JdCkEntity jdCkQuery = new JdCkEntity();
         jdCkQuery.setPtPin(ptPin);
         JdCkEntity jdCk = jdCkMapper.queryCk(jdCkQuery);
@@ -110,10 +110,10 @@ public class JdBeanChangeUtil {
 
         redPacket();
 
-        showMsg();
+        return showMsg();
     }
 
-    public void showMsg() {
+    public String showMsg() {
         String ReturnMessage = "【京东账号】" + (StringUtils.isEmpty(nickName) ? userName : nickName) + "\n";
         if (StringUtils.isNotEmpty(levelName) || StringUtils.isNotEmpty(JingXiang)){
             ReturnMessage += "【账号信息】";
@@ -171,32 +171,28 @@ public class JdBeanChangeUtil {
             ReturnMessage += "\n";
         }
 //
-//        if ($.JdFarmProdName != "") {
-//            if ($.JdtreeEnergy != 0) {
-//                if ($.treeState === 2 || $.treeState === 3) {
-//                    ReturnMessage += `【东东农场】${$.JdFarmProdName} 可以兑换了!\n`;
-//                    TempBaipiao += `【东东农场】${$.JdFarmProdName} 可以兑换了!\n`;
-//                    allReceiveMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】${$.JdFarmProdName} (东东农场)\n`;
-//                } else {
-//                    if ($.JdwaterD != 'Infinity' && $.JdwaterD != '-Infinity') {
-//                        ReturnMessage += `【东东农场】${$.JdFarmProdName}(${(($.JdtreeEnergy / $.JdtreeTotalEnergy) * 100).toFixed(0)}%,${$.JdwaterD}天)\n`;
-//                    } else {
-//                        ReturnMessage += `【东东农场】${$.JdFarmProdName}(${(($.JdtreeEnergy / $.JdtreeTotalEnergy) * 100).toFixed(0)}%)\n`;
-//                    }
-//                }
-//            } else {
-//                if ($.treeState === 0) {
-//                    TempBaipiao += `【东东农场】水果领取后未重新种植!\n`;
-//                    allWarnMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】水果领取后未重新种植! (东东农场)\n`;
-//
-//                } else if ($.treeState === 1) {
-//                    ReturnMessage += `【东东农场】${$.JdFarmProdName}种植中...\n`;
-//                } else {
-//                    TempBaipiao += `【东东农场】状态异常!\n`;
-//                    allWarnMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】状态异常! (东东农场)\n`;
-//                }
-//            }
-//        }
+        if (StringUtils.isNotEmpty(JdFarmProdName)) {
+            if (JdtreeEnergy != 0) {
+                if (treeState == 2 || treeState == 3) {
+                    ReturnMessage += "【东东农场】"+JdFarmProdName+" 可以兑换了!\n";
+                    TempBaipiao += "【东东农场】"+JdFarmProdName+" 可以兑换了!\n";
+                } else {
+                    if (JdwaterD!=0) {
+                        ReturnMessage += "【东东农场】"+JdFarmProdName+"("+JdtreeEnergy * 100 / JdtreeTotalEnergy +"%,"+JdwaterD+"天)\n";
+                    } else {
+                        ReturnMessage += "【东东农场】"+JdFarmProdName+"("+JdtreeEnergy * 100/ JdtreeTotalEnergy +"%\n";
+                    }
+                }
+            } else {
+                if (treeState == 0) {
+                    TempBaipiao += "【东东农场】水果领取后未重新种植!\n";
+                } else if (treeState == 1) {
+                    ReturnMessage += "【东东农场】"+JdFarmProdName+"种植中...\n";
+                } else {
+                    TempBaipiao += "【东东农场】状态异常!\n";
+                }
+            }
+        }
 //        if ($.jxFactoryInfo) {
 //            ReturnMessage += `【京喜工厂】${$.jxFactoryInfo}\n`
 //        }
@@ -204,35 +200,46 @@ public class JdBeanChangeUtil {
 //            allReceiveMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】${$.jxFactoryReceive} (京喜工厂)\n`;
 //            TempBaipiao += `【京喜工厂】${$.jxFactoryReceive} 可以兑换了!\n`;
 //        }
-//    const response = await PetRequest('energyCollect');
-//    const initPetTownRes = await PetRequest('initPetTown');
-//        if (initPetTownRes.code === '0' && initPetTownRes.resultCode === '0' && initPetTownRes.message === 'success') {
-//            $.petInfo = initPetTownRes.result;
-//            if ($.petInfo.userStatus === 0) {
-//                ReturnMessage += `【东东萌宠】活动未开启!\n`;
-//            } else if ($.petInfo.petStatus === 5) {
-//                ReturnMessage += `【东东萌宠】${$.petInfo.goodsInfo.goodsName}已可领取!\n`;
-//                TempBaipiao += `【东东萌宠】${$.petInfo.goodsInfo.goodsName}已可领取!\n`;
-//                allReceiveMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】${$.petInfo.goodsInfo.goodsName}可以兑换了! (东东萌宠)\n`;
-//            } else if ($.petInfo.petStatus === 6) {
-//                TempBaipiao += `【东东萌宠】未选择物品! \n`;
-//                allWarnMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】未选择物品! (东东萌宠)\n`;
-//            } else if (response.resultCode === '0') {
-//                ReturnMessage += `【东东萌宠】${$.petInfo.goodsInfo.goodsName}`;
-//                ReturnMessage += `(${(response.result.medalPercent).toFixed(0)}%,${response.result.medalNum}/${response.result.medalNum + response.result.needCollectMedalNum}块)\n`;
-//            } else if (!$.petInfo.goodsInfo) {
-//                ReturnMessage += `【东东萌宠】暂未选购新的商品!\n`;
-//                TempBaipiao += `【东东萌宠】暂未选购新的商品! \n`;
-//                allWarnMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】暂未选购新的商品! (东东萌宠)\n`;
-//            }
-//        }
-//
-//        if ($.overdue) {
-//            ReturnMessage += `${$.overdue}\n`;
-//        }
-//        ReturnMessage += `${$.message}`;
-//        allMessage += ReturnMessage + `\n`;
+        JSONObject response = PetRequest("energyCollect");
+        JSONObject initPetTownRes = PetRequest("initPetTown");
+        if (initPetTownRes.getInteger("code") == 0 && initPetTownRes.getInteger("resultCode") == 0 && "success".equals(initPetTownRes.getString("message"))) {
+            JSONObject petInfo = initPetTownRes.getJSONObject("result");
+            if (petInfo.getInteger("userStatus") == 0) {
+                ReturnMessage += "【东东萌宠】活动未开启!\n";
+            } else if (petInfo.getInteger("petStatus") == 5) {
+                ReturnMessage += "【东东萌宠】"+petInfo.getJSONObject("goodsInfo").getString("goodsName")+"已可领取!\n";
+                TempBaipiao += "【东东萌宠】"+petInfo.getJSONObject("goodsInfo").getString("goodsName")+"已可领取!\n";
+            } else if (petInfo.getInteger("petStatus") == 6) {
+                TempBaipiao += "【东东萌宠】未选择物品! \n";
+            } else if (response.getInteger("resultCode") == 0) {
+                ReturnMessage += "【东东萌宠】"+petInfo.getJSONObject("goodsInfo").getString("goodsName");
+                ReturnMessage += "("+response.getJSONObject("result").getDouble("medalPercent")+"%,"+String.valueOf(response.getJSONObject("result").getDouble("medalNum")/(response.getJSONObject("result").getDouble("medalNum") + response.getJSONObject("result").getDouble("needCollectMedalNum"))+"块)\n");
+            } else if (petInfo.getJSONObject("goodsInfo")==null) {
+                ReturnMessage += "【东东萌宠】暂未选购新的商品!\n";
+                TempBaipiao += "【东东萌宠】暂未选购新的商品!\n";
+            }
+        }
+        ReturnMessage += overdue+"\n";
+        ReturnMessage += message;
+        return ReturnMessage;
+    }
 
+    public JSONObject PetRequest(String function_id){
+        JSONObject body = new JSONObject();
+        body.put("version",2);
+        body.put("channel","app");
+        String resStr = HttpRequest.post(JDAPIHOST + "?functionId=" + function_id)
+                .header("Cookie", cookie)
+                .header("User-Agent", GetUserAgentUtil.getUserAgent())
+                .header("Host", "api.m.jd.com")
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .body("body=" + EscapeUtil.escape(body.toJSONString()) + "&appid=wh5&loginWQBiz=pet-town&clientVersion=9.0.4")
+                .timeout(3000).execute().body();
+        if (StringUtils.isNotEmpty(resStr)){
+            return JSONObject.parseObject(resStr);
+        }else {
+            return null;
+        }
     }
 
     public void redPacket() {
@@ -264,42 +271,42 @@ public class JdBeanChangeUtil {
                     List<JSONObject> redList = JSONArray.parseArray(redListStr, JSONObject.class);
                     for (JSONObject red : redList) {
                         String orgLimitStr = red.getString("orgLimitStr");
-                        if (StringUtils.isNotEmpty(red.getString("orgLimitStr")) && red.getString("orgLimitStr").contains("京喜")) {
+                        if (StringUtils.isNotEmpty(orgLimitStr) && orgLimitStr.contains("京喜")) {
                             jxRed += Float.parseFloat(red.getString("balance"));
-                            if (red.getLong("'endTime'") <= t) {
+                            if (red.getLong("endTime") <= t) {
                                 jxRedExpire += Float.parseFloat(red.getString("balance"));
                             }
                         } else if (red.getString("activityName").contains("极速版")) {
                             jsRed += Float.parseFloat(red.getString("balance"));
-                            if (red.getLong("'endTime'") <= t) {
+                            if (red.getLong("endTime") <= t) {
                                 jsRedExpire += Float.parseFloat(red.getString("balance"));
                             }
                         } else if (StringUtils.isNotEmpty(red.getString("orgLimitStr")) && red.getString("orgLimitStr").contains("京东健康")) {
                             jdhRed += Float.parseFloat(red.getString("balance"));
-                            if (red.getLong("'endTime'") <= t) {
+                            if (red.getLong("endTime") <= t) {
                                 jdhRedExpire += Float.parseFloat(red.getString("balance"));
                             }
                         } else {
                             jdRed += Float.parseFloat(red.getString("balance"));
-                            if (red.getLong("'endTime'") <= t) {
+                            if (red.getLong("endTime") <= t) {
                                 jdRedExpire += Float.parseFloat(red.getString("balance"));
                             }
                         }
                     }
-                    balance = res.getFloat("balance");
+                    balance = res.getJSONObject("data").getFloat("balance");
                     expiredBalance = (jxRedExpire + jsRedExpire + jdRedExpire);
-                    message += "【红包总额】" + balance + "(总过期" + expiredBalance + ")元";
+                    message += "【红包总额】" + balance + "(总过期" + String.format("%.2f", expiredBalance) + ")元";
                     if (jxRed > 0) {
-                        message += "\n【京喜红包】" + jxRed + "(将过期" + jxRedExpire + ")元";
+                        message += "\n【京喜红包】" + String.format("%.2f", jxRed) + "(将过期" + String.format("%.2f", jxRedExpire) + ")元";
                     }
                     if (jsRed > 0) {
-                        message += "\n【极速红包】" + jsRed + "(将过期" + jsRedExpire + ")元";
+                        message += "\n【极速红包】" + String.format("%.2f", jsRed) + "(将过期" + String.format("%.2f", jsRedExpire) + ")元";
                     }
                     if (jdRed > 0) {
-                        message += "\n【京东红包】" + jdRed + "(将过期" + jdRedExpire + ")元";
+                        message += "\n【京东红包】" + String.format("%.2f", jdRed) + "(将过期" + String.format("%.2f", jdRedExpire) + ")元";
                     }
                     if (jdhRed > 0) {
-                        message += "\n【健康红包】" + jdhRed + "(将过期" + jdhRedExpire + ")元";
+                        message += "\n【健康红包】" + String.format("%.2f", jdhRed) + "(将过期" + String.format("%.2f", jdhRedExpire) + ")元";
                     }
                 }
             }
@@ -368,8 +375,7 @@ public class JdBeanChangeUtil {
                 t = 1;
             }
             try {
-                log.info("休息5s防止黑ip...");
-                Thread.sleep(5000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -497,11 +503,12 @@ public class JdBeanChangeUtil {
                 if (res.getInteger("retcode") == 0) {
                     JSONObject data = res.getJSONObject("data");
                     if (data != null) {
-                        if (data.getJSONObject("userInfo") != null) {
-                            JSONObject baseInfo = data.getJSONObject("baseInfo");
+                        JSONObject userInfo = data.getJSONObject("userInfo");
+                        if (userInfo != null) {
+                            JSONObject baseInfo = userInfo.getJSONObject("baseInfo");
                             nickName = baseInfo.getString("nickname");
                             levelName = baseInfo.getString("levelName");
-                            isPlusVip = baseInfo.getInteger("isPlusVip");
+                            isPlusVip = userInfo.getInteger("isPlusVip");
                         }
                         if (data.getJSONObject("assetInfo") != null) {
                             JSONObject assetInfo = data.getJSONObject("assetInfo");
@@ -641,7 +648,11 @@ public class JdBeanChangeUtil {
                     .execute().body();
             if (StringUtils.isNotEmpty(result)) {
                 JSONObject res = JSONObject.parseObject(result);
-                JDwaterEveryDayT = res.getInteger("totalWaterTaskTimes");
+                if (res.getInteger("code") == 400){
+                    //活动火爆中
+                }else {
+                    JDwaterEveryDayT = res.getJSONObject("totalWaterTaskInit").getInteger("totalWaterTaskTimes");
+                }
             }
         } catch (HttpException e) {
             log.error("jdfruitRequest方法异常：" + e.getMessage());

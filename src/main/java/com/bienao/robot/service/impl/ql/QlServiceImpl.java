@@ -733,8 +733,8 @@ public class QlServiceImpl implements QlService {
                         break;
                     }
                 }
-                qlCkCountList.add(ckCount);
             }
+            qlCkCountList.add(ckCount);
         }
         //新增
         Integer min = Collections.min(qlCkCountList);
