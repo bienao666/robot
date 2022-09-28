@@ -502,43 +502,6 @@ public class WxServiceImpl implements WxService {
         weChatUtil.sendImageMsg(url, content);
     }
 
-    public static void main(String[] args) {
-        JSONObject body = new JSONObject();
-        body.put("appToken","AT_upaWvmZ7ScZDe4k1N7fBMAPWC4dEn7n0");
-        body.put("extra","bienao");
-        body.put("validTime",100);
-        String resStr = HttpRequest.post("http://wxpusher.zjiecode.com/api/fun/create/qrcode")
-                .body(body.toJSONString())
-                .execute().body();
-        JSONObject res = JSONObject.parseObject(resStr);
-        if (res.getInteger("code")==1000 && "处理成功".equals(res.getString("msg"))){
-            JSONObject data = res.getJSONObject("data");
-            String code = data.getString("code");
-            String url = data.getString("url");
-            System.out.println(url);
-            try {
-                Thread.sleep(11 * 1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            try {
-                for (int i = 0; i < 2; i++) {
-                    resStr = HttpRequest.get("https://wxpusher.zjiecode.com/api/fun/scan-qrcode-uid?code="+code)
-                            .timeout(3000)
-                            .execute().body();
-                    log.info("获取wxpusheruid接口返回：{}",resStr);
-                    try {
-                        Thread.sleep(11 * 1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     /**
      * 处理当前操作
      *
