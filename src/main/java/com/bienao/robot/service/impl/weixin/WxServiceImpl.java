@@ -383,8 +383,14 @@ public class WxServiceImpl implements WxService {
             weChatUtil.sendTextMsg("京东账号已过期，请重新登陆", content);
             return;
         }
-        String jdBeanChange = jdBeanChangeUtil.getJdBeanChange(user.getJdPtPin());
-        weChatUtil.sendTextMsg(jdBeanChange, content);
+        String jdBeanChange = null;
+        try {
+            jdBeanChange = jdBeanChangeUtil.getJdBeanChange(user.getJdPtPin());
+            weChatUtil.sendTextMsg(jdBeanChange, content);
+        } catch (Exception e) {
+            e.printStackTrace();
+            weChatUtil.sendTextMsg("robot异常，请联系管理员维护", content);
+        }
     }
 
     /**
