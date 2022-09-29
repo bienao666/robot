@@ -80,15 +80,12 @@ public class JdBeanChangeUtil {
     /**
      * 查询京东资产详情
      *
-     * @param ptPin
+     * @param jdCk
      */
-    public String getJdBeanChange(String ptPin) {
-        JdCkEntity jdCkQuery = new JdCkEntity();
-        jdCkQuery.setPtPin(ptPin);
-        JdCkEntity jdCk = jdCkMapper.queryCk(jdCkQuery);
+    public String getJdBeanChange(JdCkEntity jdCk) {
         cookie = jdCk.getCk();
         overdue = "【挂机天数】" + DateUtil.between(DateUtil.parseDate(jdCk.getCreatedTime()), DateUtil.date(), DateUnit.DAY) + "天";
-        userName = URLDecoder.decode(ptPin, CharsetUtil.defaultCharset());
+        userName = URLDecoder.decode(jdCk.getPtPin(), CharsetUtil.defaultCharset());
         try {
             TotalBean();
         } catch (Exception e) {

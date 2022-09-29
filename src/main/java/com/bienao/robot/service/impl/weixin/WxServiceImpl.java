@@ -367,7 +367,8 @@ public class WxServiceImpl implements WxService {
      *
      * @param content
      */
-    private void handleQueryJdAssets(JSONObject content) {
+    @Override
+    public void handleQueryJdAssets(JSONObject content) {
         String from_wxid = content.getString("from_wxid");
         User userQuery = new User();
         userQuery.setWxid(from_wxid);
@@ -388,7 +389,7 @@ public class WxServiceImpl implements WxService {
             }
             String jdBeanChange = null;
             try {
-                jdBeanChange = jdBeanChangeUtil.getJdBeanChange(user.getJdPtPin());
+                jdBeanChange = jdBeanChangeUtil.getJdBeanChange(jdCkEntity);
                 weChatUtil.sendTextMsg(jdBeanChange, content);
             } catch (Exception e) {
                 e.printStackTrace();
