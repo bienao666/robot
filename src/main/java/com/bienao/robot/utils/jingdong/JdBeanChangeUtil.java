@@ -89,26 +89,66 @@ public class JdBeanChangeUtil {
         cookie = jdCk.getCk();
         overdue = "【挂机天数】" + DateUtil.between(DateUtil.parseDate(jdCk.getCreatedTime()), DateUtil.date(), DateUnit.DAY) + "天";
         userName = URLDecoder.decode(ptPin, CharsetUtil.defaultCharset());
-        TotalBean();
-        TotalBean2();
+        try {
+            TotalBean();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            TotalBean2();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //汪汪乐园
-        getJoyBaseInfo("", "", "");
+        try {
+            getJoyBaseInfo("", "", "");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //京东赚赚
-        getJdZZ();
+        try {
+            getJdZZ();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //京东秒杀
-        getMs();
-        jdfruitRequest();
+        try {
+            getMs();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            jdfruitRequest();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //东东农场
-        getjdfruit();
+        try {
+            getjdfruit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //极速金币
 //        cash();
         //
-        requestAlgo();
+        try {
+            requestAlgo();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //
 //        JxmcGetRequest();
-        bean();
+        try {
+            bean();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        redPacket();
+        try {
+            redPacket();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return showMsg();
     }
@@ -221,6 +261,16 @@ public class JdBeanChangeUtil {
         }
         ReturnMessage += overdue+"\n";
         ReturnMessage += message;
+        ReturnMessage += "⭕活动攻略:⭕" + "\n";
+        ReturnMessage += "【京东赚赚】微信->京东赚赚小程序->底部赚好礼->提现无门槛红包(京东使用)\n";
+        ReturnMessage += "【东东农场】京东->我的->东东农场,完成是京东红包,可以用于京东app的任意商品\n";
+        ReturnMessage += "【东东萌宠】京东->我的->东东萌宠,完成是京东红包,可以用于京东app的任意商品\n";
+//        ReturnMessage += "【极速金币】京东极速版->我的->金币(极速版使用)\n";
+//        ReturnMessage += "【京东秒杀】京东->中间频道往右划找到京东秒杀->中间点立即签到->兑换无门槛红包(京东使用)\n";
+//        ReturnMessage += "【领现金】京东->我的->东东萌宠->领现金(微信提现+京东红包)\n";
+//        ReturnMessage += "【京喜工厂】京喜->我的->京喜工厂,完成是商品红包,用于购买指定商品(不兑换会过期)\n";
+//        ReturnMessage += "【京东金融】京东金融app->我的->养猪猪,完成是白条支付券,支付方式选白条支付时立减.\n";
+        ReturnMessage += "【其他】京喜红包只能在京喜使用,其他同理";
         return ReturnMessage;
     }
 
