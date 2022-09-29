@@ -325,11 +325,7 @@ public class WxServiceImpl implements WxService {
             handleGoods(msg, content);
             return;
         }
-        //青龙管理
-        /*if (msg.trim().equals("青龙")) {
-            qingLongGuanLiUtil.handleQingLong(content);
-            return;
-        }*/
+
         //查询我的uid
         if ("我的uid".equals(msg.trim()) || "myuid".equals(msg.trim())) {
             handleMyUid(content);
