@@ -151,7 +151,6 @@ public class WxServiceImpl implements WxService {
                 weChatUtil.sendTextMsg("未监听此群，无法取消", content);
             }
         }
-
         //判断是否在监听范围
         if (StringUtils.isNotEmpty(from_group)) {
             //获取所有监听群号
@@ -166,7 +165,6 @@ public class WxServiceImpl implements WxService {
                 return;
             }
         }
-
         //退出当前操作
         if ("q".equals(msg)) {
             log.info("退出当前操作：{}",msg);
@@ -344,7 +342,7 @@ public class WxServiceImpl implements WxService {
 
         List<CommandEntity> commandEntities = commandMapper.queryCommand("", "");
         for (CommandEntity commandEntity : commandEntities) {
-            if (msg.trim().contains(commandEntity.getCommand())) {
+            if (msg.trim().equals(commandEntity.getCommand())) {
                 weChatUtil.sendTextMsg(commandEntity.getReply(), content);
                 return;
             }

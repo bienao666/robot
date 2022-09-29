@@ -573,6 +573,12 @@ public class WireServiceImpl implements WireService {
 
         keys.add("jd_wxShopGift_activityUrl");
         addWire("店铺礼包特效","jd_wxShopGift.js",keys);
+
+        /*keys.add("M_WX_SHOP_GIFT_URL");
+        addWire("","",keys);
+
+        keys.add("M_WX_FOLLOW_DRAW_URL");
+        addWire("","",keys);*/
     }
 
 
