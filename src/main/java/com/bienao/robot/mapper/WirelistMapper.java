@@ -1,10 +1,8 @@
 package com.bienao.robot.mapper;
 
 import com.bienao.robot.entity.WireActivityEntity;
-import com.bienao.robot.entity.WireEntity;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,5 +17,7 @@ public interface WirelistMapper {
 
     Integer queryMaxId();
 
-    void updateWirelist(Integer id, String result, Date updatedTime);
+    void updateWirelist(Integer id, String result, String updatedTime);
+
+    void clear();
 }

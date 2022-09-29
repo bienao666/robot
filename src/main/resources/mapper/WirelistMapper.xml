@@ -32,4 +32,8 @@
         </set>
         where id=#{id};
     </update>
+
+    <delete id="clear">
+        delete from wirelist where created_time <![CDATA[ <= ]]> datetime('now','-2 days');
+    </delete>
 </mapper>

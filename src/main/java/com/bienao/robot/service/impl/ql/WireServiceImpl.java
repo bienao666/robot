@@ -235,7 +235,7 @@ public class WireServiceImpl implements WireService {
         }
         //更新线报表
         if (result.size()!=0){
-            wirelistMapper.updateWirelist(wireListId,JSONObject.toJSONString(result),new Date());
+            wirelistMapper.updateWirelist(wireListId,JSONObject.toJSONString(result),DateUtil.formatDateTime(new Date()));
             return Result.success();
         }else {
             return Result.error(ErrorCodeConstant.SERVICE_ERROR,"线报执行异常");

@@ -33,4 +33,12 @@ public class QlTask {
             wireService.handleWire(wireActivityEntity.getId(),wireActivityEntity.getScript(),wireActivityEntity.getContent());
         }
     }
+
+    /**
+     * 清理无效数据
+     */
+    @Scheduled(cron = "0 0 4 * * ?")
+    public void clear(){
+        wirelistMapper.clear();
+    }
 }
