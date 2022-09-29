@@ -250,7 +250,7 @@ public class JdBeanChangeUtil {
                 TempBaipiao += "【东东萌宠】未选择物品! \n";
             } else if (response.getInteger("resultCode") == 0) {
                 ReturnMessage += "【东东萌宠】"+petInfo.getJSONObject("goodsInfo").getString("goodsName");
-                ReturnMessage += "("+response.getJSONObject("result").getDouble("medalPercent")+"%,"+response.getJSONObject("result").getDouble("medalNum")+"/"+(response.getJSONObject("result").getDouble("medalNum") + response.getJSONObject("result").getDouble("needCollectMedalNum")+"块)\n");
+                ReturnMessage += "("+response.getJSONObject("result").getDouble("medalPercent")+"%,"+response.getJSONObject("result").getInteger("medalNum")+"/"+(response.getJSONObject("result").getInteger("medalNum") + response.getJSONObject("result").getInteger("needCollectMedalNum")+"块)\n");
             } else if (petInfo.getJSONObject("goodsInfo")==null) {
                 ReturnMessage += "【东东萌宠】暂未选购新的商品!\n";
                 TempBaipiao += "【东东萌宠】暂未选购新的商品!\n";
