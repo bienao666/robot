@@ -258,7 +258,7 @@ public class JdBeanChangeUtil {
         }
         ReturnMessage += overdue+"\n";
         ReturnMessage += message;
-        ReturnMessage += "⭕活动攻略:⭕" + "\n";
+        ReturnMessage += "\n活动攻略:" + "\n";
         ReturnMessage += "【京东赚赚】微信->京东赚赚小程序->底部赚好礼->提现无门槛红包(京东使用)\n";
         ReturnMessage += "【东东农场】京东->我的->东东农场,完成是京东红包,可以用于京东app的任意商品\n";
         ReturnMessage += "【东东萌宠】京东->我的->东东萌宠,完成是京东红包,可以用于京东app的任意商品\n";
@@ -391,7 +391,7 @@ public class JdBeanChangeUtil {
                                 }
                             }
                         }
-                        if (time <= end && time >= begin) {
+                        if (time >= begin && time <= end) {
                             //昨天
                             String eventMassage = detail.getString("eventMassage");
                             if (!eventMassage.contains("退还") && !eventMassage.contains("物流") && !eventMassage.contains("扣赠")) {
