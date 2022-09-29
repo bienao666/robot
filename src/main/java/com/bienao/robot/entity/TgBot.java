@@ -64,7 +64,7 @@ public class TgBot extends TelegramLongPollingBot {
                     WireService wireService = applicationContext.getBean(WireService.class);
                     Result result = wireService.addActivity(text);
                     if ("200".equals(result.getCode())){
-                        sendMsg("线报添加成功",chatId);
+                        sendMsg("线报添加成功，可去后台线报清单查看详情",chatId);
                     }else {
                         sendMsg(result.getMessage(),chatId);
                     }
