@@ -1,9 +1,12 @@
 package com.bienao.robot.service.impl.jingdong;
 
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.net.URLDecoder;
 import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.core.net.URLEncoder;
+import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.EscapeUtil;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONObject;
@@ -671,7 +674,7 @@ public class JdServiceImpl implements JdService {
                             JSONObject farmUserPro = farmInfo.getJSONObject("farmUserPro");
                             if (farmUserPro == null) {
                                 log.info("{}ck的东东农场互助码更新失败，活动没开或者活动已黑", ck.getCk());
-                                jdFruitEntity.setIsFruitHei(1);
+//                                jdFruitEntity.setIsFruitHei(1);
                             } else {
                                 //互助码
                                 String fruitShareCode = farmUserPro.getString("shareCode");
@@ -731,7 +734,7 @@ public class JdServiceImpl implements JdService {
                                         || "0".equals(petUserPro.getString("petStatus"))
                                         || StringUtils.isEmpty(petUserPro.getString("goodsInfo"))){
                                     log.info("{}ck的东东萌宠互助码更新失败，活动没开或者活动已黑", ck.getCk());
-                                    jdPetEntity.setIsPetHei(1);
+//                                    jdPetEntity.setIsPetHei(1);
                                 }else {
                                     //互助码
                                     String petShareCode = petUserPro.getString("shareCode");
@@ -786,7 +789,7 @@ public class JdServiceImpl implements JdService {
                         }else {
                             if ("PB101".equals(plantInfo.getString("errorCode")) || "3".equals(plantInfo.getString("code"))){
                                 log.info("{}ck的种豆得豆互助码更新失败，活动没开或者活动已黑", ck.getCk());
-                                jdPlantEntity.setIsPlantHei(1);
+//                                jdPlantEntity.setIsPlantHei(1);
                             }else {
                                 if ("0".equals(plantInfo.getString("code")) && StringUtils.isNotEmpty(plantInfo.getString("data"))){
                                     String shareUrl = plantInfo.getJSONObject("data").getJSONObject("jwordShareInfo").getString("shareUrl");
@@ -875,7 +878,7 @@ public class JdServiceImpl implements JdService {
             } else if ("400".equals(resultObject.getString("code"))) {
                 log.info("东东农场火爆 ‼️‼️");
                 toHelpJdFruitEntity.setIsFruitHei(1);
-                jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
+//                jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
             } else if ("3".equals(resultObject.getString("code"))) {
                 log.info("ck已过期 ‼️‼️");
                 toHelpJdCk.setStatus(1);
@@ -938,7 +941,7 @@ public class JdServiceImpl implements JdService {
                 log.info("东东农场天天抽奖火爆 ‼️‼️");
                 JdFruitEntity update = new JdFruitEntity();
                 update.setIsFruitHei(1);
-                jdFruitMapper.updateJdFruit(update);
+//                jdFruitMapper.updateJdFruit(update);
             } else if ("3".equals(resultObject.getString("code"))) {
                 log.info("ck已过期 ‼️‼️");
                 toHelpJdCk.setStatus(1);
@@ -998,7 +1001,7 @@ public class JdServiceImpl implements JdService {
                 log.info("此账号今天已经跑过助力了，跳出....");
             } else if ("1002".equals(resultObject.getString("resultCode"))) {
                 toHelpJdPetEntity.setIsPetHei(1);
-                jdPetMapper.updateJdPet(toHelpJdPetEntity);
+//                jdPetMapper.updateJdPet(toHelpJdPetEntity);
                 log.info("此账号风控，跳出....");
             } else {
                 log.info("东东萌宠助力失败:{}",resultObject.toJSONString());

@@ -14,6 +14,8 @@ create table if not exists user (
                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
                                            wxid varchar,
                                            wxName varchar,
+                                           jd_pt_pin varchar,
+                                           wxpusheruid varchar,
                                            city varchar,
                                            ip varchar,
                                            functionType INTEGER,
@@ -129,5 +131,14 @@ create table if not exists `wxbs` (
                                       `maxstep` INTEGER DEFAULT 60000,
                                       `created_time` varchar DEFAULT (datetime('now', 'localtime')),
                                       `expiry_time` varchar,
+                                      `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
+);
+create table if not exists `command` (
+                                      `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+                                      `command` varchar UNIQUE,
+                                      `function` varchar,
+                                      `reply` varchar,
+                                      `is_built_in` INTEGER DEFAULT 0,
+                                      `created_time` varchar DEFAULT (datetime('now', 'localtime')),
                                       `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );

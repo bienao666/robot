@@ -16,6 +16,20 @@ public interface UserMapper {
     int addUser(User user);
 
     /**
+     * 查询用户
+     * @param user
+     * @return
+     */
+    User queryUser(User user);
+
+    /**
+     * 修改用户
+     * @param user
+     * @return
+     */
+    int updateUser(User user);
+
+    /**
      * 根据功能类型查询
      * @param functionType
      * @return

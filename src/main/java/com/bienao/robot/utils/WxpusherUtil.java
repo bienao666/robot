@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.weixin.WXConstant;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import com.bienao.robot.utils.weixin.WeChatUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Slf4j
 public class WxpusherUtil {
 
     private Cache<String, String> redis = WXConstant.redis;
@@ -24,14 +26,13 @@ public class WxpusherUtil {
     @Autowired
     private WeChatUtil weChatUtil;
 
-    private String wxpusherToken = systemParamUtil.querySystemParam("WXPUSHERTOKEN");
-
     /**
      * 获取wxpusher关注二维码
      * @param content
      * @return
      */
     public boolean getWxpusherCode(JSONObject content){
+        String wxpusherToken = systemParamUtil.querySystemParam("WXPUSHERTOKEN");
         if (StringUtils.isEmpty(wxpusherToken)){
             return false;
         }
@@ -71,7 +72,9 @@ public class WxpusherUtil {
         String from_wxid = content.getString("from_wxid");
         String code = redis.get(from_wxid + "code");
         String resStr = HttpRequest.get("https://wxpusher.zjiecode.com/api/fun/scan-qrcode-uid?code="+code)
+                .timeout(3000)
                 .execute().body();
+        log.info("获取wxpusheruid接口返回：{}",resStr);
         if (StringUtils.isEmpty(resStr)){
             return null;
         }
@@ -93,6 +96,7 @@ public class WxpusherUtil {
      * @param url 原文链接，可选参数
      */
     public boolean sendMessage(String content, String summary, Integer contentType, List topicIds,List uids,String url){
+        String wxpusherToken = systemParamUtil.querySystemParam("WXPUSHERTOKEN");
         if (StringUtils.isEmpty(wxpusherToken)){
             return false;
         }

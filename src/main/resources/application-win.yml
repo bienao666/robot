@@ -14,9 +14,9 @@ spring:
 
 vlw:
   #vlm token
-  token: bienaoccc
+  token:
   #vlm 地址
-  url: http://101.34.47.200:10006/
+  url:
 
 logging:
   config: classpath:logback-win.xml

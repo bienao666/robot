@@ -3,8 +3,63 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bienao.robot.mapper.UserMapper">
-
     <insert id="addUser" parameterType="systemParam">
-        insert into user(wxid,wxName,city,ip,functionType) values (#{wxid},#{wxName},#{city},#{ip},#{functionType})
+        insert into user(wxid,wxName,jd_pt_pin,wxpusheruid,city,ip,functionType) values (#{wxid},#{wxName},#{jdPtPin},#{wxpusheruid},#{city},#{ip},#{functionType})
     </insert>
+
+    <select id="queryUser" parameterType="user" resultType="user">
+        select * from user where 1=1
+        <if test="id != null">
+            AND id = #{id}
+        </if>
+        <if test="wxid != null and wxid != ''">
+            AND wxid = #{wxid}
+        </if>
+        <if test="wxName != null and wxName != ''">
+            AND wxName = #{wxName}
+        </if>
+        <if test="jdPtPin != null and jdPtPin != ''">
+            AND jd_pt_pin = #{jdPtPin}
+        </if>
+        <if test="wxpusheruid != null and wxpusheruid != ''">
+            AND wxpusheruid = #{wxpusheruid}
+        </if>
+        <if test="city != null and city != ''">
+            AND city = #{city}
+        </if>
+        <if test="ip != null and ip != ''">
+            AND ip = #{ip}
+        </if>
+        <if test="functionType != null and functionType != ''">
+            AND functionType = #{functionType}
+        </if>
+    </select>
+
+    <update id="updateUser" parameterType="user">
+        update user
+        <set>
+            <if test="wxid != null and wxid != ''">
+                wxid = #{wxid},
+            </if>
+            <if test="wxName != null and wxName != ''">
+                wxName = #{wxName},
+            </if>
+            <if test="jdPtPin != null and jdPtPin != ''">
+                jd_pt_pin = #{jdPtPin},
+            </if>
+            <if test="wxpusheruid != null and wxpusheruid != ''">
+                wxpusheruid = #{wxpusheruid},
+            </if>
+            <if test="city != null and city != ''">
+                city = #{city},
+            </if>
+            <if test="ip != null and ip != ''">
+                ip = #{ip},
+            </if>
+            <if test="functionType != null and functionType != ''">
+                functionType = #{functionType},
+            </if>
+        </set>
+        where id=#{id};
+    </update>
 </mapper>

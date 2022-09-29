@@ -22,6 +22,8 @@ public interface CkService {
      */
     boolean addCk(JdCkEntity jdCkEntity);
 
+    boolean addCkWithOutCheck(JdCkEntity jdCkEntity);
+
     /**
      * 每天凌晨重置ck的助力数据
      */

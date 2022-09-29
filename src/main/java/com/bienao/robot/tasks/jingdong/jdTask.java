@@ -80,7 +80,7 @@ public class jdTask {
     /**
      * 助力池互助
      */
-    @Scheduled(cron = "20 0 2,6,12,18 * * ?")
+    @Scheduled(cron = "20 0 3 * * ?")
     public void shareHelpNoReset(){
         if (shareHelp){
             //接口调用等待时间
@@ -122,7 +122,7 @@ public class jdTask {
     /**
      * 维护助力码
      */
-    @Scheduled(cron = "0 0 12,18,23 * * ?")
+    @Scheduled(cron = "0 0 12,22 * * ?")
     public void updateShareCode(){
         if (updateShareCode){
             List<JdCkEntity> cks = jdService.queryCksAndActivity();
