@@ -25,5 +25,8 @@ class RobotApplicationTests {
 
     @Test
     public void test1() {
+        JSONObject content = new JSONObject();
+        content.put("from_wxid","wxid_hwzi277usnv522");
+        wxService.handleQueryJdAssets(content);
     }
 }

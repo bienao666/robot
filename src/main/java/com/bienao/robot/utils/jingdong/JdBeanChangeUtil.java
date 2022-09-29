@@ -250,7 +250,7 @@ public class JdBeanChangeUtil {
                 TempBaipiao += "【东东萌宠】未选择物品! \n";
             } else if (response.getInteger("resultCode") == 0) {
                 ReturnMessage += "【东东萌宠】"+petInfo.getJSONObject("goodsInfo").getString("goodsName");
-                ReturnMessage += "("+response.getJSONObject("result").getDouble("medalPercent")+"%,"+String.valueOf(response.getJSONObject("result").getDouble("medalNum")/(response.getJSONObject("result").getDouble("medalNum") + response.getJSONObject("result").getDouble("needCollectMedalNum"))+"块)\n");
+                ReturnMessage += "("+response.getJSONObject("result").getDouble("medalPercent")+"%,"+response.getJSONObject("result").getDouble("medalNum")+"/"+(response.getJSONObject("result").getDouble("medalNum") + response.getJSONObject("result").getDouble("needCollectMedalNum")+"块)\n");
             } else if (petInfo.getJSONObject("goodsInfo")==null) {
                 ReturnMessage += "【东东萌宠】暂未选购新的商品!\n";
                 TempBaipiao += "【东东萌宠】暂未选购新的商品!\n";
@@ -263,7 +263,7 @@ public class JdBeanChangeUtil {
         ReturnMessage += "【东东农场】京东->我的->东东农场,完成是京东红包,可以用于京东app的任意商品\n";
         ReturnMessage += "【东东萌宠】京东->我的->东东萌宠,完成是京东红包,可以用于京东app的任意商品\n";
 //        ReturnMessage += "【极速金币】京东极速版->我的->金币(极速版使用)\n";
-//        ReturnMessage += "【京东秒杀】京东->中间频道往右划找到京东秒杀->中间点立即签到->兑换无门槛红包(京东使用)\n";
+        ReturnMessage += "【京东秒杀】京东->中间频道往右划找到京东秒杀->中间点立即签到->兑换无门槛红包(京东使用)\n";
 //        ReturnMessage += "【领现金】京东->我的->东东萌宠->领现金(微信提现+京东红包)\n";
 //        ReturnMessage += "【京喜工厂】京喜->我的->京喜工厂,完成是商品红包,用于购买指定商品(不兑换会过期)\n";
 //        ReturnMessage += "【京东金融】京东金融app->我的->养猪猪,完成是白条支付券,支付方式选白条支付时立减.\n";
@@ -672,9 +672,7 @@ public class JdBeanChangeUtil {
                     .execute().body();
             if (StringUtils.isNotEmpty(result)) {
                 JSONObject res = JSONObject.parseObject(result);
-                if (res.getInteger("code") == 2041 || res.getInteger("code") == 2042) {
-                    JdMsScore = res.getJSONObject("data").getJSONObject("result").getJSONObject("assignment").getInteger("assignmentPoints");
-                }
+                JdMsScore = res.getJSONObject("result").getJSONObject("assignment").getInteger("assignmentPoints");
             }
         } catch (HttpException e) {
             log.error("getMs方法异常：" + e.getMessage());
