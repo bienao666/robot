@@ -168,7 +168,8 @@ public class WxServiceImpl implements WxService {
         }
 
         //退出当前操作
-        if ("q".equals(msg.trim())) {
+        if ("q".equals(msg)) {
+            log.info("退出当前操作：{}",msg);
             redis.remove(from_wxid + "operate");
             weChatUtil.sendTextMsg("已退出", content);
             return;
