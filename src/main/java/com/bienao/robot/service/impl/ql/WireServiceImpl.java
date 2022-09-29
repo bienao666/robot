@@ -258,6 +258,10 @@ public class WireServiceImpl implements WireService {
             if (config.contains("=")){
                 //export 参数名
                 String s1 = config.split("=")[0];
+                int index = s1.indexOf("export");
+                if (index!=0){
+                    s1 = s1.substring(index);
+                }
                 String key = s1.replace("export", "").replace(" ", "");
                 String value = config.split("=")[1];
                 String redis = Redis.wireRedis.get(key + value);
