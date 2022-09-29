@@ -35,6 +35,9 @@ public class WireEntity {
     //洞察变量
     private List<WireKeyEntity> keys;
 
+    //0 禁用 | 1 启用
+    private String status;
+
     //新增时间
     private String createdTime;
 

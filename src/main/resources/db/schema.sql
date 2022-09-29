@@ -46,7 +46,7 @@ create table if not exists `wire` (
                                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                                     activity_name varchar,
                                     script varchar UNIQUE,
-                                    status varchar DEFAULT '未执行',
+                                    status varchar DEFAULT '0',
                                     created_time varchar DEFAULT (datetime('now', 'localtime')),
                                     updated_time varchar DEFAULT (datetime('now', 'localtime'))
 );
