@@ -1,6 +1,7 @@
 package com.bienao.robot.controller.jingdong;
 
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.annotation.LoginToken;
 import com.bienao.robot.annotation.PassToken;
 import com.bienao.robot.entity.Result;
 import com.bienao.robot.entity.jingdong.JdCkEntity;
@@ -74,6 +75,7 @@ public class CkController {
     /**
      * 获取京东账号列表
      */
+    @LoginToken
     @GetMapping("/getJdCks")
     public Result getJdCks(@RequestParam(value = "ck",required = false) String ck,
                            @RequestParam(value = "ptPin",required = false) String ptPin,
@@ -81,6 +83,20 @@ public class CkController {
                            @RequestParam(value = "status",required = false) Integer status){
         List<JdCkEntity> jdcks = ckService.getJdCks(ck,ptPin,level,status);
         return Result.success(jdcks);
+    }
+
+    /**
+     * 获取京东账号列表
+     */
+    @LoginToken
+    @GetMapping("/getJdCkList")
+    public Result getJdCkList(@RequestParam(value = "ck",required = false) String ck,
+                           @RequestParam(value = "ptPin",required = false) String ptPin,
+                           @RequestParam(value = "status",required = false) Integer status,
+                           @RequestParam(value = "qlName",required = false) String qlName,
+                           @RequestParam(value = "pageNo") Integer pageNo,
+                           @RequestParam(value = "pageSize") Integer pageSize){
+        return ckService.getJdCkList(ck,ptPin,status,qlName,pageNo,pageSize);
     }
 
     /**

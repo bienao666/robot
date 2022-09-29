@@ -50,4 +50,10 @@ public class JdCkEntity {
 
     //种豆得豆
     private JdPlantEntity jdPlantEntity;
+
+    //所属青龙id
+    private Integer qlId;
+
+    //所属青龙备注
+    private String qlRemark;
 }

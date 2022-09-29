@@ -2,23 +2,28 @@ package com.bienao.robot.service.impl.jingdong;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.PageUtil;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.entity.QlEntity;
+import com.bienao.robot.entity.QlEnv;
 import com.bienao.robot.entity.Result;
 import com.bienao.robot.entity.jingdong.JdCkEntity;
 import com.bienao.robot.enums.ErrorCodeConstant;
+import com.bienao.robot.mapper.QlMapper;
 import com.bienao.robot.mapper.jingdong.JdCkMapper;
 import com.bienao.robot.mapper.jingdong.JdFruitMapper;
 import com.bienao.robot.mapper.jingdong.JdPetMapper;
 import com.bienao.robot.mapper.jingdong.JdPlantMapper;
 import com.bienao.robot.service.jingdong.CkService;
 import com.bienao.robot.utils.jingdong.GetUserAgentUtil;
+import com.bienao.robot.utils.ql.QlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.jdbc.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -39,6 +44,12 @@ public class CkServiceImpl implements CkService {
 
     @Autowired
     private JdPlantMapper jdPlantMapper;
+
+    @Autowired
+    private QlUtil qlUtil;
+
+    @Autowired
+    private QlMapper qlMapper;
 
     private Pattern jdPinPattern = Pattern.compile("pt_pin=(.+?);");
 
@@ -270,5 +281,49 @@ public class CkServiceImpl implements CkService {
         }else {
             return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"数据库操作异常");
         }
+    }
+
+    @Override
+    public Result getJdCkList(String ck, String ptPin, Integer status,String qlName,Integer pageNo,Integer pageSize) {
+        List<JdCkEntity> jdCkEntities = new ArrayList<>();
+        //查询所有青龙
+        List<QlEntity> qlEntities = qlMapper.queryQls(null);
+        for (int i = 0; i < qlEntities.size(); i++) {
+            QlEntity qlEntity = qlEntities.get(i);
+            if (StringUtils.isNotEmpty(qlName) && !qlEntity.getRemark().contains(qlName)){
+                continue;
+            }
+            List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
+            for (QlEnv env : envs) {
+                if ("JD_COOKIE".equals(env.getName())) {
+                    if (StringUtils.isNotEmpty(ck) && !env.getValue().contains(ck)){
+                        continue;
+                    }
+                    if (StringUtils.isNotEmpty(ptPin) && !env.getValue().contains(ptPin)){
+                        continue;
+                    }
+                    if (status!=null && !status.equals(env.getStatus())){
+                        continue;
+                    }
+                    JdCkEntity jdCkEntity = new JdCkEntity();
+                    jdCkEntity.setQlId(qlEntity.getId());
+                    jdCkEntity.setQlRemark(qlEntity.getRemark());
+                    jdCkEntity.setId(env.getId());
+                    jdCkEntity.setCk(env.getValue());
+                    jdCkEntity.setRemark(env.getRemarks());
+                    jdCkEntity.setStatus(env.getStatus());
+                    jdCkEntities.add(jdCkEntity);
+                }
+            }
+        }
+        int start = PageUtil.getStart(pageNo, pageSize) - pageSize;
+        int end = PageUtil.getEnd(pageNo, pageSize) - pageSize;
+        JSONObject result = new JSONObject();
+        result.put("total", jdCkEntities.size());
+        result.put("pageNo", pageNo);
+        result.put("pageSize", pageSize);
+        jdCkEntities = jdCkEntities.subList(start, Math.min(end, jdCkEntities.size()));
+        result.put("jdCkList", jdCkEntities);
+        return Result.success(result);
     }
 }

@@ -39,4 +39,6 @@ public interface CkService {
     Result updateJdCk(JdCkEntity jdCkEntity);
 
     Result deleteJdCks(List<Integer> ids);
+
+    Result getJdCkList(String ck, String ptPin, Integer status,String qlName,Integer pageNo,Integer pageSize);
 }
