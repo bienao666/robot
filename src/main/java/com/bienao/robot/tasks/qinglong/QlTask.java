@@ -54,4 +54,12 @@ public class QlTask {
     public void setSmallHead(){
         qlService.setSmallHead();
     }
+
+    /**
+     * 韭菜友好设置
+     */
+    @Scheduled(cron = "0 0 4 * * ?")
+    public void leekFriendly(){
+//        qlService.leekFriendly();
+    }
 }
