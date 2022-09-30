@@ -23,9 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -106,13 +104,13 @@ public class CkServiceImpl implements CkService {
 
         //校验ck是否有效
         JSONObject jsonObject = queryDetail(jdCkEntity.getCk());
-        if (jsonObject==null){
+        if (jsonObject == null) {
             throw new RuntimeException("ck不存在或者ck已失效");
         }
 
         String ptPin = "";
         Matcher matcher = jdPinPattern.matcher(jdCkEntity.getCk());
-        if (matcher.find()){
+        if (matcher.find()) {
             ptPin = matcher.group(1);
         }
         jdCkEntity.setPtPin(ptPin);
@@ -128,11 +126,11 @@ public class CkServiceImpl implements CkService {
                 return true;
             }
             return false;
-        }else {
+        } else {
             //更新
             jdck.setCk(jdCkEntity.getCk());
             jdck.setUpdatedTime(DateUtil.formatDateTime(new Date()));
-            if (StringUtils.isNotEmpty(jdCkEntity.getRemark())){
+            if (StringUtils.isNotEmpty(jdCkEntity.getRemark())) {
                 jdck.setRemark(jdCkEntity.getRemark());
             }
             int i = jdCkMapper.updateCk(jdck);
@@ -161,7 +159,7 @@ public class CkServiceImpl implements CkService {
 
         String ptPin = "";
         Matcher matcher = jdPinPattern.matcher(jdCkEntity.getCk());
-        if (matcher.find()){
+        if (matcher.find()) {
             ptPin = matcher.group(1);
         }
         jdCkEntity.setPtPin(ptPin);
@@ -177,11 +175,11 @@ public class CkServiceImpl implements CkService {
                 return true;
             }
             return false;
-        }else {
+        } else {
             //更新
             jdck.setCk(jdCkEntity.getCk());
             jdck.setUpdatedTime(DateUtil.formatDateTime(new Date()));
-            if (StringUtils.isNotEmpty(jdCkEntity.getRemark())){
+            if (StringUtils.isNotEmpty(jdCkEntity.getRemark())) {
                 jdck.setRemark(jdCkEntity.getRemark());
             }
             int i = jdCkMapper.updateCk(jdck);
@@ -224,7 +222,7 @@ public class CkServiceImpl implements CkService {
                 jdCkEntity.setStatus(1);
                 jdCkMapper.updateCk(jdCkEntity);
             } else {
-                if (StringUtils.isEmpty(jdCkEntity.getRemark())){
+                if (StringUtils.isEmpty(jdCkEntity.getRemark())) {
                     JSONObject baseInfo = jsonObject.getJSONObject("baseInfo");
                     if (baseInfo != null) {
                         jdCkEntity.setRemark(baseInfo.getString("nickname"));
@@ -233,9 +231,9 @@ public class CkServiceImpl implements CkService {
                     }
                 }
                 //查看助力超级vip是否过期
-                if (jdCkEntity.getLevel()==1 && StringUtils.isNotEmpty(jdCkEntity.getExpiryTime())){
+                if (jdCkEntity.getLevel() == 1 && StringUtils.isNotEmpty(jdCkEntity.getExpiryTime())) {
                     DateTime expiryTime = DateUtil.parse(jdCkEntity.getExpiryTime());
-                    if (expiryTime.getTime() < DateUtil.date().getTime()){
+                    if (expiryTime.getTime() < DateUtil.date().getTime()) {
                         jdCkEntity.setLevel(2);
                         jdCkEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
                         jdCkEntity.setExpiryTime(null);
@@ -254,7 +252,7 @@ public class CkServiceImpl implements CkService {
     }
 
     @Override
-    public List<JdCkEntity> getJdCks(String ck,String ptPin,Integer level,Integer status) {
+    public List<JdCkEntity> getJdCks(String ck, String ptPin, Integer level, Integer status) {
         JdCkEntity jdCkEntity = new JdCkEntity();
         jdCkEntity.setCk(ck);
         jdCkEntity.setPtPin(ptPin);
@@ -266,43 +264,43 @@ public class CkServiceImpl implements CkService {
     @Override
     public Result updateJdCk(JdCkEntity jdCkEntity) {
         int i = jdCkMapper.updateCk(jdCkEntity);
-        if (i==1){
+        if (i == 1) {
             return Result.success();
-        }else {
-            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"数据库操作异常");
+        } else {
+            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR, "数据库操作异常");
         }
     }
 
     @Override
     public Result deleteJdCks(List<Integer> ids) {
         int i = jdCkMapper.deleteCks(ids);
-        if (i>0){
+        if (i > 0) {
             return Result.success();
-        }else {
-            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"数据库操作异常");
+        } else {
+            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR, "数据库操作异常");
         }
     }
 
     @Override
-    public Result getJdCkList(String ck, String ptPin, Integer status,String qlName,Integer pageNo,Integer pageSize) {
+    public Result getJdCkList(String ck, String ptPin, Integer status, String qlName, Integer pageNo, Integer pageSize) {
         List<JdCkEntity> jdCkEntities = new ArrayList<>();
         //查询所有青龙
         List<QlEntity> qlEntities = qlMapper.queryQls(null);
         for (int i = 0; i < qlEntities.size(); i++) {
             QlEntity qlEntity = qlEntities.get(i);
-            if (StringUtils.isNotEmpty(qlName) && !qlEntity.getRemark().contains(qlName)){
+            if (StringUtils.isNotEmpty(qlName) && !qlEntity.getRemark().contains(qlName)) {
                 continue;
             }
             List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
             for (QlEnv env : envs) {
                 if ("JD_COOKIE".equals(env.getName())) {
-                    if (StringUtils.isNotEmpty(ck) && !env.getValue().contains(ck)){
+                    if (StringUtils.isNotEmpty(ck) && !env.getValue().contains(ck)) {
                         continue;
                     }
-                    if (StringUtils.isNotEmpty(ptPin) && !env.getValue().contains(ptPin)){
+                    if (StringUtils.isNotEmpty(ptPin) && !env.getValue().contains(ptPin)) {
                         continue;
                     }
-                    if (status!=null && !status.equals(env.getStatus())){
+                    if (status != null && !status.equals(env.getStatus())) {
                         continue;
                     }
                     JdCkEntity jdCkEntity = new JdCkEntity();
@@ -325,5 +323,57 @@ public class CkServiceImpl implements CkService {
         jdCkEntities = jdCkEntities.subList(start, Math.min(end, jdCkEntities.size()));
         result.put("jdCkList", jdCkEntities);
         return Result.success(result);
+    }
+
+    @Override
+    public Result enableJdCk(List<JSONObject> cks) {
+        HashMap<Integer, List<Integer>> map = new HashMap<>();
+        for (JSONObject ck : cks) {
+            Integer qlId = ck.getInteger("qlId");
+            Integer id = ck.getInteger("id");
+            List<Integer> list = map.get(qlId);
+            if (list == null) {
+                list = new ArrayList<>();
+                list.add(id);
+            } else {
+                list.add(id);
+            }
+            map.put(qlId,list);
+        }
+        for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {
+            Integer qlId = entry.getKey();
+            QlEntity qlEntity = qlMapper.queryQl(qlId);
+            if (qlEntity != null) {
+                List<Integer> list = entry.getValue();
+                qlUtil.enableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), list);
+            }
+        }
+        return Result.success();
+    }
+
+    @Override
+    public Result disableJdCk(List<JSONObject> cks) {
+        HashMap<Integer, List<Integer>> map = new HashMap<>();
+        for (JSONObject ck : cks) {
+            Integer qlId = ck.getInteger("qlId");
+            Integer id = ck.getInteger("id");
+            List<Integer> list = map.get(qlId);
+            if (list == null) {
+                list = new ArrayList<>();
+                list.add(id);
+            } else {
+                list.add(id);
+            }
+            map.put(qlId,list);
+        }
+        for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {
+            Integer qlId = entry.getKey();
+            QlEntity qlEntity = qlMapper.queryQl(qlId);
+            if (qlEntity != null) {
+                List<Integer> list = entry.getValue();
+                qlUtil.disableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), list);
+            }
+        }
+        return Result.success();
     }
 }

@@ -8,7 +8,7 @@
         insert into ql(url,clientID,clientSecret,head,remark) values (#{url},#{clientID},#{clientSecret},#{head},#{remark})
     </insert>
 
-    <select id="queryQl" parameterType="string" resultType="qlEntity">
+    <select id="queryQl" resultType="qlEntity">
         select * from ql where id=#{id}
     </select>
 

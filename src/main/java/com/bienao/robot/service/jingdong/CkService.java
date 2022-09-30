@@ -41,4 +41,8 @@ public interface CkService {
     Result deleteJdCks(List<Integer> ids);
 
     Result getJdCkList(String ck, String ptPin, Integer status,String qlName,Integer pageNo,Integer pageSize);
+
+    Result enableJdCk(List<JSONObject> cks);
+
+    Result disableJdCk(List<JSONObject> cks);
 }

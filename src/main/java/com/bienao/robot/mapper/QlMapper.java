@@ -24,6 +24,8 @@ public interface QlMapper {
      */
     QlEntity queryQlByUrl(String url);
 
+    QlEntity queryQl(Integer id);
+
     /**
      * 查询青龙
      * @return
