@@ -852,7 +852,7 @@ public class JdServiceImpl implements JdService {
                     if (jdck == null) {
                         //添加
                         jdck = new JdCkEntity();
-                        jdck.setStatus(1);
+                        jdck.setStatus(0);
                         jdck.setCk(ck);
                         jdck.setLevel(2);
                         if (StringUtils.isNotEmpty(remarks)) {
@@ -863,14 +863,16 @@ public class JdServiceImpl implements JdService {
                         count++;
                     } else {
                         //更新
-                        jdck.setStatus(1);
-                        jdck.setCk(ck);
-                        if (StringUtils.isNotEmpty(remarks)) {
-                            jdck.setRemark(remarks);
+                        if (!ck.equals(jdck.getCk())){
+                            jdck.setStatus(0);
+                            jdck.setCk(ck);
+                            if (StringUtils.isNotEmpty(remarks)) {
+                                jdck.setRemark(remarks);
+                            }
+                            jdck.setUpdatedTime(DateUtil.formatDateTime(new Date()));
+                            jdCkMapper.updateCk(jdck);
+                            count++;
                         }
-                        jdck.setUpdatedTime(DateUtil.formatDateTime(new Date()));
-                        jdCkMapper.updateCk(jdck);
-                        count++;
                     }
                 }
             }

@@ -27,7 +27,7 @@ public class JdCkEntity {
     @NotNull(message = "等级不能为空")
     private Integer level;
 
-    //是否有效 0否1是
+    //是否有效 0有效1无效
     private Integer status;
 
     //当日京豆收益
