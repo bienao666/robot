@@ -3,6 +3,7 @@ package com.bienao.robot.tasks.qinglong;
 
 import com.bienao.robot.entity.WireActivityEntity;
 import com.bienao.robot.mapper.WirelistMapper;
+import com.bienao.robot.service.ql.QlService;
 import com.bienao.robot.service.ql.WireService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class QlTask {
 
     @Autowired
     private WirelistMapper wirelistMapper;
+
+    @Autowired
+    private QlService qlService;
 
 
     /**
@@ -40,5 +44,14 @@ public class QlTask {
     @Scheduled(cron = "0 0 4 * * ?")
     public void clear(){
         wirelistMapper.clear();
+    }
+
+    /**
+     * 设置小车头
+     * 5分钟设置一次
+     */
+    @Scheduled(cron = "0 */5 * * * ?")
+    public void setSmallHead(){
+        qlService.setSmallHead();
     }
 }

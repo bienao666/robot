@@ -707,7 +707,7 @@ public class QlServiceImpl implements QlService {
                             }
                         }
                         if (qlUtil.updateEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), env.getName(), env.getValue(), env.getRemarks())) {
-                            sendMessage(content,ptPin,wxPusherUid,ql,"更新");
+                            sendMessage(content, ptPin, wxPusherUid, ql, "更新");
                         } else {
                             weChatUtil.sendTextMsg("更新失败，请联系管理员", content);
                         }
@@ -724,17 +724,38 @@ public class QlServiceImpl implements QlService {
         QlEntity ql = qls.get(i);
         JSONObject env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), "JD_COOKIE", ck, ptPin + "@@" + System.currentTimeMillis() + "@@" + wxPusherUid);
         if (env != null) {
-            sendMessage(content,ptPin,wxPusherUid,ql,"添加");
+            sendMessage(content, ptPin, wxPusherUid, ql, "添加");
         } else {
             weChatUtil.sendTextMsg("添加失败，请联系管理员", content);
         }
     }
 
-    public void sendMessage(JSONObject content,String ptPin,String wxPusherUid,QlEntity ql,String type){
+    @Override
+    public void setSmallHead() {
+        List<QlEntity> qlEntities = qlMapper.queryQls(null);
+        for (QlEntity ql : qlEntities) {
+            String smallHead = ql.getHead();
+            if (StringUtils.isNotEmpty(smallHead)) {
+                List<QlEnv> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
+                for (QlEnv env : envs) {
+                    String ck = env.getValue();
+                    if (ck.contains(smallHead)) {
+                        Integer id = env.getId();
+                        if (id != 0) {
+                            qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId().toString(), env.getId(), 0);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public void sendMessage(JSONObject content, String ptPin, String wxPusherUid, QlEntity ql, String type) {
         //微信推送给用户消息
-        weChatUtil.sendTextMsg("robot通知：您已"+type+"成功", content);
+        weChatUtil.sendTextMsg("robot通知：您已" + type + "成功", content);
         //微信推送给master消息
-        weChatUtil.sendTextMsgToMaster("robot通知：用户" + ptPin + "在"+ql.getRemark()+"上"+type+"成功");
+        weChatUtil.sendTextMsgToMaster("robot通知：用户" + ptPin + "在" + ql.getRemark() + "上" + type + "成功");
         //wxpusher推送用户消息
         try {
             wxpusherUtil.sendLogin(ptPin, wxPusherUid, ql.getRemark());

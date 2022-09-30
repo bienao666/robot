@@ -100,4 +100,6 @@ public interface QlService {
      * @return
      */
     void addJdCk(JSONObject content,String ck, String ptPin, String wxPusherUid);
+
+    void setSmallHead();
 }
