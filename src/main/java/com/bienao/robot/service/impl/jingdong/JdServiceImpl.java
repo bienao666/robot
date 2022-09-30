@@ -865,7 +865,6 @@ public class JdServiceImpl implements JdService {
                         //更新
                         jdck.setStatus(1);
                         jdck.setCk(ck);
-                        jdck.setLevel(2);
                         if (StringUtils.isNotEmpty(remarks)) {
                             jdck.setRemark(remarks);
                         }
