@@ -45,4 +45,6 @@ public interface CkService {
     Result enableJdCk(List<JSONObject> cks);
 
     Result disableJdCk(List<JSONObject> cks);
+
+    Result deleteJdCk(List<JSONObject> cks);
 }

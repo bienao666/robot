@@ -127,6 +127,18 @@ public class CkController {
     }
 
     /**
+     * 删除京东ck
+     */
+    @PassToken
+    @PostMapping("/deleteJdCk")
+    public Result deleteJdCk(@RequestBody List<JSONObject> cks) {
+        if (cks == null || cks.size() == 0) {
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "cks不能为空");
+        }
+        return ckService.deleteJdCk(cks);
+    }
+
+    /**
      * 修改京东ck
      */
     @PostMapping("/updateJdCk")

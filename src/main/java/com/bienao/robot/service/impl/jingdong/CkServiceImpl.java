@@ -376,4 +376,30 @@ public class CkServiceImpl implements CkService {
         }
         return Result.success();
     }
+
+    @Override
+    public Result deleteJdCk(List<JSONObject> cks) {
+        HashMap<Integer, List<Integer>> map = new HashMap<>();
+        for (JSONObject ck : cks) {
+            Integer qlId = ck.getInteger("qlId");
+            Integer id = ck.getInteger("id");
+            List<Integer> list = map.get(qlId);
+            if (list == null) {
+                list = new ArrayList<>();
+                list.add(id);
+            } else {
+                list.add(id);
+            }
+            map.put(qlId,list);
+        }
+        for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {
+            Integer qlId = entry.getKey();
+            QlEntity qlEntity = qlMapper.queryQl(qlId);
+            if (qlEntity != null) {
+                List<Integer> list = entry.getValue();
+                qlUtil.deleteEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), list);
+            }
+        }
+        return Result.success();
+    }
 }
