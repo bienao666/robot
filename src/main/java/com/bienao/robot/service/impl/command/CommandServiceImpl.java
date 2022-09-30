@@ -52,6 +52,8 @@ public class CommandServiceImpl implements CommandService {
         addCommandEntities("老色批","随机获取一张老色批图片","",1,commands,commandEntities);
         addCommandEntities("xx天气","查询xx城市的天气","",1,commands,commandEntities);
         addCommandEntities("比价","根据商品链接查询价格信息","",1,commands,commandEntities);
+        addCommandEntities("启用 xxx","启用京东ck xxx","启用成功",1,commands,commandEntities);
+        addCommandEntities("禁用 xxx","禁用京东ck xxx","禁用成功",1,commands,commandEntities);
         if (commandEntities.size()>0){
             commandMapper.addCommands(commandEntities);
         }
