@@ -215,6 +215,11 @@ public class WxServiceImpl implements WxService {
             handleAddGroup(content);
             return;
         }
+        //禁用
+        /*if (msg.startsWith("禁用")) {
+            handleAddGroup(content);
+            return;
+        }*/
         //登陆
         if ("登陆".equals(msg) || "登录".equals(msg)) {
             handleJdLogin(content);
