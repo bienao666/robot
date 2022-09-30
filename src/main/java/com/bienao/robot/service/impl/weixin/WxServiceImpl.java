@@ -25,6 +25,7 @@ import com.bienao.robot.service.user.UserService;
 import com.bienao.robot.service.weixin.WxService;
 import com.bienao.robot.utils.*;
 import com.bienao.robot.utils.jingdong.JdBeanChangeUtil;
+import com.bienao.robot.utils.ql.QlUtil;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import com.bienao.robot.utils.weixin.WeChatUtil;
 import com.google.common.collect.EvictingQueue;
@@ -89,6 +90,12 @@ public class WxServiceImpl implements WxService {
 
     @Autowired
     private JdBeanChangeUtil jdBeanChangeUtil;
+
+    @Autowired
+    private QlMapper qlMapper;
+
+    @Autowired
+    private QlUtil qlUtil;
 
     private Cache<String, String> redis = WXConstant.redis;
 
@@ -181,7 +188,7 @@ public class WxServiceImpl implements WxService {
         }
 
         //系统参数
-        if (msg.startsWith("设置") || msg.startsWith("启用") || msg.startsWith("关闭")) {
+        if (msg.startsWith("设置") || msg.startsWith("关闭")) {
             handleSetSysParam(content);
             return;
         }
@@ -216,10 +223,16 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //禁用
-        /*if (msg.startsWith("禁用")) {
-            handleAddGroup(content);
+        if (msg.startsWith("禁用")) {
+            handleDisableCk(content);
             return;
-        }*/
+        }
+        //启用
+        if (msg.startsWith("启用")) {
+            handleEnableCk(content);
+            return;
+        }
+
         //登陆
         if ("登陆".equals(msg) || "登录".equals(msg)) {
             handleJdLogin(content);
@@ -360,6 +373,62 @@ public class WxServiceImpl implements WxService {
                 handleLast(content, num, publicKey);
             }
         }
+    }
+
+    /**
+     * 启用京东ck
+     * @param content
+     */
+    private void handleEnableCk(JSONObject content) {
+        String ck = content.getString("msg").replace("启用","").replace(" ","");
+        //查询所有青龙
+        List<QlEntity> qlEntities = qlMapper.queryQls(null);
+        boolean isReturn = false;
+        for (QlEntity qlEntity : qlEntities) {
+            if (isReturn){
+                return;
+            }
+            List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
+            for (QlEnv env : envs) {
+                if ("JD_COOKIE".equals(env.getName())&&env.getValue().contains(ck)) {
+                    ArrayList<Integer> ids = new ArrayList<>();
+                    ids.add(env.getId());
+                    qlUtil.enableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(),ids);
+                    isReturn =true;
+                    weChatUtil.sendTextMsg("启用成功",content);
+                    break;
+                }
+            }
+        }
+        weChatUtil.sendTextMsg("启用失败，该ck不存在",content);
+    }
+
+    /**
+     * 禁用京东ck
+     * @param content
+     */
+    private void handleDisableCk(JSONObject content) {
+        String ck = content.getString("msg").replace("禁用","").replace(" ","");
+        //查询所有青龙
+        List<QlEntity> qlEntities = qlMapper.queryQls(null);
+        boolean isReturn = false;
+        for (QlEntity qlEntity : qlEntities) {
+            if (isReturn){
+                return;
+            }
+            List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
+            for (QlEnv env : envs) {
+                if ("JD_COOKIE".equals(env.getName())&&env.getValue().contains(ck)) {
+                    ArrayList<Integer> ids = new ArrayList<>();
+                    ids.add(env.getId());
+                    qlUtil.disableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(),ids);
+                    isReturn =true;
+                    weChatUtil.sendTextMsg("禁用成功",content);
+                    break;
+                }
+            }
+        }
+        weChatUtil.sendTextMsg("禁用失败，该ck不存在",content);
     }
 
     /**
@@ -924,7 +993,7 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleSetSysParam(JSONObject content) {
-        String msg = content.getString("msg").replace("设置", "").replace("启用", "").replace("关闭", "").trim();
+        String msg = content.getString("msg").replace("设置", "").replace("关闭", "").trim();
         String[] split = msg.split(" ");
         if (split.length >= 1) {
             if (StringUtils.isEmpty(systemParamUtil.querySystemParam("WXMASTERS")) && "微信管理员".equals(split[0])) {
