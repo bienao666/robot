@@ -515,12 +515,6 @@ public class WireServiceImpl implements WireService {
         keys.add("jd_cjwxShopFollowActivity_activityId");
         addWire("CJ关注店铺有礼","jd_cjwxShopFollowActivity.js",keys);
 
-        keys.add("jd_wxKnowledgeActivity_activityId");
-        addWire("LZ知识超人通用活动","jd_wxKnowledgeActivity.js",keys);
-
-        keys.add("jd_cjwxKnowledgeActivity_activityId");
-        addWire("CJ知识超人通用活动","jd_cjwxKnowledgeActivity.js",keys);
-
         keys.add("jd_wxBuildActivity_activityId");
         addWire("LZ盖楼有礼","jd_wxBuildActivity.js",keys);
 
@@ -577,6 +571,9 @@ public class WireServiceImpl implements WireService {
 
         keys.add("jd_wxShopGift_activityUrl");
         addWire("店铺礼包特效","jd_wxShopGift.js",keys);
+
+        keys.add("jd_wxKnowledgeActivity_activityUrl");
+        addWire("知识超人","jd_wxKnowledgeActivity.js",keys);
 
         /*keys.add("M_WX_SHOP_GIFT_URL");
         addWire("","",keys);
