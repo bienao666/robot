@@ -47,4 +47,6 @@ public interface JdService {
     void updatePetShareCode(List<JdCkEntity> cks);
 
     void updatePlantShareCode(List<JdCkEntity> cks);
+
+    void qlToZlc();
 }

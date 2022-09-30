@@ -10,15 +10,19 @@ import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.EscapeUtil;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.entity.QlEntity;
+import com.bienao.robot.entity.QlEnv;
 import com.bienao.robot.entity.jingdong.JdCkEntity;
 import com.bienao.robot.entity.jingdong.JdFruitEntity;
 import com.bienao.robot.entity.jingdong.JdPetEntity;
 import com.bienao.robot.entity.jingdong.JdPlantEntity;
+import com.bienao.robot.mapper.QlMapper;
 import com.bienao.robot.mapper.jingdong.*;
 import com.bienao.robot.service.jingdong.CkService;
 import com.bienao.robot.service.jingdong.JdService;
 import com.bienao.robot.utils.jingdong.CommonUtil;
 import com.bienao.robot.utils.jingdong.GetUserAgentUtil;
+import com.bienao.robot.utils.ql.QlUtil;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +33,8 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
@@ -53,10 +59,15 @@ public class JdServiceImpl implements JdService {
     private JdJdMapper jdJdMapper;
 
     @Autowired
-    private CkService ckService;
+    private QlMapper qlMapper;
 
     @Autowired
     private SystemParamUtil systemParamUtil;
+
+    @Autowired
+    private QlUtil qlUtil;
+
+    private Pattern jdPinPattern = Pattern.compile("pt_pin=(.+?);");
 
     /**
      * 东东农场互助
@@ -811,6 +822,60 @@ public class JdServiceImpl implements JdService {
                     log.info("{}的种豆得豆互助码更新失败，{}", ck.getCk(), e.getMessage());
                 }
             }
+        }
+    }
+
+    /**
+     * 青龙同步助力池
+     */
+    @Override
+    public void qlToZlc() {
+        List<QlEntity> qlEntities = qlMapper.queryQls(null);
+        for (QlEntity ql : qlEntities) {
+            log.info("青龙服务器：{}开始同步助力池。。。",ql.getRemark());
+            int count = 0;
+            List<QlEnv> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
+            for (QlEnv env : envs) {
+                String name = env.getName();
+                String ck = env.getValue();
+                String remarks = env.getRemarks();
+                if ("JD_COOKIE".equals(name)) {
+                    String ptPin = "";
+                    Matcher matcher = jdPinPattern.matcher(ck);
+                    if (matcher.find()) {
+                        ptPin = matcher.group(1);
+                    }
+                    //判断pt_pin是否存在
+                    JdCkEntity jdCkEntityQuery = new JdCkEntity();
+                    jdCkEntityQuery.setPtPin(ptPin);
+                    JdCkEntity jdck = jdCkMapper.queryCk(jdCkEntityQuery);
+                    if (jdck == null) {
+                        //添加
+                        jdck = new JdCkEntity();
+                        jdck.setStatus(1);
+                        jdck.setCk(ck);
+                        jdck.setLevel(2);
+                        if (StringUtils.isNotEmpty(remarks)) {
+                            jdck.setRemark(remarks);
+                        }
+                        jdck.setPtPin(ptPin);
+                        jdCkMapper.addCk(jdck);
+                        count++;
+                    } else {
+                        //更新
+                        jdck.setStatus(1);
+                        jdck.setCk(ck);
+                        jdck.setLevel(2);
+                        if (StringUtils.isNotEmpty(remarks)) {
+                            jdck.setRemark(remarks);
+                        }
+                        jdck.setUpdatedTime(DateUtil.formatDateTime(new Date()));
+                        jdCkMapper.updateCk(jdck);
+                        count++;
+                    }
+                }
+            }
+            log.info("青龙服务器：{}同步助力池结束，共同步{}个ck",ql.getRemark(),count);
         }
     }
 

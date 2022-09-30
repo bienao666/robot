@@ -110,7 +110,7 @@ public class jdTask {
     /**
      * 检查ck是否过期
      */
-    @Scheduled(cron = "0 0 4 * * ?")
+    @Scheduled(cron = "0 0 14 * * ?")
     public void checkCk(){
         if (checkCk){
             ckService.checkCk();
@@ -146,6 +146,18 @@ public class jdTask {
             jdService.countJd();
         }else {
             log.info("统计京豆收益定时任务执行失败，请先去配置countJd为true");
+        }
+    }
+
+    /**
+     * 青龙同步助力池
+     * 每隔一小时同步一次
+     */
+    @Scheduled(cron = "0 0 */1 * * ?")
+    public void qlToZlc(){
+        String qltozlc = systemParamUtil.querySystemParam("QLTOZLC");
+        if ("是".equals(qltozlc)){
+            jdService.qlToZlc();
         }
     }
 }
