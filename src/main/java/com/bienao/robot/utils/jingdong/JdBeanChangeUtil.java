@@ -83,6 +83,47 @@ public class JdBeanChangeUtil {
      * @param jdCk
      */
     public String getJdBeanChange(JdCkEntity jdCk) {
+        cookie = "";
+        overdue = "";
+        userName = "";
+        beanCount = 0;
+        incomeBean = 0;
+        expenseBean = 0;
+        todayIncomeBean = 0;
+        todayOutcomeBean = 0;
+        errorMsg = "";
+        isLogin = true;
+        nickName = "";
+        levelName = "";
+        message = "";
+        balance = 0.00F;
+        expiredBalance = 0.00F;
+        JdzzNum = 0;
+        JdMsScore = 0;
+        JdFarmProdName = "";
+        JdtreeEnergy = 0;
+        JdtreeTotalEnergy = 0;
+        treeState = 0;
+        JdwaterTotalT = 0;
+        JdwaterD = 0;
+        JDwaterEveryDayT = 0;
+        JDtotalcash = 0;
+        JDEggcnt = 0;
+        Jxmctoken = "";
+        DdFactoryReceive = "";
+        jxFactoryInfo = "";
+        jxFactoryReceive = "";
+        jdCash = 0;
+        isPlusVip = 0;
+        JingXiang = "";
+        //月收入
+        int allincomeBean = 0;
+        //月支出
+        int allexpenseBean = 0;
+        int joylevel = 0;
+        String TempBaipiao = "";
+        String enCryptMethodJD = "";
+
         cookie = jdCk.getCk();
         overdue = "【挂机天数】" + DateUtil.between(DateUtil.parseDate(jdCk.getCreatedTime()), DateUtil.date(), DateUnit.DAY) + "天";
         userName = URLDecoder.decode(jdCk.getPtPin(), CharsetUtil.defaultCharset());
