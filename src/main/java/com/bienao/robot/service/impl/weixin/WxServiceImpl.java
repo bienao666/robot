@@ -293,6 +293,11 @@ public class WxServiceImpl implements WxService {
             handleQxTsWb(content);
             return;
         }
+        //命令
+        if ("命令".equals(msg)){
+            handleCommand(content);
+            return;
+        }
         //推送支付宝红包
         if (msg.trim().equals("推送支付宝红包")) {
             handleTsZfbHb(content);
@@ -373,6 +378,19 @@ public class WxServiceImpl implements WxService {
                 handleLast(content, num, publicKey);
             }
         }
+    }
+
+    /**
+     * 查询所有的命令
+     * @param content
+     */
+    private void handleCommand(JSONObject content) {
+        List<CommandEntity> commandEntities = commandMapper.queryCommand(null, null);
+        String msg = "";
+        for (CommandEntity commandEntity : commandEntities) {
+            msg += commandEntity.getCommand() + " -> " + commandEntity.getFunction() + "\n";
+        }
+        weChatUtil.sendTextMsg(msg,content);
     }
 
     /**
