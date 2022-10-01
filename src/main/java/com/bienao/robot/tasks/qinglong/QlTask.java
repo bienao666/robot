@@ -64,8 +64,8 @@ public class QlTask {
      */
     @Scheduled(cron = "0 0 4 * * ?")
     public void leekFriendly(){
-        String qltozlc = systemParamUtil.querySystemParam("LEEKFRIENDLY");
-        if ("是".equals(qltozlc)){
+        String leekFriendly = systemParamUtil.querySystemParam("LEEKFRIENDLY");
+        if ("是".equals(leekFriendly)){
             qlService.leekFriendly();
         }
     }
