@@ -146,8 +146,7 @@ public class ShareCodeController {
      */
     @GetMapping("/getHelpList")
     public Result getHelpList(@RequestParam String type){
-        List<String> helpList = jdService.getHelpList(type);
-        return Result.success(helpList);
+        return Result.success(jdService.getHelpList(type));
     }
 
     /**
