@@ -528,27 +528,28 @@ public class JdServiceImpl implements JdService {
         Integer counts = jdCkMapper.queryCkCount();
         infos.put("allCkCount", counts);
         //东东农场
-        int fruitHelp = jdFruitMapper.getHelpTimes();
-        infos.put("jdfruit", "已助力满==>" + fruitHelp + "个");
-        //农场抽奖
+        List<JdCkEntity> jdCkEntities = jdCkMapper.queryHasHelpFruitCk();
+        infos.put("jdfruit", "已助力满==>" + jdCkEntities.size() + "个");
+        //东东农场助力清单
+        /*//农场抽奖
         int fruitHelpLottery = jdFruitMapper.getHelpLotteryTimes();
-        infos.put("jdfruitLottery", "已助力满==>" + fruitHelpLottery + "个");
+        infos.put("jdfruitLottery", "已助力满==>" + fruitHelpLottery + "个");*/
         //东东萌宠
         int petTimes = jdPetMapper.getHelpTimes();
         infos.put("jdpet", "已助力满==>" + petTimes + "个");
         //种豆得豆
         int plantTimes = jdPlantMapper.getHelpTimes();
         infos.put("jdbean", "已助力满==>" + plantTimes + "个");
-        //东东工厂
+        /*//东东工厂
         infos.put("jdddfactory", "待开发");
         //健康社区
         infos.put("jdhealth", "待开发");
         //京喜工厂
         infos.put("jdjxfactory", "待开发");
         //闪购盲盒
-        infos.put("jdsgmh", "待开发");
+        infos.put("jdsgmh", "待开发");*/
         //京东登陆地址
-        infos.put("jdLoginUrl", "http://121.43.32.165:6702");
+        infos.put("jdLoginUrl", systemParamUtil.querySystemParam("JDLONGINURL"));
         return infos;
     }
 
@@ -878,6 +879,39 @@ public class JdServiceImpl implements JdService {
             }
             log.info("青龙服务器：{}同步助力池结束，共同步{}个ck",ql.getRemark(),count);
         }
+    }
+
+    @Override
+    public List getHelpList(String type) {
+        ArrayList<String> list = new ArrayList<>();
+        List<JdCkEntity> jdCkEntities = new ArrayList<>();
+        switch (type){
+            case "fruit":
+                jdCkEntities = jdCkMapper.queryHasHelpFruitCk();
+                break;
+            case "pet":
+                jdCkEntities = jdCkMapper.queryHasHelpPetCk();
+                break;
+            case "plant":
+                jdCkEntities = jdCkMapper.queryHasHelpPlantCk();
+                break;
+        }
+        for (JdCkEntity jdCkEntity : jdCkEntities) {
+            String name = "";
+            String remark = jdCkEntity.getRemark();
+            if (StringUtils.isNotEmpty(remark)){
+                if (remark.contains("@@")){
+                    int index = remark.indexOf("@@");
+                    name = jdCkEntity.getRemark().substring(0,index);
+                }else {
+                    name = jdCkEntity.getRemark();
+                }
+            }else {
+                name = jdCkEntity.getPtPin();
+            }
+            list.add(name);
+        }
+        return list;
     }
 
     /**

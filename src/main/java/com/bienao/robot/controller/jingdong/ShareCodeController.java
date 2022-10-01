@@ -142,6 +142,15 @@ public class ShareCodeController {
     }
 
     /**
+     * 获取助力清单
+     */
+    @GetMapping("/getHelpList")
+    public Result getHelpList(@RequestParam String type){
+        List<String> helpList = jdService.getHelpList(type);
+        return Result.success(helpList);
+    }
+
+    /**
      * 統計京豆
      */
     @GetMapping("/countJd")
