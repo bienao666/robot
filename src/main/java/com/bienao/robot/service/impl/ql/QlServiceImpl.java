@@ -9,9 +9,11 @@ import com.bienao.robot.entity.QlCron;
 import com.bienao.robot.entity.QlEntity;
 import com.bienao.robot.entity.QlEnv;
 import com.bienao.robot.entity.SystemParam;
+import com.bienao.robot.entity.jingdong.JdCkEntity;
 import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.mapper.QlMapper;
 import com.bienao.robot.entity.Result;
+import com.bienao.robot.mapper.jingdong.JdCkMapper;
 import com.bienao.robot.service.ql.QlService;
 import com.bienao.robot.utils.WxpusherUtil;
 import com.bienao.robot.utils.ql.QlUtil;
@@ -44,6 +46,9 @@ public class QlServiceImpl implements QlService {
 
     @Autowired
     private WxpusherUtil wxpusherUtil;
+
+    @Autowired
+    private JdCkMapper jdCkMapper;
 
     private Cache<String, String> redis = WXConstant.redis;
 
@@ -242,7 +247,7 @@ public class QlServiceImpl implements QlService {
                         isContainBigHead = true;
                         qlBigHeadJson = env;
                         systemParamUtil.updateSystemParam("BIGHEADLOCATION", "", ql.getId().toString());
-                        JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId().toString(), env.getId(), 0);
+                        JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), env.getId(), 0);
                         if (jsonObject == null) {
                             results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置失败");
                         } else {
@@ -283,7 +288,7 @@ public class QlServiceImpl implements QlService {
                     JSONObject env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), qlBigHeadJson.getName(),
                             qlBigHeadJson.getValue(),
                             qlBigHeadJson.getRemarks());
-                    JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getString("id"), env.getInteger("id"), 0);
+                    JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getInteger("id"), env.getInteger("id"), 0);
                     if (jsonObject == null) {
                         results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置失败");
                     } else {
@@ -742,11 +747,50 @@ public class QlServiceImpl implements QlService {
                     if (ck.contains(smallHead)) {
                         Integer id = env.getId();
                         if (id != 0) {
-                            qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId().toString(), env.getId(), 0);
+                            qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), env.getId(), 0);
                         }
                         break;
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * 韭菜友好设置
+     */
+    @Override
+    public void leekFriendly() {
+        List<QlEntity> qlEntities = qlMapper.queryQls(null);
+        for (QlEntity ql : qlEntities) {
+            log.info("青龙服务器：{}开始韭菜友好排序。。。",ql.getRemark());
+            List<QlEnv> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
+            //保留前五个ck不动
+            int limit = 5;
+            int count = 0;
+            //第五个ck的索引
+            int index = 0;
+            //存放五个以后的ck
+            TreeMap<Integer, QlEnv> treeMap = new TreeMap<>();
+            for (int i = 0; i < envs.size(); i++) {
+                QlEnv env = envs.get(i);
+                if (!"JD_COOKIE".equals(env.getName())){
+                    continue;
+                }
+                count++;
+                if (count<=limit){
+                    index = i;
+                    continue;
+                }
+                //查询前一天的京豆收益
+                JdCkEntity jdCkEntityQuery = new JdCkEntity();
+                jdCkEntityQuery.setCk(env.getValue());
+                JdCkEntity jdCkEntity = jdCkMapper.queryCk(jdCkEntityQuery);
+                treeMap.put(jdCkEntity.getJd(),env);
+            }
+            for (Map.Entry<Integer, QlEnv> entry : treeMap.entrySet()) {
+                QlEnv qlEnv = entry.getValue();
+                qlUtil.moveEnv(ql.getUrl(),ql.getTokenType(),ql.getToken(),qlEnv.getId(),1000,++index);
             }
         }
     }

@@ -5,6 +5,7 @@ import com.bienao.robot.entity.WireActivityEntity;
 import com.bienao.robot.mapper.WirelistMapper;
 import com.bienao.robot.service.ql.QlService;
 import com.bienao.robot.service.ql.WireService;
+import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,6 +25,9 @@ public class QlTask {
 
     @Autowired
     private QlService qlService;
+
+    @Autowired
+    private SystemParamUtil systemParamUtil;
 
 
     /**
@@ -60,6 +64,9 @@ public class QlTask {
      */
     @Scheduled(cron = "0 0 4 * * ?")
     public void leekFriendly(){
-//        qlService.leekFriendly();
+        String qltozlc = systemParamUtil.querySystemParam("LEEKFRIENDLY");
+        if ("是".equals(qltozlc)){
+            qlService.leekFriendly();
+        }
     }
 }

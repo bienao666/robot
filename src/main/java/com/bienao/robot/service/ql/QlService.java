@@ -102,4 +102,9 @@ public interface QlService {
     void addJdCk(JSONObject content,String ck, String ptPin, String wxPusherUid);
 
     void setSmallHead();
+
+    /**
+     * 韭菜友好设置
+     */
+    void leekFriendly();
 }

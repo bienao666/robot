@@ -242,7 +242,7 @@ public class QlUtil {
      * @param toIndex 目标位置
      * @return
      */
-    public JSONObject moveEnv(String url,String tokenType,String token,String id,Integer fromIndex,Integer toIndex){
+    public JSONObject moveEnv(String url,String tokenType,String token,Integer id,Integer fromIndex,Integer toIndex){
         if (!url.endsWith("/")){
             url = url+"/";
         }
