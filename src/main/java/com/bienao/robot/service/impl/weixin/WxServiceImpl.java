@@ -457,6 +457,28 @@ public class WxServiceImpl implements WxService {
     @Override
     public void handleQueryJdAssets(JSONObject content) {
         String from_wxid = content.getString("from_wxid");
+        //限制一天只能查3次
+        String timesStr = redis.get(from_wxid + "QueryTimes");
+        if (StringUtils.isEmpty(timesStr)){
+            redis.put(from_wxid + "QueryTimes","1");
+            redis.put(from_wxid + "QueryTime",DateUtil.formatDateTime(DateUtil.date()));
+        }else {
+            Integer times = Integer.parseInt(timesStr);
+            if (times>3){
+                weChatUtil.sendTextMsg("抱歉，今日查询次数已耗尽，请明日再查询（robot保护京东账号策略：一天只能查三次）", content);
+                return;
+            }
+            //限制查询间隔3个小时
+            //上次查询时间
+            DateTime lastTime = DateUtil.parse(redis.get(from_wxid + "QueryTime"));
+            DateTime limitTime = DateUtil.offsetHour(lastTime, 3);
+            if (limitTime.getTime()>DateUtil.date().getTime()){
+                weChatUtil.sendTextMsg("抱歉，请在"+DateUtil.formatDateTime(limitTime)+"后查询（robot保护京东账号策略：查询间隔3小时）", content);
+                return;
+            }
+            redis.put(from_wxid + "QueryTimes",String.valueOf(times+1));
+            redis.put(from_wxid + "QueryTime",DateUtil.formatDateTime(DateUtil.date()));
+        }
         User userQuery = new User();
         userQuery.setWxid(from_wxid);
         User user = userService.queryUser(userQuery);

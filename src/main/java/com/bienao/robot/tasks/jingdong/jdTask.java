@@ -1,5 +1,8 @@
 package com.bienao.robot.tasks.jingdong;
 
+import cn.hutool.cache.Cache;
+import cn.hutool.cache.impl.CacheObj;
+import com.bienao.robot.Constants.weixin.WXConstant;
 import com.bienao.robot.entity.Result;
 import com.bienao.robot.entity.jingdong.JdCkEntity;
 import com.bienao.robot.service.jingdong.CkService;
@@ -12,6 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -44,6 +49,8 @@ public class jdTask {
 
     @Value("${task-function.countJd}")
     private boolean countJd;
+
+    private Cache<String, String> redis = WXConstant.redis;
 
     /**
      * 助力池互助
@@ -158,6 +165,25 @@ public class jdTask {
         String qltozlc = systemParamUtil.querySystemParam("QLTOZLC");
         if ("是".equals(qltozlc)){
             jdService.qlToZlc();
+        }
+    }
+
+    /**
+     * 清空京东查询次数限制
+     */
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void clearJdQueryTimes(){
+        ArrayList<String> clear = new ArrayList<>();
+        Iterator<CacheObj<String, String>> iterator = redis.cacheObjIterator();
+        if (iterator.hasNext()){
+            CacheObj<String, String> cacheObj = iterator.next();
+            String key = cacheObj.getKey();
+            if (key.endsWith("QueryTimes")){
+                clear.add(key);
+            }
+        }
+        for (String k : clear) {
+            redis.remove(k);
         }
     }
 }
