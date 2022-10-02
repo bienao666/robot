@@ -1,12 +1,9 @@
 package com.bienao.robot.service.impl.jingdong;
 
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.net.URLDecoder;
 import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.core.net.URLEncoder;
-import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.EscapeUtil;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONObject;
@@ -18,9 +15,7 @@ import com.bienao.robot.entity.jingdong.JdPetEntity;
 import com.bienao.robot.entity.jingdong.JdPlantEntity;
 import com.bienao.robot.mapper.QlMapper;
 import com.bienao.robot.mapper.jingdong.*;
-import com.bienao.robot.service.jingdong.CkService;
 import com.bienao.robot.service.jingdong.JdService;
-import com.bienao.robot.utils.jingdong.CommonUtil;
 import com.bienao.robot.utils.jingdong.GetUserAgentUtil;
 import com.bienao.robot.utils.ql.QlUtil;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
@@ -99,14 +94,10 @@ public class JdServiceImpl implements JdService {
                     svipCks.add(ck);
                 }
                 if ((ck.getLevel() == 1) && (jdFruitEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdFruitEntity.getHelpCode()))) {
-                    //svip && 未助力满 && 互助码不为空
-                    svipCks.add(ck);
-                }
-                if ((ck.getLevel() == 2) && (jdFruitEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdFruitEntity.getHelpCode()))) {
                     //vip && 未助力满 && 互助码不为空
                     vipCks.add(ck);
                 }
-                if ((ck.getLevel() == 3) && (jdFruitEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdFruitEntity.getHelpCode()))) {
+                if ((ck.getLevel() == 2) && (jdFruitEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdFruitEntity.getHelpCode()))) {
                     //普通用户 && 未助力满 && 互助码不为空
                     ptCks.add(ck);
                 }
@@ -118,9 +109,9 @@ public class JdServiceImpl implements JdService {
         }
 
         jdCks.addAll(svipCks);
-
-        //排序
-        jdCks = CommonUtil.getHelpCks(jdCks, vipCks, ptCks);
+        jdCks.addAll(vipCks);
+        Collections.shuffle(ptCks);
+        jdCks.addAll(ptCks);
 
         Collections.shuffle(toHelpJdCks);
 
@@ -317,14 +308,10 @@ public class JdServiceImpl implements JdService {
                     svipCks.add(ck);
                 }
                 if ((ck.getLevel() == 1) && (jdPetEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdPetEntity.getHelpCode()))) {
-                    //svip && 未助力满 && 互助码不为空
-                    svipCks.add(ck);
-                }
-                if ((ck.getLevel() == 2) && (jdPetEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdPetEntity.getHelpCode()))) {
                     //vip && 未助力满 && 互助码不为空
                     vipCks.add(ck);
                 }
-                if ((ck.getLevel() == 3) && (jdPetEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdPetEntity.getHelpCode()))) {
+                if ((ck.getLevel() == 2) && (jdPetEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdPetEntity.getHelpCode()))) {
                     //普通用户 && 未助力满 && 互助码不为空
                     ptCks.add(ck);
                 }
@@ -336,9 +323,9 @@ public class JdServiceImpl implements JdService {
         }
 
         jdCks.addAll(svipCks);
-
-        //排序
-        jdCks = CommonUtil.getHelpCks(jdCks, vipCks, ptCks);
+        jdCks.addAll(vipCks);
+        Collections.shuffle(ptCks);
+        jdCks.addAll(ptCks);
 
         Collections.shuffle(toHelpJdCks);
 
@@ -423,14 +410,10 @@ public class JdServiceImpl implements JdService {
                     svipCks.add(ck);
                 }
                 if ((ck.getLevel() == 1) && (jdPlantEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdPlantEntity.getHelpCode()))) {
-                    //svip && 未助力满 && 互助码不为空
-                    svipCks.add(ck);
-                }
-                if ((ck.getLevel() == 2) && (jdPlantEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdPlantEntity.getHelpCode()))) {
                     //vip && 未助力满 && 互助码不为空
                     vipCks.add(ck);
                 }
-                if ((ck.getLevel() == 3) && (jdPlantEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdPlantEntity.getHelpCode()))) {
+                if ((ck.getLevel() == 2) && (jdPlantEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdPlantEntity.getHelpCode()))) {
                     //普通用户 && 未助力满 && 互助码不为空
                     ptCks.add(ck);
                 }
@@ -442,9 +425,9 @@ public class JdServiceImpl implements JdService {
         }
 
         jdCks.addAll(svipCks);
-
-        //排序
-        jdCks = CommonUtil.getHelpCks(jdCks, vipCks, ptCks);
+        jdCks.addAll(vipCks);
+        Collections.shuffle(ptCks);
+        jdCks.addAll(ptCks);
 
         Collections.shuffle(toHelpJdCks);
 
