@@ -83,8 +83,9 @@ public class CkController {
     public Result getJdCks(@RequestParam(value = "ck", required = false) String ck,
                            @RequestParam(value = "ptPin", required = false) String ptPin,
                            @RequestParam(value = "level", required = false) Integer level,
-                           @RequestParam(value = "status", required = false) Integer status) {
-        List<JdCkEntity> jdcks = ckService.getJdCks(ck, ptPin, level, status);
+                           @RequestParam(value = "status", required = false) Integer status,
+                           @RequestParam(value = "remark", required = false) String remark) {
+        List<JdCkEntity> jdcks = ckService.getJdCks(ck, ptPin, level, status,remark);
         return Result.success(jdcks);
     }
 

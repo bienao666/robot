@@ -36,6 +36,9 @@
         <if test="status != null">
             AND status = #{status}
         </if>
+        <if test="remark !=null and remark !=''">
+            and remark like ('%'||#{remark}||'%')
+        </if>
         order by level
     </select>
 

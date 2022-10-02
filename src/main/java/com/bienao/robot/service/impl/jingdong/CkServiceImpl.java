@@ -252,12 +252,13 @@ public class CkServiceImpl implements CkService {
     }
 
     @Override
-    public List<JdCkEntity> getJdCks(String ck, String ptPin, Integer level, Integer status) {
+    public List<JdCkEntity> getJdCks(String ck, String ptPin, Integer level, Integer status,String remark) {
         JdCkEntity jdCkEntity = new JdCkEntity();
         jdCkEntity.setCk(ck);
         jdCkEntity.setPtPin(ptPin);
         jdCkEntity.setLevel(level);
         jdCkEntity.setStatus(status);
+        jdCkEntity.setRemark(remark);
         return jdCkMapper.queryCks(jdCkEntity);
     }
 
