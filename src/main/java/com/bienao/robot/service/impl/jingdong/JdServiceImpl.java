@@ -82,12 +82,12 @@ public class JdServiceImpl implements JdService {
         List<JdCkEntity> toHelpJdCks = new ArrayList<>();
 
         for (JdCkEntity ck : cks) {
-            if (ck.getStatus()==1){
+            if (ck.getStatus() == 1) {
                 //ck失效
                 continue;
             }
             JdFruitEntity jdFruitEntity = ck.getJdFruitEntity();
-            if (jdFruitEntity!= null && (jdFruitEntity.getIsFruitHei() == 0)) {
+            if (jdFruitEntity != null && (jdFruitEntity.getIsFruitHei() == 0)) {
                 //东东农场不黑
                 if ((ck.getLevel() == 0) && (jdFruitEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdFruitEntity.getHelpCode()))) {
                     //自己 && 未助力满 && 互助码不为空
@@ -117,7 +117,7 @@ public class JdServiceImpl implements JdService {
 
         Integer limit = null;
         String ddncHelpStr = systemParamUtil.querySystemParam("DDNCHELP");
-        if (StringUtils.isNotEmpty(ddncHelpStr)){
+        if (StringUtils.isNotEmpty(ddncHelpStr)) {
             limit = Integer.parseInt(ddncHelpStr);
             log.info("查询到东东农场助力上限：{}个", limit);
         }
@@ -135,11 +135,15 @@ public class JdServiceImpl implements JdService {
                     log.info("{}东东农场已助力满!!!", jdCk.getRemark());
                     break;
                 }
+                if (jdFruitEntity.getIsFruitHei() == 1) {
+                    //东东农场火爆
+                    break;
+                }
                 if (jdFruitEntity.getHelpCode().equals(toHelpJdFruitEntity.getHelpCode())) {
                     //不能为自己助力
                     continue;
                 }
-                if (StringUtils.isEmpty(toHelpJdFruitEntity.getHelpCode())){
+                if (StringUtils.isEmpty(toHelpJdFruitEntity.getHelpCode())) {
                     //活动未初始化
                     continue;
                 }
@@ -151,16 +155,16 @@ public class JdServiceImpl implements JdService {
                     //助力
                     helpFruit(toHelpJdCk, jdCk);
                     try {
-                        log.info("东东农场助力休息"+zlcwaittime*1000+"s防止黑ip...");
-                        Thread.sleep(zlcwaittime*1000);
+                        log.info("东东农场助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
+                        Thread.sleep(zlcwaittime * 1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             }
-            if (limit!=null){
+            if (limit != null) {
                 int fruitHelp = jdFruitMapper.getHelpTimes();
-                if (fruitHelp>=limit){
+                if (fruitHelp >= limit) {
                     return;
                 }
             }
@@ -186,12 +190,12 @@ public class JdServiceImpl implements JdService {
         List<JdCkEntity> toHelpJdCks = new ArrayList<>();
 
         for (JdCkEntity ck : cks) {
-            if (ck.getStatus()==1){
+            if (ck.getStatus() == 1) {
                 //ck失效
                 continue;
             }
             JdFruitEntity jdFruitEntity = ck.getJdFruitEntity();
-            if (jdFruitEntity!= null && (jdFruitEntity.getIsFruitHei() == 0)) {
+            if (jdFruitEntity != null && (jdFruitEntity.getIsFruitHei() == 0)) {
                 //东东农场不黑
                 if ((ck.getLevel() == 0) && (jdFruitEntity.getHelpLotteryStatus() == 0) && (StringUtils.isNotEmpty(jdFruitEntity.getHelpCode()))) {
                     //自己 && 未助力满 && 互助码不为空
@@ -220,14 +224,14 @@ public class JdServiceImpl implements JdService {
 
         //随机排序
         Collections.shuffle(vipCks);
-        List<JdCkEntity> vipCks1 = vipCks.subList(0,vipCks.size() / 10);
-        List<JdCkEntity> vipCks2 = vipCks.subList(vipCks.size() / 10,vipCks.size());
+        List<JdCkEntity> vipCks1 = vipCks.subList(0, vipCks.size() / 10);
+        List<JdCkEntity> vipCks2 = vipCks.subList(vipCks.size() / 10, vipCks.size());
         //添加vipCk第一部分
         jdCks.addAll(vipCks1);
         //随机排序
         Collections.shuffle(ptCks);
-        List<JdCkEntity> ptCks1 = ptCks.subList(0,ptCks.size() / 10);
-        List<JdCkEntity> ptCks2 = ptCks.subList(ptCks.size() / 10,ptCks.size());
+        List<JdCkEntity> ptCks1 = ptCks.subList(0, ptCks.size() / 10);
+        List<JdCkEntity> ptCks2 = ptCks.subList(ptCks.size() / 10, ptCks.size());
         //添加ck第一部分
         jdCks.addAll(ptCks1);
 
@@ -255,7 +259,7 @@ public class JdServiceImpl implements JdService {
                     //不能为自己助力
                     continue;
                 }
-                if (StringUtils.isEmpty(toHelpJdFruitEntity.getHelpCode())){
+                if (StringUtils.isEmpty(toHelpJdFruitEntity.getHelpCode())) {
                     //活动未初始化
                     continue;
                 }
@@ -266,9 +270,9 @@ public class JdServiceImpl implements JdService {
                 if (toHelpJdFruitEntity.getToHelpLotteryStatus() == 1) {
                     //助力
                     helpFruitLottery(toHelpJdCk, jdCk);
-                    log.info("东东农场天天抽奖助力休息"+zlcwaittime*1000+"s防止黑ip...");
+                    log.info("东东农场天天抽奖助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
                     try {
-                        Thread.sleep(zlcwaittime*1000);
+                        Thread.sleep(zlcwaittime * 1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -296,12 +300,12 @@ public class JdServiceImpl implements JdService {
         List<JdCkEntity> toHelpJdCks = new ArrayList<>();
 
         for (JdCkEntity ck : cks) {
-            if (ck.getStatus()==1){
+            if (ck.getStatus() == 1) {
                 //ck失效
                 continue;
             }
             JdPetEntity jdPetEntity = ck.getJdPetEntity();
-            if (jdPetEntity!= null && (jdPetEntity.getIsPetHei() == 0)) {
+            if (jdPetEntity != null && (jdPetEntity.getIsPetHei() == 0)) {
                 //东东萌宠不黑
                 if ((ck.getLevel() == 0) && (jdPetEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdPetEntity.getHelpCode()))) {
                     //自己 && 未助力满 && 互助码不为空
@@ -331,7 +335,7 @@ public class JdServiceImpl implements JdService {
 
         Integer limit = null;
         String ddmcHelpStr = systemParamUtil.querySystemParam("DDMCHELP");
-        if (StringUtils.isNotEmpty(ddmcHelpStr)){
+        if (StringUtils.isNotEmpty(ddmcHelpStr)) {
             limit = Integer.parseInt(ddmcHelpStr);
             log.info("查询到东东萌宠助力上限：{}个", limit);
         }
@@ -354,28 +358,32 @@ public class JdServiceImpl implements JdService {
                     //不能为自己助力
                     continue;
                 }
-                if (StringUtils.isEmpty(toHelpJdPetEntity.getHelpCode())){
+                if (jdPetEntity.getIsPetHei() == 1) {
+                    //东东萌宠火爆
+                    break;
+                }
+                if (StringUtils.isEmpty(toHelpJdPetEntity.getHelpCode())) {
                     //活动未初始化
                     continue;
                 }
                 if (toHelpJdPetEntity.getIsPetHei() == 1) {
-                    //东东农场火爆
+                    //东东萌宠火爆
                     continue;
                 }
                 if (toHelpJdPetEntity.getToHelpStatus() == 1) {
                     //助力
                     helpPet(toHelpJdCk, jdCk);
                     try {
-                        log.info("东东萌宠助力休息"+zlcwaittime*1000+"s防止黑ip...");
-                        Thread.sleep(zlcwaittime*1000);
+                        log.info("东东萌宠助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
+                        Thread.sleep(zlcwaittime * 1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             }
-            if (limit!=null){
+            if (limit != null) {
                 int petTimes = jdPetMapper.getHelpTimes();
-                if (petTimes>=limit){
+                if (petTimes >= limit) {
                     return;
                 }
             }
@@ -385,7 +393,7 @@ public class JdServiceImpl implements JdService {
 
     @Async("asyncServiceExecutor")
     @Override
-    public void plantShareHelp(List<JdCkEntity> cks,int zlcwaittime) {
+    public void plantShareHelp(List<JdCkEntity> cks, int zlcwaittime) {
         //需要被助力的ck集合
         List<JdCkEntity> jdCks = new ArrayList<>();
         //查询所有的svipck 未助力满
@@ -398,12 +406,12 @@ public class JdServiceImpl implements JdService {
         List<JdCkEntity> toHelpJdCks = new ArrayList<>();
 
         for (JdCkEntity ck : cks) {
-            if (ck.getStatus()==1){
+            if (ck.getStatus() == 1) {
                 //ck失效
                 continue;
             }
             JdPlantEntity jdPlantEntity = ck.getJdPlantEntity();
-            if (jdPlantEntity!= null && (jdPlantEntity.getIsPlantHei() == 0)) {
+            if (jdPlantEntity != null && (jdPlantEntity.getIsPlantHei() == 0)) {
                 //种豆得豆不黑
                 if ((ck.getLevel() == 0) && (jdPlantEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdPlantEntity.getHelpCode()))) {
                     //自己 && 未助力满 && 互助码不为空
@@ -433,7 +441,7 @@ public class JdServiceImpl implements JdService {
 
         Integer limit = null;
         String zdddHelpStr = systemParamUtil.querySystemParam("ZDDDHELP");
-        if (StringUtils.isNotEmpty(zdddHelpStr)){
+        if (StringUtils.isNotEmpty(zdddHelpStr)) {
             limit = Integer.parseInt(zdddHelpStr);
             log.info("查询到种豆得豆助力上限：{}个", limit);
         }
@@ -452,11 +460,15 @@ public class JdServiceImpl implements JdService {
                     log.info("{}种豆得豆已助力满!!!", jdCk.getRemark());
                     break;
                 }
+                if (jdPlantEntity.getIsPlantHei() == 1) {
+                    //种豆得豆火爆
+                    break;
+                }
                 if (jdPlantEntity.getHelpCode().equals(toHelpJdPlantEntity.getHelpCode())) {
                     //不能为自己助力
                     continue;
                 }
-                if (StringUtils.isEmpty(toHelpJdPlantEntity.getHelpCode())){
+                if (StringUtils.isEmpty(toHelpJdPlantEntity.getHelpCode())) {
                     //活动未初始化
                     continue;
                 }
@@ -468,16 +480,16 @@ public class JdServiceImpl implements JdService {
                     //助力
                     helpPlant(toHelpJdCk, jdCk);
                     try {
-                        log.info("种豆得豆助力休息"+zlcwaittime*1000+"s防止黑ip...");
-                        Thread.sleep(zlcwaittime*1000);
+                        log.info("种豆得豆助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
+                        Thread.sleep(zlcwaittime * 1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             }
-            if (limit!=null){
+            if (limit != null) {
                 int plantTimes = jdPlantMapper.getHelpTimes();
-                if (plantTimes>=limit){
+                if (plantTimes >= limit) {
                     return;
                 }
             }
@@ -498,13 +510,13 @@ public class JdServiceImpl implements JdService {
      * 获取助力信息
      */
     @Override
-    public JSONObject   getJdInfo() {
+    public JSONObject getJdInfo() {
         JSONObject infos = new JSONObject();
         List<JSONObject> jdDatas = jdJdMapper.queryJd();
         //京豆收益
         TreeMap<String, String> jdIncome = new TreeMap<>();
         for (JSONObject jdData : jdDatas) {
-            jdIncome.put(DateUtil.format(DateUtil.parse(jdData.getString("date")), "MM.dd"),jdData.getString("jdCount"));
+            jdIncome.put(DateUtil.format(DateUtil.parse(jdData.getString("date")), "MM.dd"), jdData.getString("jdCount"));
         }
         infos.put("jdIncome", jdIncome);
         //ck总数
@@ -558,10 +570,10 @@ public class JdServiceImpl implements JdService {
             int yesterday = 0;
             int t = 0;
             do {
-                log.info("统计"+jdCkEntity.getRemark()+"京豆中。。。");
-                JSONObject jingBeanBalanceDetail = getJingBeanBalanceDetail(jdCkEntity.getCk(),page,pageSize);
-                if (jingBeanBalanceDetail != null){
-                    if ("0".equals(jingBeanBalanceDetail.getString("code"))){
+                log.info("统计" + jdCkEntity.getRemark() + "京豆中。。。");
+                JSONObject jingBeanBalanceDetail = getJingBeanBalanceDetail(jdCkEntity.getCk(), page, pageSize);
+                if (jingBeanBalanceDetail != null) {
+                    if ("0".equals(jingBeanBalanceDetail.getString("code"))) {
                         page++;
                         List<JSONObject> detailList = jingBeanBalanceDetail.getJSONArray("detailList").toJavaList(JSONObject.class);
                         for (JSONObject detail : detailList) {
@@ -570,33 +582,33 @@ public class JdServiceImpl implements JdService {
                             //今天
 
                         }*/
-                            if (time <= end && time >= begin){
+                            if (time <= end && time >= begin) {
                                 //昨天
                                 String eventMassage = detail.getString("eventMassage");
-                                if (!eventMassage.contains("退还") && !eventMassage.contains("物流") && !eventMassage.contains("扣赠")){
+                                if (!eventMassage.contains("退还") && !eventMassage.contains("物流") && !eventMassage.contains("扣赠")) {
                                     int amount = Integer.parseInt(detail.getString("amount"));
-                                    if (amount>0){
+                                    if (amount > 0) {
                                         yesterday += amount;
 
                                     }
                                 }
                             }
-                            if (time < begin){
+                            if (time < begin) {
                                 //前天跳出
-                                t=1;
+                                t = 1;
                             }
                         }
-                    }else if ("3".equals(jingBeanBalanceDetail.getString("code"))){
+                    } else if ("3".equals(jingBeanBalanceDetail.getString("code"))) {
                         log.info("ck已过期，或者填写不规范");
                         //跳出
-                        t=1;
-                    }else {
-                        log.info("未知情况：{}",jingBeanBalanceDetail.toJSONString());
-                        t=1;
+                        t = 1;
+                    } else {
+                        log.info("未知情况：{}", jingBeanBalanceDetail.toJSONString());
+                        t = 1;
                     }
-                }else {
+                } else {
                     //跳出
-                    t=1;
+                    t = 1;
                 }
                 try {
                     log.info("休息5s防止黑ip...");
@@ -604,8 +616,8 @@ public class JdServiceImpl implements JdService {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            }while (t==0);
-            log.info("统计"+jdCkEntity.getRemark()+"京豆结果：{}",yesterday);
+            } while (t == 0);
+            log.info("统计" + jdCkEntity.getRemark() + "京豆结果：{}", yesterday);
             jdCkEntity.setJd(yesterday);
             jdCkEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
             jdCkMapper.updateCk(jdCkEntity);
@@ -614,16 +626,16 @@ public class JdServiceImpl implements JdService {
         log.info("更新京豆数据！！！");
         int jdCount = jdCkMapper.sumJdCount();
         int i = jdJdMapper.addJdDate(DateUtil.formatDateTime(date), jdCount);
-        if (i==1){
+        if (i == 1) {
             log.info("京豆数据更新成功！！！");
-        }else {
+        } else {
             log.info("京豆数据更新失败！！！");
         }
     }
 
-    public JSONObject getJingBeanBalanceDetail(String ck,int page,int pageSize){
+    public JSONObject getJingBeanBalanceDetail(String ck, int page, int pageSize) {
         String result = HttpRequest.post("https://api.m.jd.com/client.action?functionId=getJingBeanBalanceDetail")
-                .body("body=%7B%22pageSize%22%3A%22"+pageSize+"%22%2C%22page%22%3A%22"+page+"%22%7D&appid=ld")
+                .body("body=%7B%22pageSize%22%3A%22" + pageSize + "%22%2C%22page%22%3A%22" + page + "%22%7D&appid=ld")
                 .header("User-Agent", GetUserAgentUtil.getUserAgent())
                 .header("Host", "api.m.jd.com")
                 .header("Content-Type", "application/x-www-form-urlencoded")
@@ -634,7 +646,7 @@ public class JdServiceImpl implements JdService {
         if (StringUtils.isEmpty(result)) {
             log.info("查询京豆详情请求失败 ‼️‼️");
             return null;
-        }else if(result.contains("response status: 403")){
+        } else if (result.contains("response status: 403")) {
             return null;
         } else {
             return JSONObject.parseObject(result);
@@ -648,24 +660,24 @@ public class JdServiceImpl implements JdService {
     @Async("asyncServiceExecutor")
     public void updateFruitShareCode(List<JdCkEntity> cks) {
         for (JdCkEntity ck : cks) {
-            if (ck.getStatus()==1){
+            if (ck.getStatus() == 1) {
                 //ck失效
                 continue;
             }
             JdFruitEntity jdFruitEntity = ck.getJdFruitEntity();
-            if (jdFruitEntity == null){
+            if (jdFruitEntity == null) {
                 jdFruitEntity = new JdFruitEntity();
                 jdFruitEntity.setCkId(ck.getId());
                 jdFruitEntity.setIsFruitHei(0);
             }
-            if (StringUtils.isEmpty(jdFruitEntity.getHelpCode())){
+            if (StringUtils.isEmpty(jdFruitEntity.getHelpCode())) {
                 try {
                     //查询农场信息
                     JSONObject farmInfo = getFarmInfo(ck.getCk());
                     if (farmInfo != null) {
-                        if (StringUtils.isNotEmpty(farmInfo.getString("code")) && "403".equals(farmInfo.getString("code"))){
+                        if (StringUtils.isNotEmpty(farmInfo.getString("code")) && "403".equals(farmInfo.getString("code"))) {
                             log.info("ip已黑，休息20s!!!");
-                        }else {
+                        } else {
                             JSONObject farmUserPro = farmInfo.getJSONObject("farmUserPro");
                             if (farmUserPro == null) {
                                 log.info("{}ck的东东农场互助码更新失败，活动没开或者活动已黑", ck.getCk());
@@ -681,10 +693,10 @@ public class JdServiceImpl implements JdService {
                             }
                         }
                     }
-                    if (jdFruitEntity.getId()==null){
+                    if (jdFruitEntity.getId() == null) {
                         //id不存在，新增
                         jdFruitMapper.addJdFruit(jdFruitEntity);
-                    }else {
+                    } else {
                         //id存在，修改
                         jdFruitMapper.updateJdFruit(jdFruitEntity);
                     }
@@ -703,34 +715,34 @@ public class JdServiceImpl implements JdService {
     @Async("asyncServiceExecutor")
     public void updatePetShareCode(List<JdCkEntity> cks) {
         for (JdCkEntity ck : cks) {
-            if (ck.getStatus()==1){
+            if (ck.getStatus() == 1) {
                 //ck失效
                 continue;
             }
             JdPetEntity jdPetEntity = ck.getJdPetEntity();
-            if (jdPetEntity == null){
+            if (jdPetEntity == null) {
                 jdPetEntity = new JdPetEntity();
                 jdPetEntity.setCkId(ck.getId());
                 jdPetEntity.setIsPetHei(0);
             }
-            if (StringUtils.isEmpty(jdPetEntity.getHelpCode())){
+            if (StringUtils.isEmpty(jdPetEntity.getHelpCode())) {
                 try {
                     //查询萌宠信息
-                    JSONObject petInfo = getPetInfo(ck.getCk(),"initPetTown");
+                    JSONObject petInfo = getPetInfo(ck.getCk(), "initPetTown");
                     if (petInfo != null) {
-                        if (StringUtils.isNotEmpty(petInfo.getString("code")) && "403".equals(petInfo.getString("code"))){
+                        if (StringUtils.isNotEmpty(petInfo.getString("code")) && "403".equals(petInfo.getString("code"))) {
                             log.info("ip已黑，休息20s!!!");
-                        }else {
-                            if ("0".equals(petInfo.getString("code")) && "0".equals(petInfo.getString("resultCode")) && "success".equals(petInfo.getString("message"))){
+                        } else {
+                            if ("0".equals(petInfo.getString("code")) && "0".equals(petInfo.getString("resultCode")) && "success".equals(petInfo.getString("message"))) {
                                 JSONObject petUserPro = petInfo.getJSONObject("result");
-                                if (petUserPro==null
+                                if (petUserPro == null
                                         || "0".equals(petUserPro.getString("userStatus"))
                                         || "0".equals(petUserPro.getString("petStatus"))
                                         || "0".equals(petUserPro.getString("petStatus"))
-                                        || StringUtils.isEmpty(petUserPro.getString("goodsInfo"))){
+                                        || StringUtils.isEmpty(petUserPro.getString("goodsInfo"))) {
                                     log.info("{}ck的东东萌宠互助码更新失败，活动没开或者活动已黑", ck.getCk());
 //                                    jdPetEntity.setIsPetHei(1);
-                                }else {
+                                } else {
                                     //互助码
                                     String petShareCode = petUserPro.getString("shareCode");
                                     if (StringUtils.isNotEmpty(petShareCode)) {
@@ -742,10 +754,10 @@ public class JdServiceImpl implements JdService {
                             }
                         }
                     }
-                    if (jdPetEntity.getId()==null){
+                    if (jdPetEntity.getId() == null) {
                         //id不存在，新增
                         jdPetMapper.addJdPet(jdPetEntity);
-                    }else {
+                    } else {
                         //id存在，修改
                         jdPetMapper.updateJdPet(jdPetEntity);
                     }
@@ -764,29 +776,29 @@ public class JdServiceImpl implements JdService {
     @Async("asyncServiceExecutor")
     public void updatePlantShareCode(List<JdCkEntity> cks) {
         for (JdCkEntity ck : cks) {
-            if (ck.getStatus()==1){
+            if (ck.getStatus() == 1) {
                 //ck失效
                 continue;
             }
             JdPlantEntity jdPlantEntity = ck.getJdPlantEntity();
-            if (jdPlantEntity == null){
+            if (jdPlantEntity == null) {
                 jdPlantEntity = new JdPlantEntity();
                 jdPlantEntity.setCkId(ck.getId());
                 jdPlantEntity.setIsPlantHei(0);
             }
-            if (StringUtils.isEmpty(jdPlantEntity.getHelpCode())){
+            if (StringUtils.isEmpty(jdPlantEntity.getHelpCode())) {
                 try {
                     //查询种豆得豆信息
-                    JSONObject plantInfo = getPlantInfo(ck.getCk(),"plantBeanIndex");
+                    JSONObject plantInfo = getPlantInfo(ck.getCk(), "plantBeanIndex");
                     if (plantInfo != null) {
-                        if (StringUtils.isNotEmpty(plantInfo.getString("code")) && "403".equals(plantInfo.getString("code"))){
+                        if (StringUtils.isNotEmpty(plantInfo.getString("code")) && "403".equals(plantInfo.getString("code"))) {
                             log.info("ip已黑，休息20s!!!");
-                        }else {
-                            if ("PB101".equals(plantInfo.getString("errorCode")) || "3".equals(plantInfo.getString("code"))){
+                        } else {
+                            if ("PB101".equals(plantInfo.getString("errorCode")) || "3".equals(plantInfo.getString("code"))) {
                                 log.info("{}ck的种豆得豆互助码更新失败，活动没开或者活动已黑", ck.getCk());
 //                                jdPlantEntity.setIsPlantHei(1);
-                            }else {
-                                if ("0".equals(plantInfo.getString("code")) && StringUtils.isNotEmpty(plantInfo.getString("data"))){
+                            } else {
+                                if ("0".equals(plantInfo.getString("code")) && StringUtils.isNotEmpty(plantInfo.getString("data"))) {
                                     String shareUrl = plantInfo.getJSONObject("data").getJSONObject("jwordShareInfo").getString("shareUrl");
                                     String plantShareCode = shareUrl.split("plantUuid=")[1];
                                     jdPlantEntity.setHelpCode(plantShareCode);
@@ -794,10 +806,10 @@ public class JdServiceImpl implements JdService {
                             }
                         }
                     }
-                    if (jdPlantEntity.getId()==null){
+                    if (jdPlantEntity.getId() == null) {
                         //id不存在，新增
                         jdPlantMapper.addJdPlant(jdPlantEntity);
-                    }else {
+                    } else {
                         //id存在，修改
                         jdPlantMapper.updateJdPlant(jdPlantEntity);
                     }
@@ -816,7 +828,7 @@ public class JdServiceImpl implements JdService {
     public void qlToZlc() {
         List<QlEntity> qlEntities = qlMapper.queryQls(null);
         for (QlEntity ql : qlEntities) {
-            log.info("青龙服务器：{}开始同步助力池。。。",ql.getRemark());
+            log.info("青龙服务器：{}开始同步助力池。。。", ql.getRemark());
             int count = 0;
             List<QlEnv> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
             for (QlEnv env : envs) {
@@ -847,7 +859,7 @@ public class JdServiceImpl implements JdService {
                         count++;
                     } else {
                         //更新
-                        if (!ck.equals(jdck.getCk())){
+                        if (!ck.equals(jdck.getCk())) {
                             jdck.setStatus(0);
                             jdck.setCk(ck);
                             if (StringUtils.isNotEmpty(remarks)) {
@@ -860,7 +872,7 @@ public class JdServiceImpl implements JdService {
                     }
                 }
             }
-            log.info("青龙服务器：{}同步助力池结束，共同步{}个ck",ql.getRemark(),count);
+            log.info("青龙服务器：{}同步助力池结束，共同步{}个ck", ql.getRemark(), count);
         }
     }
 
@@ -868,7 +880,7 @@ public class JdServiceImpl implements JdService {
     public List getHelpList(String type) {
         ArrayList<String> list = new ArrayList<>();
         List<JdCkEntity> jdCkEntities = new ArrayList<>();
-        switch (type){
+        switch (type) {
             case "fruit":
                 jdCkEntities = jdCkMapper.queryHasHelpFruitCk();
                 break;
@@ -882,14 +894,14 @@ public class JdServiceImpl implements JdService {
         for (JdCkEntity jdCkEntity : jdCkEntities) {
             String name = "";
             String remark = jdCkEntity.getRemark();
-            if (StringUtils.isNotEmpty(remark)){
-                if (remark.contains("@@")){
+            if (StringUtils.isNotEmpty(remark)) {
+                if (remark.contains("@@")) {
                     int index = remark.indexOf("@@");
-                    name = jdCkEntity.getRemark().substring(0,index);
-                }else {
+                    name = jdCkEntity.getRemark().substring(0, index);
+                } else {
                     name = jdCkEntity.getRemark();
                 }
-            }else {
+            } else {
                 name = jdCkEntity.getPtPin();
             }
             list.add(name);
@@ -961,13 +973,14 @@ public class JdServiceImpl implements JdService {
             } else if ("400".equals(resultObject.getString("code"))) {
                 log.info("东东农场火爆 ‼️‼️");
                 toHelpJdFruitEntity.setIsFruitHei(1);
+                jdFruitEntity.setIsFruitHei(1);
 //                jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
             } else if ("3".equals(resultObject.getString("code"))) {
                 log.info("ck已过期 ‼️‼️");
                 toHelpJdCk.setStatus(1);
                 toHelpJdCk.setUpdatedTime(DateUtil.formatDateTime(new Date()));
                 jdCkMapper.updateCk(toHelpJdCk);
-            }else {
+            } else {
                 log.info("东东农场助力失败 ‼️‼️");
             }
         }
@@ -1030,7 +1043,7 @@ public class JdServiceImpl implements JdService {
                 toHelpJdCk.setStatus(1);
                 toHelpJdCk.setUpdatedTime(DateUtil.formatDateTime(new Date()));
                 jdCkMapper.updateCk(toHelpJdCk);
-            }else {
+            } else {
                 log.info("东东农场天天抽奖助力失败 ‼️‼️");
             }
         }
@@ -1052,7 +1065,7 @@ public class JdServiceImpl implements JdService {
         body.put("version", 2);
         body.put("channel", "app");
         String result = HttpRequest.post(JDAPIHOST + "?functionId=slaveHelp")
-                .body("body="+ EscapeUtil.escape(body.toJSONString()) +"&appid=wh5&loginWQBiz=pet-town&clientVersion=9.0.4")
+                .body("body=" + EscapeUtil.escape(body.toJSONString()) + "&appid=wh5&loginWQBiz=pet-town&clientVersion=9.0.4")
                 .header("cookie", toHelpJdCk.getCk())
                 .header("User-Agent", GetUserAgentUtil.getUserAgent())
                 .header("Host", "api.m.jd.com")
@@ -1073,7 +1086,7 @@ public class JdServiceImpl implements JdService {
                     log.info("【东东萌宠助力好友结果】: 助力失败，您今天助力次数已耗尽");
                     toHelpJdPetEntity.setToHelpStatus(0);
                     jdPetMapper.updateJdPet(toHelpJdPetEntity);
-                }  else if ("2".equals(helpResult.getString("helpStatus"))) {
+                } else if ("2".equals(helpResult.getString("helpStatus"))) {
                     log.info("【东东萌宠助力好友结果】: 好友已满助力");
                     jdPetEntity.setHelpStatus(1);
                     jdPetMapper.updateJdPet(jdPetEntity);
@@ -1082,12 +1095,12 @@ public class JdServiceImpl implements JdService {
                 }
             } else if ("已经助过力".equals(resultObject.getString("message"))) {
                 log.info("此账号今天已经跑过助力了，跳出....");
-            } else if ("1002".equals(resultObject.getString("resultCode"))) {
+            } else if ("1002".equals(resultObject.getString("resultCode")) || "411".equals(resultObject.getString("resultCode"))) {
                 toHelpJdPetEntity.setIsPetHei(1);
-//                jdPetMapper.updateJdPet(toHelpJdPetEntity);
+                jdPetEntity.setIsPetHei(1);
                 log.info("此账号风控，跳出....");
             } else {
-                log.info("东东萌宠助力失败:{}",resultObject.toJSONString());
+                log.info("东东萌宠助力失败:{}", resultObject.toJSONString());
             }
         }
     }
@@ -1109,7 +1122,7 @@ public class JdServiceImpl implements JdService {
         body.put("shareUuid", "");
         body.put("followType", "1");
         String result = HttpRequest.post(JDAPIHOST)
-                .body("functionId=plantBeanIndex&body="+ URLEncodeUtil.encode(body.toJSONString()) +"&appid=ld&client=apple&area=19_1601_50258_51885&build=167490&clientVersion=9.3.2")
+                .body("functionId=plantBeanIndex&body=" + URLEncodeUtil.encode(body.toJSONString()) + "&appid=ld&client=apple&area=19_1601_50258_51885&build=167490&clientVersion=9.3.2")
                 .header("cookie", toHelpJdCk.getCk())
                 .header("Accept", "*/*")
                 .header("User-Agent", GetUserAgentUtil.getUserAgent())
@@ -1132,15 +1145,18 @@ public class JdServiceImpl implements JdService {
                     log.info("【种豆得豆助力好友结果】: 助力失败，您今天助力次数已耗尽");
                     toHelpJdPlantEntity.setToHelpStatus(0);
                     jdPlantMapper.updateJdPlant(toHelpJdPlantEntity);
-                }  else if ("3".equals(helpResult.getJSONObject("helpShareRes").getString("state"))) {
+                } else if ("3".equals(helpResult.getJSONObject("helpShareRes").getString("state"))) {
                     log.info("【种豆得豆助力好友结果】: 好友已满助力");
                     jdPlantEntity.setHelpStatus(1);
                     jdPlantMapper.updateJdPlant(jdPlantEntity);
                 } else {
                     log.info("种豆得豆助力其他情况：{}", helpResult.toJSONString());
                 }
-            } else {
-                log.info("东东萌宠助力失败:{}",resultObject.toJSONString());
+            }else if ("3".equals(resultObject.getString("code"))){
+                jdPlantEntity.setIsPlantHei(1);
+                toHelpJdPlantEntity.setIsPlantHei(1);
+            }else {
+                log.info("种豆得豆助力失败:{}", resultObject.toJSONString());
             }
         }
     }
@@ -1193,12 +1209,12 @@ public class JdServiceImpl implements JdService {
      * @param ck
      * @return
      */
-    public JSONObject getPetInfo(String ck,String functionId) {
+    public JSONObject getPetInfo(String ck, String functionId) {
         JSONObject body = new JSONObject();
-        body.put("version",2);
-        body.put("channel","app");
-        String result = HttpRequest.post(JDAPIHOST + "?functionId="+functionId)
-                .body("body="+ EscapeUtil.escape(body.toJSONString()) +"&appid=wh5&loginWQBiz=pet-town&clientVersion=9.0.4")
+        body.put("version", 2);
+        body.put("channel", "app");
+        String result = HttpRequest.post(JDAPIHOST + "?functionId=" + functionId)
+                .body("body=" + EscapeUtil.escape(body.toJSONString()) + "&appid=wh5&loginWQBiz=pet-town&clientVersion=9.0.4")
                 .header("cookie", ck)
                 .header("User-Agent", GetUserAgentUtil.getUserAgent())
                 .header("Host", "api.m.jd.com")
@@ -1226,13 +1242,13 @@ public class JdServiceImpl implements JdService {
      * @param ck
      * @return
      */
-    public JSONObject getPlantInfo(String ck,String functionId) {
+    public JSONObject getPlantInfo(String ck, String functionId) {
         JSONObject body = new JSONObject();
-        body.put("version","9.2.4.1");
-        body.put("monitor_source","plant_app_plant_index");
-        body.put("monitor_refer","");
+        body.put("version", "9.2.4.1");
+        body.put("monitor_source", "plant_app_plant_index");
+        body.put("monitor_refer", "");
         String result = HttpRequest.post(JDAPIHOST)
-                .body("functionId="+functionId+"&body="+ URLEncodeUtil.encode(body.toJSONString()) +"&appid=ld&client=apple&area=19_1601_50258_51885&build=167490&clientVersion=9.3.2")
+                .body("functionId=" + functionId + "&body=" + URLEncodeUtil.encode(body.toJSONString()) + "&appid=ld&client=apple&area=19_1601_50258_51885&build=167490&clientVersion=9.3.2")
                 .header("cookie", ck)
                 .header("Accept", "*/*")
                 .header("User-Agent", GetUserAgentUtil.getUserAgent())
@@ -1258,30 +1274,31 @@ public class JdServiceImpl implements JdService {
 
     /**
      * 初始化集卡抽奖活动数据API
+     *
      * @return
      */
-    public boolean initForTurntableFarm(String cookie){
+    public boolean initForTurntableFarm(String cookie) {
         JSONObject body = new JSONObject();
-        body.put("version",4);
-        body.put("channel",1);
+        body.put("version", 4);
+        body.put("channel", 1);
         String functionId = "initForTurntableFarm";
         String resStr = get(functionId, body.toJSONString(), cookie);
-        log.info("初始化天天抽奖得好礼返回：{}",resStr);
-        if (StringUtils.isEmpty(resStr)){
+        log.info("初始化天天抽奖得好礼返回：{}", resStr);
+        if (StringUtils.isEmpty(resStr)) {
             log.info("初始化天天抽奖得好礼失败");
             return false;
-        }else {
+        } else {
             JSONObject res = JSONObject.parseObject(resStr);
-            if ("0".equals(res.getString("code"))){
+            if ("0".equals(res.getString("code"))) {
                 return true;
-            }else {
+            } else {
                 log.info("初始化天天抽奖得好礼失败");
                 return false;
             }
         }
     }
 
-    public String get(String functionId,String body,String cookie){
+    public String get(String functionId, String body, String cookie) {
         URLEncoder urlEncoder = URLEncoder.createDefault();
         String res = HttpRequest.get(JDAPIHOST + "?functionId=" + functionId + "&body=" + urlEncoder.encode(body, Charset.defaultCharset()) + "&appid=wh5")
                 .header("Host", "api.m.jd.com")
