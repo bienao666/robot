@@ -56,4 +56,7 @@ public class JdCkEntity {
 
     //所属青龙备注
     private String qlRemark;
+
+    //ck在青龙的位置
+    private int qlindex;
 }

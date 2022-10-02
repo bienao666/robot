@@ -286,13 +286,13 @@ public class CkServiceImpl implements CkService {
         List<JdCkEntity> jdCkEntities = new ArrayList<>();
         //查询所有青龙
         List<QlEntity> qlEntities = qlMapper.queryQls(null);
-        for (int i = 0; i < qlEntities.size(); i++) {
-            QlEntity qlEntity = qlEntities.get(i);
+        for (QlEntity qlEntity : qlEntities) {
             if (StringUtils.isNotEmpty(qlName) && !qlEntity.getRemark().contains(qlName)) {
                 continue;
             }
             List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
-            for (QlEnv env : envs) {
+            for (int i = 0; i < envs.size(); i++) {
+                QlEnv env = envs.get(i);
                 if ("JD_COOKIE".equals(env.getName())) {
                     if (StringUtils.isNotEmpty(ck) && !env.getValue().contains(ck)) {
                         continue;
@@ -310,6 +310,7 @@ public class CkServiceImpl implements CkService {
                     jdCkEntity.setCk(env.getValue());
                     jdCkEntity.setRemark(env.getRemarks());
                     jdCkEntity.setStatus(env.getStatus());
+                    jdCkEntity.setQlindex(i);
                     jdCkEntities.add(jdCkEntity);
                 }
             }
