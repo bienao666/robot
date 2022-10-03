@@ -128,15 +128,15 @@
     </select>
 
     <select id="queryHasHelpFruitCk" resultType="jdCkEntity">
-        select * from jdck where 1 = 1 and id in (select ckid from jdFruit where help_status =1)
+        select * from jdck where 1 = 1 and id in (select ckid from jdFruit where help_status =1) order by level
     </select>
 
     <select id="queryHasHelpPetCk" resultType="jdCkEntity">
-        select * from jdck where 1 = 1 and id in (select ckid from jdPet where help_status =1)
+        select * from jdck where 1 = 1 and id in (select ckid from jdPet where help_status =1) order by level
     </select>
 
     <select id="queryHasHelpPlantCk" resultType="jdCkEntity">
-        select * from jdck where 1 = 1 and id in (select ckid from jdPlant where help_status =1)
+        select * from jdck where 1 = 1 and id in (select ckid from jdPlant where help_status =1) order by level
     </select>
 
 </mapper>
