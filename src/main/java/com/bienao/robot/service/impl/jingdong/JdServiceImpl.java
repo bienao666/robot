@@ -972,7 +972,7 @@ public class JdServiceImpl implements JdService {
                 }
             } else if ("400".equals(resultObject.getString("code"))) {
                 log.info("东东农场火爆 ‼️‼️");
-                toHelpJdFruitEntity.setIsFruitHei(1);
+//                toHelpJdFruitEntity.setIsFruitHei(1);
                 jdFruitEntity.setIsFruitHei(1);
 //                jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
             } else if ("3".equals(resultObject.getString("code"))) {
@@ -982,6 +982,14 @@ public class JdServiceImpl implements JdService {
                 jdCkMapper.updateCk(toHelpJdCk);
             } else {
                 log.info("东东农场助力失败 ‼️‼️");
+            }
+            Integer times = toHelpJdFruitEntity.getTimes();
+            times++;
+            if (times>10){
+                toHelpJdFruitEntity.setToHelpStatus(0);
+                jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
+            }else {
+                toHelpJdFruitEntity.setTimes(times);
             }
         }
     }
@@ -1095,12 +1103,23 @@ public class JdServiceImpl implements JdService {
                 }
             } else if ("已经助过力".equals(resultObject.getString("message"))) {
                 log.info("此账号今天已经跑过助力了，跳出....");
-            } else if ("1002".equals(resultObject.getString("resultCode")) || "411".equals(resultObject.getString("resultCode"))) {
-                toHelpJdPetEntity.setIsPetHei(1);
+            } else if ("1002".equals(resultObject.getString("resultCode"))) {
+//                toHelpJdPetEntity.setIsPetHei(1);
+                jdPetEntity.setIsPetHei(1);
+                log.info("此账号火爆，跳出....");
+            } else if ("411".equals(resultObject.getString("resultCode"))){
                 jdPetEntity.setIsPetHei(1);
                 log.info("此账号风控，跳出....");
             } else {
                 log.info("东东萌宠助力失败:{}", resultObject.toJSONString());
+            }
+            Integer times = toHelpJdPetEntity.getTimes();
+            times++;
+            if (times>10){
+                toHelpJdPetEntity.setToHelpStatus(0);
+                jdPetMapper.updateJdPet(toHelpJdPetEntity);
+            }else {
+                toHelpJdPetEntity.setTimes(times);
             }
         }
     }
@@ -1154,9 +1173,17 @@ public class JdServiceImpl implements JdService {
                 }
             }else if ("3".equals(resultObject.getString("code"))){
                 jdPlantEntity.setIsPlantHei(1);
-                toHelpJdPlantEntity.setIsPlantHei(1);
+//                toHelpJdPlantEntity.setIsPlantHei(1);
             }else {
                 log.info("种豆得豆助力失败:{}", resultObject.toJSONString());
+            }
+            Integer times = toHelpJdPlantEntity.getTimes();
+            times++;
+            if (times>10){
+                toHelpJdPlantEntity.setToHelpStatus(0);
+                jdPlantMapper.updateJdPlant(toHelpJdPlantEntity);
+            }else {
+                toHelpJdPlantEntity.setTimes(times);
             }
         }
     }

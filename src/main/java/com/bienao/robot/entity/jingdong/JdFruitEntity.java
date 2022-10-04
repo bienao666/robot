@@ -27,4 +27,7 @@ public class JdFruitEntity {
 
     //天天抽奖是否还有助力 0否1是
     private Integer toHelpLotteryStatus;
+
+    //助力次数
+    private Integer times = 0;
 }
