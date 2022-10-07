@@ -1,7 +1,9 @@
 package com.bienao.robot.entity;
 
 import cn.hutool.extra.spring.SpringUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.service.ql.WireService;
+import com.bienao.robot.utils.ForwardUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
@@ -13,6 +15,8 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.List;
+
 @Slf4j
 @Component
 public class TgBot extends TelegramLongPollingBot {
@@ -21,7 +25,7 @@ public class TgBot extends TelegramLongPollingBot {
     private String username;
 
     public TgBot() {
-        this( new DefaultBotOptions());
+        this(new DefaultBotOptions());
     }
 
     public TgBot(DefaultBotOptions options) {
@@ -51,22 +55,44 @@ public class TgBot extends TelegramLongPollingBot {
         if (update.hasMessage()) {
             Message message = update.getMessage();
 
+            log.info("tg监听消息 {}", JSONObject.toJSONString(message));
+
+            //获取群号
             Long chatId = message.getChatId();
-
             String text = message.getText();
+            log.info("tg监听消息 chatId：{}->text：{}", chatId, text);
 
-            log.info("tg监听消息 chatId：{}->text：{}",chatId,text);
+            //记录群
+            /*if (chatId != null) {
+                List<Group> groups = this.groupMapper.queryGroupByGroupId(String.valueOf(chatId));
+                if (groups.size() == 0) {
+                    Group group = new Group();
+                    group.setGroupid(String.valueOf(chatId));
+                    group.setGroupName(message.getChat().getTitle());
+                    this.groupMapper.addGroup(group);
+                }
+            }*/
 
-            if (StringUtils.isNotEmpty(text)){
+            //转发
+            /*List<ForwardEntity> list = forwardMapper.queryForward(String.valueOf(chatId), null, null, null);
+            if (list.size()>0){
+                ForwardUtil forwardUtil = new ForwardUtil();
+                for (ForwardEntity forwardEntity : list) {
+                    forwardUtil.forward(text,forwardEntity.getTo(),forwardEntity.getTotype());
+                }
+            }*/
+
+
+            if (StringUtils.isNotEmpty(text)) {
                 //处理消息
-                if (text.contains("export ")){
+                if (text.contains("export ")) {
                     ApplicationContext applicationContext = SpringUtil.getApplicationContext();
                     WireService wireService = applicationContext.getBean(WireService.class);
                     Result result = wireService.addActivity(text);
-                    if ("200".equals(result.getCode())){
-                        sendMsg("线报添加成功，可去后台线报清单查看详情",chatId);
-                    }else {
-                        sendMsg(result.getMessage(),chatId);
+                    if ("200".equals(result.getCode())) {
+                        sendMsg("线报添加成功，可去后台线报清单查看详情", chatId);
+                    } else {
+                        sendMsg(result.getMessage(), chatId);
                     }
                 }
             }
@@ -74,7 +100,7 @@ public class TgBot extends TelegramLongPollingBot {
     }
 
     //回复普通文本消息
-    public void sendMsg(String text,Long chatId){
+    public void sendMsg(String text, Long chatId) {
         SendMessage response = new SendMessage();
         response.setChatId(String.valueOf(chatId));
         response.setText(text);

@@ -142,3 +142,14 @@ create table if not exists `command` (
                                       `created_time` varchar DEFAULT (datetime('now', 'localtime')),
                                       `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );
+create table if not exists `forward` (
+                                         `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+                                         `from` varchar ,
+                                         `fromname` varchar ,
+                                         `fromtype` INTEGER,
+                                         `to` varchar,
+                                         `toname` varchar ,
+                                         `totype` INTEGER,
+                                         `created_time` varchar DEFAULT (datetime('now', 'localtime')),
+                                         `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
+);

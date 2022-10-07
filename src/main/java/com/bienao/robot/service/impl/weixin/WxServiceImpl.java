@@ -97,6 +97,12 @@ public class WxServiceImpl implements WxService {
     @Autowired
     private QlUtil qlUtil;
 
+    @Autowired
+    private ForwardMapper forwardMapper;
+
+    @Autowired
+    private ForwardUtil forwardUtil;
+
     private Cache<String, String> redis = WXConstant.redis;
 
     private Pattern lowerDatePattern = Pattern.compile("/Date\\((\\d+)\\+");
@@ -115,9 +121,32 @@ public class WxServiceImpl implements WxService {
             return;
         }
 
+        //获取微信群号
+        String from_group = content.getString("from_group");
+
+        //记录群
+        if (StringUtils.isNotEmpty(from_group)){
+            List<Group> groups = groupMapper.queryGroupByGroupId(from_group);
+            if (groups.size()==0){
+                Group group = new Group();
+                group.setGroupid(from_group);
+                group.setGroupName(content.getString("from_group_name"));
+                groupMapper.addGroup(group);
+            }
+        }
+
         //发送人
         String from_wxid = content.getString("from_wxid");
         String msg = content.getString("msg").trim();
+
+        //转发
+        List<ForwardEntity> list = forwardMapper.queryForward(String.valueOf(from_group), null, null, null);
+        if (list.size()>0){
+            for (ForwardEntity forwardEntity : list) {
+                forwardUtil.forward(msg,forwardEntity.getTo(),forwardEntity.getTotype());
+            }
+        }
+
 
         //机器人
         String robortwxid = systemParamUtil.querySystemParam("ROBORTWXID");
@@ -125,8 +154,7 @@ public class WxServiceImpl implements WxService {
             systemParamUtil.updateSystemParam("ROBORTWXID", "机器人", content.getString("robot_wxid"));
         }
 
-        //获取微信群号
-        String from_group = content.getString("from_group");
+
 
         //监听群
         if ("监听".equals(msg.trim()) && StringUtils.isNotEmpty(from_group) && weChatUtil.isMaster(content)) {

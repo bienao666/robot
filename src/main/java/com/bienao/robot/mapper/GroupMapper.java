@@ -36,4 +36,11 @@ public interface GroupMapper {
      * @return
      */
     int deleteGroupByGroupIdAndFunctionType(String groupid,Integer functionType);
+
+    /**
+     * 根据群号查询群
+     * @param groupid
+     * @return
+     */
+    List<Group> queryGroupByGroupId(String groupid);
 }

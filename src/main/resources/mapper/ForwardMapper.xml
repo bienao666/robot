@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bienao.robot.mapper.ForwardMapper">
+
+    <insert id="addForward">
+        insert into forward(`from`,fromname,fromtype,`to`,toname,totype) values (#{from},#{fromName},#{fromtype},#{to},#{toName},#{totype})
+    </insert>
+
+    <select id="queryForward" resultType="forwardEntity">
+        select * from forward where 1=1
+        <if test="from != null and from != ''">
+            and `from` = #{from}
+        </if>
+        <if test="fromName != null and fromName != ''">
+            and `fromname` like ('%'||#{fromName}||'%')
+        </if>
+        <if test="to != null and to != ''">
+            and `to` = #{to}
+        </if>
+        <if test="toName != null and toName != ''">
+            and `toname` like ('%'||#{toName}||'%')
+        </if>
+        order by `from`,`to`,created_time
+    </select>
+
+    <delete id="deleteForward" parameterType="string">
+        delete from forward where 1=1 and id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

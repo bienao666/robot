@@ -19,4 +19,8 @@
     <delete id="deleteGroupByGroupIdAndFunctionType">
         delete from `group` where groupid=#{groupid} and functionType=#{functionType}
     </delete>
+
+    <select id="queryGroupByGroupId" resultType="group">
+        select * from `group` where groupid=#{groupid}
+    </select>
 </mapper>
