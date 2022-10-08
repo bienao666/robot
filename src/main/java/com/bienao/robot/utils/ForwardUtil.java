@@ -9,11 +9,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ForwardUtil {
+
     @Autowired
     private WeChatUtil weChatUtil;
 
     @Autowired
     private SystemParamUtil systemParamUtil;
+
     public void forward(String message, String to, Integer toType){
         if (toType.equals(MessageFromType.wxq)){
             JSONObject content = new JSONObject();

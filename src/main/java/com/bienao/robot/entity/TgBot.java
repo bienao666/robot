@@ -62,6 +62,20 @@ public class TgBot extends TelegramLongPollingBot {
             String text = message.getText();
             log.info("tg监听消息 chatId：{}->text：{}", chatId, text);
 
+            if (StringUtils.isNotEmpty(text)) {
+                //处理消息
+                if (text.contains("export ")) {
+                    ApplicationContext applicationContext = SpringUtil.getApplicationContext();
+                    WireService wireService = applicationContext.getBean(WireService.class);
+                    Result result = wireService.addActivity(text);
+                    if ("200".equals(result.getCode())) {
+                        sendMsg("线报添加成功，可去后台线报清单查看详情", chatId);
+                    } else {
+                        sendMsg(result.getMessage(), chatId);
+                    }
+                }
+            }
+
             //记录群
             /*if (chatId != null) {
                 List<Group> groups = this.groupMapper.queryGroupByGroupId(String.valueOf(chatId));
@@ -81,21 +95,6 @@ public class TgBot extends TelegramLongPollingBot {
                     forwardUtil.forward(text,forwardEntity.getTo(),forwardEntity.getTotype());
                 }
             }*/
-
-
-            if (StringUtils.isNotEmpty(text)) {
-                //处理消息
-                if (text.contains("export ")) {
-                    ApplicationContext applicationContext = SpringUtil.getApplicationContext();
-                    WireService wireService = applicationContext.getBean(WireService.class);
-                    Result result = wireService.addActivity(text);
-                    if ("200".equals(result.getCode())) {
-                        sendMsg("线报添加成功，可去后台线报清单查看详情", chatId);
-                    } else {
-                        sendMsg(result.getMessage(), chatId);
-                    }
-                }
-            }
         }
     }
 

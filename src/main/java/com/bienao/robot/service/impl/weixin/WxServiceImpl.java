@@ -21,6 +21,7 @@ import com.bienao.robot.mapper.jingdong.JdCkMapper;
 import com.bienao.robot.service.jingdong.CkService;
 import com.bienao.robot.service.jingdong.JdService;
 import com.bienao.robot.service.ql.QlService;
+import com.bienao.robot.service.ql.WireService;
 import com.bienao.robot.service.user.UserService;
 import com.bienao.robot.service.weixin.WxService;
 import com.bienao.robot.utils.*;
@@ -103,6 +104,9 @@ public class WxServiceImpl implements WxService {
     @Autowired
     private ForwardUtil forwardUtil;
 
+    @Autowired
+    private WireService wireService;
+
     private Cache<String, String> redis = WXConstant.redis;
 
     private Pattern lowerDatePattern = Pattern.compile("/Date\\((\\d+)\\+");
@@ -125,9 +129,9 @@ public class WxServiceImpl implements WxService {
         String from_group = content.getString("from_group");
 
         //记录群
-        if (StringUtils.isNotEmpty(from_group)){
+        if (StringUtils.isNotEmpty(from_group)) {
             List<Group> groups = groupMapper.queryGroupByGroupId(from_group);
-            if (groups.size()==0){
+            if (groups.size() == 0) {
                 Group group = new Group();
                 group.setGroupid(from_group);
                 group.setGroupName(content.getString("from_group_name"));
@@ -141,9 +145,18 @@ public class WxServiceImpl implements WxService {
 
         //转发
         List<ForwardEntity> list = forwardMapper.queryForward(String.valueOf(from_group), null, null, null);
-        if (list.size()>0){
+        if (list.size() > 0) {
             for (ForwardEntity forwardEntity : list) {
-                forwardUtil.forward(msg,forwardEntity.getTo(),forwardEntity.getTotype());
+                forwardUtil.forward("转发自" + forwardEntity.getFromName() + "\n:" + msg, forwardEntity.getTo(), forwardEntity.getTotype());
+            }
+        }
+
+        if (msg.contains("export ")) {
+            Result result = wireService.addActivity(msg);
+            if ("200".equals(result.getCode())) {
+                weChatUtil.sendTextMsg("线报添加成功，可去后台线报清单查看详情", content);
+            } else {
+                weChatUtil.sendTextMsg(result.getMessage(), content);
             }
         }
 
@@ -153,8 +166,6 @@ public class WxServiceImpl implements WxService {
         if (StringUtils.isEmpty(robortwxid)) {
             systemParamUtil.updateSystemParam("ROBORTWXID", "机器人", content.getString("robot_wxid"));
         }
-
-
 
         //监听群
         if ("监听".equals(msg.trim()) && StringUtils.isNotEmpty(from_group) && weChatUtil.isMaster(content)) {
@@ -202,7 +213,7 @@ public class WxServiceImpl implements WxService {
         }
         //退出当前操作
         if ("q".equals(msg)) {
-            log.info("退出当前操作：{}",msg);
+            log.info("退出当前操作：{}", msg);
             redis.remove(from_wxid + "operate");
             weChatUtil.sendTextMsg("已退出", content);
             return;
@@ -322,7 +333,7 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //命令
-        if ("命令".equals(msg)){
+        if ("命令".equals(msg)) {
             handleCommand(content);
             return;
         }
@@ -410,6 +421,7 @@ public class WxServiceImpl implements WxService {
 
     /**
      * 查询所有的命令
+     *
      * @param content
      */
     private void handleCommand(JSONObject content) {
@@ -418,63 +430,65 @@ public class WxServiceImpl implements WxService {
         for (CommandEntity commandEntity : commandEntities) {
             msg += commandEntity.getCommand() + " -> " + commandEntity.getFunction() + "\n";
         }
-        weChatUtil.sendTextMsg(msg,content);
+        weChatUtil.sendTextMsg(msg, content);
     }
 
     /**
      * 启用京东ck
+     *
      * @param content
      */
     private void handleEnableCk(JSONObject content) {
-        String ck = content.getString("msg").replace("启用","").replace(" ","");
+        String ck = content.getString("msg").replace("启用", "").replace(" ", "");
         //查询所有青龙
         List<QlEntity> qlEntities = qlMapper.queryQls(null);
         boolean isReturn = false;
         for (QlEntity qlEntity : qlEntities) {
-            if (isReturn){
+            if (isReturn) {
                 return;
             }
             List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
             for (QlEnv env : envs) {
-                if ("JD_COOKIE".equals(env.getName())&&env.getValue().contains(ck)) {
+                if ("JD_COOKIE".equals(env.getName()) && env.getValue().contains(ck)) {
                     ArrayList<Integer> ids = new ArrayList<>();
                     ids.add(env.getId());
-                    qlUtil.enableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(),ids);
-                    isReturn =true;
-                    weChatUtil.sendTextMsg("启用成功",content);
+                    qlUtil.enableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), ids);
+                    isReturn = true;
+                    weChatUtil.sendTextMsg("启用成功", content);
                     break;
                 }
             }
         }
-        weChatUtil.sendTextMsg("启用失败，该ck不存在",content);
+        weChatUtil.sendTextMsg("启用失败，该ck不存在", content);
     }
 
     /**
      * 禁用京东ck
+     *
      * @param content
      */
     private void handleDisableCk(JSONObject content) {
-        String ck = content.getString("msg").replace("禁用","").replace(" ","");
+        String ck = content.getString("msg").replace("禁用", "").replace(" ", "");
         //查询所有青龙
         List<QlEntity> qlEntities = qlMapper.queryQls(null);
         boolean isReturn = false;
         for (QlEntity qlEntity : qlEntities) {
-            if (isReturn){
+            if (isReturn) {
                 return;
             }
             List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
             for (QlEnv env : envs) {
-                if ("JD_COOKIE".equals(env.getName())&&env.getValue().contains(ck)) {
+                if ("JD_COOKIE".equals(env.getName()) && env.getValue().contains(ck)) {
                     ArrayList<Integer> ids = new ArrayList<>();
                     ids.add(env.getId());
-                    qlUtil.disableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(),ids);
-                    isReturn =true;
-                    weChatUtil.sendTextMsg("禁用成功",content);
+                    qlUtil.disableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), ids);
+                    isReturn = true;
+                    weChatUtil.sendTextMsg("禁用成功", content);
                     break;
                 }
             }
         }
-        weChatUtil.sendTextMsg("禁用失败，该ck不存在",content);
+        weChatUtil.sendTextMsg("禁用失败，该ck不存在", content);
     }
 
     /**
@@ -487,12 +501,12 @@ public class WxServiceImpl implements WxService {
         String from_wxid = content.getString("from_wxid");
         //限制一天只能查3次
         String timesStr = redis.get(from_wxid + "QueryTimes");
-        if (StringUtils.isEmpty(timesStr)){
-            redis.put(from_wxid + "QueryTimes","1");
-            redis.put(from_wxid + "QueryTime",DateUtil.formatDateTime(DateUtil.date()));
-        }else {
+        if (StringUtils.isEmpty(timesStr)) {
+            redis.put(from_wxid + "QueryTimes", "1");
+            redis.put(from_wxid + "QueryTime", DateUtil.formatDateTime(DateUtil.date()));
+        } else {
             Integer times = Integer.parseInt(timesStr);
-            if (times>3){
+            if (times > 3) {
                 weChatUtil.sendTextMsg("抱歉，今日查询次数已耗尽，请明日再查询（robot保护京东账号策略：一天只能查三次）", content);
                 return;
             }
@@ -500,12 +514,12 @@ public class WxServiceImpl implements WxService {
             //上次查询时间
             DateTime lastTime = DateUtil.parse(redis.get(from_wxid + "QueryTime"));
             DateTime limitTime = DateUtil.offsetHour(lastTime, 3);
-            if (limitTime.getTime()>DateUtil.date().getTime()){
-                weChatUtil.sendTextMsg("抱歉，请在"+DateUtil.formatDateTime(limitTime)+"后查询（robot保护京东账号策略：查询间隔3小时）", content);
+            if (limitTime.getTime() > DateUtil.date().getTime()) {
+                weChatUtil.sendTextMsg("抱歉，请在" + DateUtil.formatDateTime(limitTime) + "后查询（robot保护京东账号策略：查询间隔3小时）", content);
                 return;
             }
-            redis.put(from_wxid + "QueryTimes",String.valueOf(times+1));
-            redis.put(from_wxid + "QueryTime",DateUtil.formatDateTime(DateUtil.date()));
+            redis.put(from_wxid + "QueryTimes", String.valueOf(times + 1));
+            redis.put(from_wxid + "QueryTime", DateUtil.formatDateTime(DateUtil.date()));
         }
         User userQuery = new User();
         userQuery.setWxid(from_wxid);
@@ -520,7 +534,7 @@ public class WxServiceImpl implements WxService {
             JdCkEntity jdCkEntityQuery = new JdCkEntity();
             jdCkEntityQuery.setPtPin(jdPtPin);
             JdCkEntity jdCkEntity = jdCkMapper.queryCk(jdCkEntityQuery);
-            if (jdCkEntity!=null && jdCkEntity.getStatus()==1){
+            if (jdCkEntity != null && jdCkEntity.getStatus() == 1) {
                 weChatUtil.sendTextMsg("京东账号已过期，请重新登陆", content);
                 return;
             }
@@ -728,7 +742,7 @@ public class WxServiceImpl implements WxService {
                 jdCkEntity.setLevel(2);
                 ckService.addCkWithOutCheck(jdCkEntity);
                 //保存user
-                userService.saveUser(content,from_wxid,ptPin,wxpusherUid);
+                userService.saveUser(content, from_wxid, ptPin, wxpusherUid);
                 redis.remove(from_wxid + "operate");
             }
             return;
