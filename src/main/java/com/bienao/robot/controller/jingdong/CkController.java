@@ -92,7 +92,7 @@ public class CkController {
     /**
      * 获取京东账号列表
      */
-    @PassToken
+    @LoginToken
     @GetMapping("/getJdCkList")
     public Result getJdCkList(@RequestParam(value = "ck", required = false) String ck,
                               @RequestParam(value = "ptPin", required = false) String ptPin,
@@ -106,7 +106,7 @@ public class CkController {
     /**
      * 启用京东ck
      */
-    @PassToken
+    @LoginToken
     @PostMapping("/enableJdCk")
     public Result enableJdCk(@RequestBody List<JSONObject> cks) {
         if (cks == null || cks.size() == 0) {
@@ -118,7 +118,7 @@ public class CkController {
     /**
      * 禁用京东ck
      */
-    @PassToken
+    @LoginToken
     @PostMapping("/disableJdCk")
     public Result disableJdCk(@RequestBody List<JSONObject> cks) {
         if (cks == null || cks.size() == 0) {
@@ -130,7 +130,7 @@ public class CkController {
     /**
      * 删除京东ck
      */
-    @PassToken
+    @LoginToken
     @PostMapping("/deleteJdCk")
     public Result deleteJdCk(@RequestBody List<JSONObject> cks) {
         if (cks == null || cks.size() == 0) {
@@ -142,6 +142,7 @@ public class CkController {
     /**
      * 修改京东ck
      */
+    @LoginToken
     @PostMapping("/updateJdCk")
     public Result updateJdCk(@RequestBody JdCkEntity jdCkEntity) {
         if (jdCkEntity.getId() == null) {
@@ -153,6 +154,7 @@ public class CkController {
     /**
      * 删除京东ck
      */
+    @LoginToken
     @PostMapping("/deleteJdCks")
     public Result deleteJdCks(@RequestBody List<Integer> ids) {
         if (ids == null || ids.size() == 0) {

@@ -1,6 +1,7 @@
 package com.bienao.robot.controller.jingdong;
 
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.annotation.PassToken;
 import com.bienao.robot.entity.jingdong.JdCkEntity;
 import com.bienao.robot.mapper.jingdong.JdCkMapper;
 import com.bienao.robot.entity.Result;
@@ -144,9 +145,14 @@ public class ShareCodeController {
     /**
      * 获取助力清单
      */
+    @PassToken
     @GetMapping("/getHelpList")
     public Result getHelpList(@RequestParam String type){
-        return Result.success(jdService.getHelpList(type));
+        log.info("获取助力清单入参:{}",type);
+        List helpList = jdService.getHelpList(type);
+        Result success = Result.success(helpList);
+        log.info("获取助力清单出参:{}",JSONObject.toJSONString(helpList));
+        return success;
     }
 
     /**
