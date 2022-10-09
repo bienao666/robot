@@ -147,16 +147,7 @@ public class WxServiceImpl implements WxService {
         List<ForwardEntity> list = forwardMapper.queryForward(String.valueOf(from_group), null, null, null);
         if (list.size() > 0) {
             for (ForwardEntity forwardEntity : list) {
-                forwardUtil.forward("转发自" + forwardEntity.getFromName() + "\n:" + msg, forwardEntity.getTo(), forwardEntity.getTotype());
-            }
-        }
-
-        if (msg.contains("export ")) {
-            Result result = wireService.addActivity(msg);
-            if ("200".equals(result.getCode())) {
-                weChatUtil.sendTextMsg("线报添加成功，可去后台线报清单查看详情", content);
-            } else {
-                weChatUtil.sendTextMsg(result.getMessage(), content);
+                forwardUtil.forward(msg, forwardEntity.getTo(), forwardEntity.getTotype());
             }
         }
 
@@ -211,6 +202,16 @@ public class WxServiceImpl implements WxService {
                 return;
             }
         }
+
+        if (msg.contains("export ")) {
+            Result result = wireService.addActivity(msg);
+            if ("200".equals(result.getCode())) {
+                weChatUtil.sendTextMsg("线报添加成功，可去后台线报清单查看详情", content);
+            } else {
+                weChatUtil.sendTextMsg(result.getMessage(), content);
+            }
+        }
+
         //退出当前操作
         if ("q".equals(msg)) {
             log.info("退出当前操作：{}", msg);
