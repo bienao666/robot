@@ -2,6 +2,8 @@ package com.bienao.robot.entity;
 
 import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.mapper.ForwardMapper;
+import com.bienao.robot.mapper.GroupMapper;
 import com.bienao.robot.service.ql.WireService;
 import com.bienao.robot.utils.ForwardUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -62,10 +64,11 @@ public class TgBot extends TelegramLongPollingBot {
             String text = message.getText();
             log.info("tg监听消息 chatId：{}->text：{}", chatId, text);
 
+            ApplicationContext applicationContext = SpringUtil.getApplicationContext();
+
             if (StringUtils.isNotEmpty(text)) {
                 //处理消息
                 if (text.contains("export ")) {
-                    ApplicationContext applicationContext = SpringUtil.getApplicationContext();
                     WireService wireService = applicationContext.getBean(WireService.class);
                     Result result = wireService.addActivity(text);
                     if ("200".equals(result.getCode())) {
@@ -77,24 +80,26 @@ public class TgBot extends TelegramLongPollingBot {
             }
 
             //记录群
-            /*if (chatId != null) {
-                List<Group> groups = this.groupMapper.queryGroupByGroupId(String.valueOf(chatId));
+            if (chatId != null) {
+                GroupMapper groupMapper = applicationContext.getBean(GroupMapper.class);
+                List<Group> groups = groupMapper.queryGroupByGroupId(String.valueOf(chatId));
                 if (groups.size() == 0) {
                     Group group = new Group();
                     group.setGroupid(String.valueOf(chatId));
                     group.setGroupName(message.getChat().getTitle());
-                    this.groupMapper.addGroup(group);
+                    groupMapper.addGroup(group);
                 }
-            }*/
+            }
 
             //转发
-            /*List<ForwardEntity> list = forwardMapper.queryForward(String.valueOf(chatId), null, null, null);
+            ForwardMapper forwardMapper = applicationContext.getBean(ForwardMapper.class);
+            List<ForwardEntity> list = forwardMapper.queryForward(String.valueOf(chatId), null, null, null);
             if (list.size()>0){
-                ForwardUtil forwardUtil = new ForwardUtil();
+                ForwardUtil forwardUtil = applicationContext.getBean(ForwardUtil.class);
                 for (ForwardEntity forwardEntity : list) {
                     forwardUtil.forward(text,forwardEntity.getTo(),forwardEntity.getTotype());
                 }
-            }*/
+            }
         }
     }
 
