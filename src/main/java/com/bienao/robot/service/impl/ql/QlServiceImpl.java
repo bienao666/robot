@@ -786,9 +786,11 @@ public class QlServiceImpl implements QlService {
                 JdCkEntity jdCkEntityQuery = new JdCkEntity();
                 jdCkEntityQuery.setCk(env.getValue());
                 JdCkEntity jdCkEntity = jdCkMapper.queryCk(jdCkEntityQuery);
-                Integer jd = jdCkEntity.getJd();
-                if (jd>10){
-                    treeMap.put(jd,env);
+                if (jdCkEntity!=null){
+                    Integer jd = jdCkEntity.getJd();
+                    if (jd>10){
+                        treeMap.put(jd,env);
+                    }
                 }
             }
             for (Map.Entry<Integer, QlEnv> entry : treeMap.entrySet()) {

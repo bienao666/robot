@@ -4,6 +4,7 @@ import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.annotation.LoginToken;
+import com.bienao.robot.annotation.PassToken;
 import com.bienao.robot.entity.QlEntity;
 import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.entity.Result;
@@ -289,6 +290,17 @@ public class QlController {
         log.info("cancelHead结束：{}",System.currentTimeMillis());
         log.info("cancelHead耗时：{}ms",(end-start));
         return result;
+    }
+
+    /**
+     * 韭菜友好
+     * @return
+     */
+    @PassToken
+    @GetMapping("/leekFriendly")
+    public Result leekFriendly(){
+        qlService.leekFriendly();
+        return Result.success();
     }
 
 }
