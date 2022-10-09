@@ -575,6 +575,9 @@ public class WireServiceImpl implements WireService {
         keys.add("jd_wxKnowledgeActivity_activityUrl");
         addWire("知识超人","jd_wxKnowledgeActivity.js",keys);
 
+        keys.add("DPQDTK");
+        addWire("常规店铺签到","jd_dpqd.js",keys);
+
         /*keys.add("M_WX_SHOP_GIFT_URL");
         addWire("","",keys);
 
