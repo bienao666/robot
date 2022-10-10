@@ -89,7 +89,7 @@ public class QlUtil {
      * @param remarks 备注
      * @return
      */
-    public JSONObject addEnvs(String url,String tokenType,String token,String name,String value,String remarks){
+    public QlEnv addEnvs(String url,String tokenType,String token,String name,String value,String remarks){
         if (!url.endsWith("/")){
             url = url+"/";
         }
@@ -114,7 +114,7 @@ public class QlUtil {
                 return null;
             }
             String dataStr = res.getString("data");
-            List<JSONObject> list = JSON.parseArray(dataStr, JSONObject.class);
+            List<QlEnv> list = JSON.parseArray(dataStr, QlEnv.class);
             if (list.size()==0){
                 return null;
             }else {

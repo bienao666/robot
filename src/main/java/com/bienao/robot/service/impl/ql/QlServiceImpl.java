@@ -285,10 +285,10 @@ public class QlServiceImpl implements QlService {
                 //该青龙没有大车头
                 if (!isContainBigHead) {
                     //设置大车头
-                    JSONObject env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), qlBigHeadJson.getName(),
+                    QlEnv env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), qlBigHeadJson.getName(),
                             qlBigHeadJson.getValue(),
                             qlBigHeadJson.getRemarks());
-                    JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getInteger("id"), env.getInteger("id"), 0);
+                    JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), env.getId(), 0);
                     if (jsonObject == null) {
                         results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置失败");
                     } else {
@@ -713,6 +713,7 @@ public class QlServiceImpl implements QlService {
                         }
                         if (qlUtil.updateEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), env.getName(), env.getValue(), env.getRemarks())) {
                             sendMessage(content, ptPin, wxPusherUid, ql, "更新");
+                            qlUtil.moveEnv(ql.getUrl(),ql.getTokenType(),ql.getToken(),env.getId(),1000,6);
                         } else {
                             weChatUtil.sendTextMsg("更新失败，请联系管理员", content);
                         }
@@ -727,9 +728,10 @@ public class QlServiceImpl implements QlService {
         Integer min = Collections.min(qlCkCountList);
         int i = qlCkCountList.indexOf(min);
         QlEntity ql = qls.get(i);
-        JSONObject env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), "JD_COOKIE", ck, ptPin + "@@" + System.currentTimeMillis() + "@@" + wxPusherUid);
+        QlEnv env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), "JD_COOKIE", ck, ptPin + "@@" + System.currentTimeMillis() + "@@" + wxPusherUid);
         if (env != null) {
             sendMessage(content, ptPin, wxPusherUid, ql, "添加");
+            qlUtil.moveEnv(ql.getUrl(),ql.getTokenType(),ql.getToken(),env.getId(),1000,6);
         } else {
             weChatUtil.sendTextMsg("添加失败，请联系管理员", content);
         }
