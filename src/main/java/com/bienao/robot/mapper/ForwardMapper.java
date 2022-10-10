@@ -27,5 +27,5 @@ public interface ForwardMapper {
      * 删除
      * @param ids
      */
-    void deleteForward(List<Integer> ids);
+    int deleteForward(List<Integer> ids);
 }

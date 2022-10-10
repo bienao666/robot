@@ -43,4 +43,10 @@ public interface GroupMapper {
      * @return
      */
     List<Group> queryGroupByGroupId(String groupid);
+
+    /**
+     * 查询所有群
+     * @return
+     */
+    List<Group> queryDistinctGroup(String groupName,String groupid);
 }

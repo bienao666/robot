@@ -23,6 +23,7 @@ import com.bienao.robot.service.jingdong.JdService;
 import com.bienao.robot.service.ql.QlService;
 import com.bienao.robot.service.ql.WireService;
 import com.bienao.robot.service.user.UserService;
+import com.bienao.robot.service.weixin.ForwardService;
 import com.bienao.robot.service.weixin.WxService;
 import com.bienao.robot.utils.*;
 import com.bienao.robot.utils.jingdong.JdBeanChangeUtil;
@@ -100,6 +101,9 @@ public class WxServiceImpl implements WxService {
 
     @Autowired
     private ForwardMapper forwardMapper;
+
+    @Autowired
+    private ForwardService forwardService;
 
     @Autowired
     private ForwardUtil forwardUtil;
@@ -235,6 +239,16 @@ public class WxServiceImpl implements WxService {
         //功能列表
         if ("菜单".equals(msg)) {
             handleFunctionList(content);
+            return;
+        }
+        //转发
+        if (msg.startsWith("转发")) {
+            handleForward(content);
+            return;
+        }
+        //取消转发
+        if (msg.startsWith("取消转发")) {
+            handleQxForward(content);
             return;
         }
         //京东资产查询
@@ -392,9 +406,14 @@ public class WxServiceImpl implements WxService {
             handleMyUid(content);
             return;
         }
+        //查询所有群号
+        if ("群号列表".equals(msg.trim())) {
+            handleGroupCodes(content);
+            return;
+        }
         //查询群id
-        if ("群号".equals(msg.trim()) || "groupCode".equals(msg.trim())) {
-            handleMyUid(content);
+        if (msg.startsWith("群号")) {
+            handleGroupCode(content);
             return;
         }
         //查询微信管理员
@@ -421,17 +440,108 @@ public class WxServiceImpl implements WxService {
     }
 
     /**
+     * 取消转发群消息
+     * @param content
+     */
+    private void handleQxForward(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag){
+            String msg = content.getString("msg").replace("取消转发", "").trim();
+            String[] split = msg.split(" ");
+            if (split.length != 2){
+                weChatUtil.sendTextMsg("取消转发格式有误",content);
+                return;
+            }
+            String fromGroupId = split[0];
+            String toGroupId = split[1];
+            List<ForwardEntity> forwardEntities = forwardMapper.queryForward(fromGroupId, null, toGroupId, null);
+            if (forwardEntities.size() == 0 ){
+                weChatUtil.sendTextMsg("转发不存在",content);
+                return;
+            }
+            ArrayList<Integer> ids = new ArrayList<>();
+            ids.add(forwardEntities.get(0).getId());
+            int i = forwardService.deleteForward(ids);
+            if (i == 0){
+                weChatUtil.sendTextMsg("取消失败",content);
+            }else {
+                weChatUtil.sendTextMsg("取消转发",content);
+            }
+        }
+    }
+
+    /**
+     * 转发群消息
+     * @param content
+     */
+    private void handleForward(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag){
+            String msg = content.getString("msg").replace("转发", "").trim();
+            String[] split = msg.split(" ");
+            if (split.length != 2){
+                weChatUtil.sendTextMsg("转发格式有误",content);
+                return;
+            }
+            String fromGroupId = split[0];
+            String toGroupId = split[1];
+            List<ForwardEntity> forwardEntities = forwardMapper.queryForward(fromGroupId, null, toGroupId, null);
+            if (forwardEntities.size() > 0 ){
+                weChatUtil.sendTextMsg("改转发已设置过",content);
+                return;
+            }
+            List<Group> groups = groupMapper.queryDistinctGroup(null, fromGroupId);
+            if (groups.size()!=1){
+                weChatUtil.sendTextMsg(fromGroupId+"群不存在",content);
+                return;
+            }
+            Group fromGroup = groups.get(0);
+            groups = groupMapper.queryDistinctGroup(null, toGroupId);
+            if (groups.size()!=1){
+                weChatUtil.sendTextMsg(fromGroupId+"群不存在",content);
+                return;
+            }
+            Group toGroup = groups.get(0);
+            int i = forwardService.addForward(fromGroup,toGroup);
+            if (i == 1){
+                weChatUtil.sendTextMsg("开启转发",content);
+            }else {
+                weChatUtil.sendTextMsg("转发失败",content);
+            }
+        }
+    }
+
+    /**
+     * 查询所有群号列表
+     * @param content
+     */
+    private void handleGroupCodes(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag){
+            List<Group> groups = groupMapper.queryDistinctGroup(null,null);
+            String msg = "";
+            for (Group group : groups) {
+                msg += group.getGroupName() + "\n  " + group.getGroupid() + "\n";
+            }
+            weChatUtil.sendTextMsg(msg,content);
+        }
+    }
+
+    /**
      * 查询所有的命令
      *
      * @param content
      */
     private void handleCommand(JSONObject content) {
-        List<CommandEntity> commandEntities = commandMapper.queryCommand(null, null);
-        String msg = "";
-        for (CommandEntity commandEntity : commandEntities) {
-            msg += commandEntity.getCommand() + " -> " + commandEntity.getFunction() + "\n";
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag){
+            List<CommandEntity> commandEntities = commandMapper.queryCommand(null, null);
+            String msg = "";
+            for (CommandEntity commandEntity : commandEntities) {
+                msg += commandEntity.getCommand() + " -> " + commandEntity.getFunction() + "\n";
+            }
+            weChatUtil.sendTextMsg(msg, content);
         }
-        weChatUtil.sendTextMsg(msg, content);
     }
 
     /**
@@ -440,27 +550,30 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleEnableCk(JSONObject content) {
-        String ck = content.getString("msg").replace("启用", "").replace(" ", "");
-        //查询所有青龙
-        List<QlEntity> qlEntities = qlMapper.queryQls(null);
-        boolean isReturn = false;
-        for (QlEntity qlEntity : qlEntities) {
-            if (isReturn) {
-                return;
-            }
-            List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
-            for (QlEnv env : envs) {
-                if ("JD_COOKIE".equals(env.getName()) && env.getValue().contains(ck)) {
-                    ArrayList<Integer> ids = new ArrayList<>();
-                    ids.add(env.getId());
-                    qlUtil.enableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), ids);
-                    isReturn = true;
-                    weChatUtil.sendTextMsg("启用成功", content);
-                    break;
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag){
+            String ck = content.getString("msg").replace("启用", "").replace(" ", "");
+            //查询所有青龙
+            List<QlEntity> qlEntities = qlMapper.queryQls(null);
+            boolean isReturn = false;
+            for (QlEntity qlEntity : qlEntities) {
+                if (isReturn) {
+                    return;
+                }
+                List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
+                for (QlEnv env : envs) {
+                    if ("JD_COOKIE".equals(env.getName()) && env.getValue().contains(ck)) {
+                        ArrayList<Integer> ids = new ArrayList<>();
+                        ids.add(env.getId());
+                        qlUtil.enableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), ids);
+                        isReturn = true;
+                        weChatUtil.sendTextMsg("启用成功", content);
+                        break;
+                    }
                 }
             }
+            weChatUtil.sendTextMsg("启用失败，该ck不存在", content);
         }
-        weChatUtil.sendTextMsg("启用失败，该ck不存在", content);
     }
 
     /**
@@ -469,27 +582,30 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleDisableCk(JSONObject content) {
-        String ck = content.getString("msg").replace("禁用", "").replace(" ", "");
-        //查询所有青龙
-        List<QlEntity> qlEntities = qlMapper.queryQls(null);
-        boolean isReturn = false;
-        for (QlEntity qlEntity : qlEntities) {
-            if (isReturn) {
-                return;
-            }
-            List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
-            for (QlEnv env : envs) {
-                if ("JD_COOKIE".equals(env.getName()) && env.getValue().contains(ck)) {
-                    ArrayList<Integer> ids = new ArrayList<>();
-                    ids.add(env.getId());
-                    qlUtil.disableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), ids);
-                    isReturn = true;
-                    weChatUtil.sendTextMsg("禁用成功", content);
-                    break;
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag){
+            String ck = content.getString("msg").replace("禁用", "").replace(" ", "");
+            //查询所有青龙
+            List<QlEntity> qlEntities = qlMapper.queryQls(null);
+            boolean isReturn = false;
+            for (QlEntity qlEntity : qlEntities) {
+                if (isReturn) {
+                    return;
+                }
+                List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
+                for (QlEnv env : envs) {
+                    if ("JD_COOKIE".equals(env.getName()) && env.getValue().contains(ck)) {
+                        ArrayList<Integer> ids = new ArrayList<>();
+                        ids.add(env.getId());
+                        qlUtil.disableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), ids);
+                        isReturn = true;
+                        weChatUtil.sendTextMsg("禁用成功", content);
+                        break;
+                    }
                 }
             }
+            weChatUtil.sendTextMsg("禁用失败，该ck不存在", content);
         }
-        weChatUtil.sendTextMsg("禁用失败，该ck不存在", content);
     }
 
     /**
@@ -1154,9 +1270,22 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     public void handleGroupCode(JSONObject content) {
+        String groupName = content.getString("msg").replace("群号","").trim();
+        String msg = "";
+        if (StringUtils.isEmpty(groupName)){
+            msg = content.getString("from_group");
+        }else {
+            List<Group> groups = groupMapper.queryDistinctGroup(groupName,null);
+            if (groups.size()==0){
+                msg = "未查到"+groupName+"群";
+            }else {
+                for (Group group : groups) {
+                    msg += group.getGroupName() + "\n  " + group.getGroupid() + "\n";
+                }
+            }
+        }
         //发送人
-        String from_group = content.getString("from_group");
-        weChatUtil.sendTextMsg(from_group, content);
+        weChatUtil.sendTextMsg(msg, content);
     }
 
 
