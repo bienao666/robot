@@ -115,7 +115,9 @@ public class WxServiceImpl implements WxService {
 
     private Pattern lowerDatePattern = Pattern.compile("/Date\\((\\d+)\\+");
 
-    private static Pattern ckPattern = Pattern.compile("pt_pin=(.+?);");
+    private static Pattern jdPinPattern = Pattern.compile("pt_pin=(.+?);");
+
+    private static Pattern ckPattern = Pattern.compile("pt_key=(.+?);pt_pin=(.+?);");
 
     @Async("asyncServiceExecutor")
     @Override
@@ -214,6 +216,12 @@ public class WxServiceImpl implements WxService {
             } else {
                 weChatUtil.sendTextMsg(result.getMessage(), content);
             }
+        }
+
+        //京东ck
+        if (ckPattern.matcher(msg.trim()).find()){
+            addJdCk(msg,content);
+            return;
         }
 
         //退出当前操作
@@ -813,54 +821,7 @@ public class WxServiceImpl implements WxService {
                 redis.remove(from_wxid + "operate");
                 weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
             } else {
-                String ptPin = "";
-                Matcher matcher = ckPattern.matcher(ck);
-                if (matcher.find()) {
-                    ptPin = matcher.group(1);
-                }
-                String wxpusherUid = "";
-                //生成wxpusher二维码
-                if (wxpusherUtil.getWxpusherCode(content)) {
-                    try {
-                        Thread.sleep(11 * 1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        for (int i = 0; i < 2; i++) {
-                            weChatUtil.sendTextMsg("正在配置资产推送中，请稍后。。。", content);
-                            wxpusherUid = wxpusherUtil.getWxpusherUid(content);
-                            if (StringUtils.isNotEmpty(wxpusherUid)) {
-                                break;
-                            }
-                            try {
-                                Thread.sleep(11 * 1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    if (StringUtils.isEmpty(wxpusherUid)) {
-                        weChatUtil.sendTextMsg("资产推送配置失败，可重新登陆或者联系管理员手动配置", content);
-                    }
-                    //保存ck
-                    qlService.addJdCk(content, ck, ptPin, wxpusherUid);
-                } else {
-                    //保存ck
-                    qlService.addJdCk(content, ck, ptPin, "");
-                }
-                //保存cookie
-                JdCkEntity jdCkEntity = new JdCkEntity();
-                jdCkEntity.setCk(ck);
-                jdCkEntity.setPtPin(ptPin);
-                jdCkEntity.setStatus(0);
-                jdCkEntity.setLevel(2);
-                ckService.addCkWithOutCheck(jdCkEntity);
-                //保存user
-                userService.saveUser(content, from_wxid, ptPin, wxpusherUid);
-                redis.remove(from_wxid + "operate");
+                addJdCk(ck,content);
             }
             return;
         }
@@ -899,6 +860,57 @@ public class WxServiceImpl implements WxService {
                 redis.put(from_wxid + "operate", "brushylgytimes", 11 * 1000);
             }
         }
+    }
+
+    private void addJdCk(String ck,JSONObject content){
+        String ptPin = "";
+        Matcher matcher = jdPinPattern.matcher(ck);
+        if (matcher.find()) {
+            ptPin = matcher.group(1);
+        }
+        String wxpusherUid = "";
+        //生成wxpusher二维码
+        if (wxpusherUtil.getWxpusherCode(content)) {
+            try {
+                Thread.sleep(11 * 1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            try {
+                for (int i = 0; i < 2; i++) {
+                    weChatUtil.sendTextMsg("正在配置资产推送中，请稍后。。。", content);
+                    wxpusherUid = wxpusherUtil.getWxpusherUid(content);
+                    if (StringUtils.isNotEmpty(wxpusherUid)) {
+                        break;
+                    }
+                    try {
+                        Thread.sleep(11 * 1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (StringUtils.isEmpty(wxpusherUid)) {
+                weChatUtil.sendTextMsg("资产推送配置失败，可重新登陆或者联系管理员手动配置", content);
+            }
+            //保存ck
+            qlService.addJdCk(content, ck, ptPin, wxpusherUid);
+        } else {
+            //保存ck
+            qlService.addJdCk(content, ck, ptPin, "");
+        }
+        //保存cookie
+        JdCkEntity jdCkEntity = new JdCkEntity();
+        jdCkEntity.setCk(ck);
+        jdCkEntity.setPtPin(ptPin);
+        jdCkEntity.setStatus(0);
+        jdCkEntity.setLevel(2);
+        ckService.addCkWithOutCheck(jdCkEntity);
+        //保存user
+        userService.saveUser(content, content.getString("from_wxid"), ptPin, wxpusherUid);
+        redis.remove(content.getString("from_wxid") + "operate");
     }
 
     /**

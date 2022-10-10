@@ -717,6 +717,9 @@ public class QlServiceImpl implements QlService {
                         }
                         if (qlUtil.updateEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), env.getName(), env.getValue(), env.getRemarks())) {
                             sendMessage(content, ptPin, wxPusherUid, ql, "更新");
+                            ArrayList<Integer> ids = new ArrayList<>();
+                            ids.add(env.getId());
+                            qlUtil.enableEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), ids);
                             qlUtil.moveEnv(ql.getUrl(),ql.getTokenType(),ql.getToken(),env.getId(),1000,6);
                         } else {
                             weChatUtil.sendTextMsg("更新失败，请联系管理员", content);
