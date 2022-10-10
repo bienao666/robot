@@ -1607,6 +1607,40 @@ public class WxServiceImpl implements WxService {
         }
     }
 
+    /*public static void main(String[] args) {
+        Festival festival = new Festival("国庆节", 10, 1, false, 0L);
+        Date now = new Date();
+        int year = DateUtil.year(now);
+        int month = 0;
+        int day = 0;
+        // 如果节日为农历，则取出对应的公历日
+        if (festival.isChineseDate()) {
+            DateTime festivalDay = new DateTime(new ChineseDate(year, festival.getMonth(), festival.getDay()).getGregorianDate().getTime());
+            month = festivalDay.month()+1;
+            day = festivalDay.dayOfMonth();
+        } else {
+            month = festival.getMonth();
+            day = festival.getDay();
+        }
+        // 如果当前日期大于等于节日的月份和天数，则年数取下一年
+        if (DateUtil.month(now)+1 > month) {
+            year++;
+        }else {
+            if (DateUtil.month(now)+1 == month && DateUtil.dayOfMonth(now) >= day){
+                year++;
+            }
+        }
+        DateTime festivalDay;
+        // 如果节日为农历，则取出对应的公历日
+        if (festival.isChineseDate()) {
+            festivalDay = new DateTime(new ChineseDate(year, festival.getMonth(), festival.getDay()).getGregorianDate().getTime());
+        } else {
+            festivalDay = DateUtil.parse(year + "-" + festival.getMonth() + "-" + festival.getDay());
+        }
+        // 计算当前日期和节日（公历日）的天数差 并保存
+        System.out.println(DateUtil.betweenDay(now, festivalDay, false));
+    }*/
+
 
     /**
      * 摸鱼
@@ -1635,7 +1669,7 @@ public class WxServiceImpl implements WxService {
         festivalList.add(new Festival("国庆节", 10, 1, false, 0L));
         festivalList.add(new Festival("七夕节", 7, 7, true, 0L));
         festivalList.add(new Festival("情人节", 2, 14, false, 0L));
-        festivalList.add(new Festival("重阳节", 9, 9, true, 0L));
+//        festivalList.add(new Festival("重阳节", 9, 9, true, 0L));
         // 获取节日时间差
         festivalList.forEach(this::getGregorianDayDiff);
         // 存放周末 【不剔除法定调休】【周末无需关心月/日】
@@ -1676,9 +1710,24 @@ public class WxServiceImpl implements WxService {
         // 获取当前日期
         Date now = new Date();
         int year = DateUtil.year(now);
+        int month = 0;
+        int day = 0;
+        // 如果节日为农历，则取出今年对应的公历日
+        if (festival.isChineseDate()) {
+            DateTime festivalDay = new DateTime(new ChineseDate(year, festival.getMonth(), festival.getDay()).getGregorianDate().getTime());
+            month = festivalDay.month()+1;
+            day = festivalDay.dayOfMonth();
+        } else {
+            month = festival.getMonth();
+            day = festival.getDay();
+        }
         // 如果当前日期大于等于节日的月份和天数，则年数取下一年
-        if (DateUtil.month(now) >= festival.getMonth() && DateUtil.dayOfMonth(now) >= festival.getDay()) {
+        if (DateUtil.month(now)+1 > month) {
             year++;
+        }else {
+            if (DateUtil.month(now)+1 == month && DateUtil.dayOfMonth(now) >= day){
+                year++;
+            }
         }
         DateTime festivalDay;
         // 如果节日为农历，则取出对应的公历日
