@@ -34,7 +34,7 @@ public interface CkService {
      */
     void checkCk();
 
-    List<JdCkEntity> getJdCks(String ck,String ptPin,Integer level,Integer status,String remark);
+    Result getJdCks(String ck,String ptPin,Integer level,Integer status,String remark,Integer pageNo,Integer pageSize);
 
     Result updateJdCk(JdCkEntity jdCkEntity);
 

@@ -252,14 +252,23 @@ public class CkServiceImpl implements CkService {
     }
 
     @Override
-    public List<JdCkEntity> getJdCks(String ck, String ptPin, Integer level, Integer status,String remark) {
+    public Result getJdCks(String ck, String ptPin, Integer level, Integer status,String remark, Integer pageNo, Integer pageSize) {
         JdCkEntity jdCkEntity = new JdCkEntity();
         jdCkEntity.setCk(ck);
         jdCkEntity.setPtPin(ptPin);
         jdCkEntity.setLevel(level);
         jdCkEntity.setStatus(status);
         jdCkEntity.setRemark(remark);
-        return jdCkMapper.queryCks(jdCkEntity);
+        List<JdCkEntity> jdCkEntities = jdCkMapper.queryCks(jdCkEntity);
+        int start = PageUtil.getStart(pageNo, pageSize) - pageSize;
+        int end = PageUtil.getEnd(pageNo, pageSize) - pageSize;
+        JSONObject result = new JSONObject();
+        result.put("total", jdCkEntities.size());
+        result.put("pageNo", pageNo);
+        result.put("pageSize", pageSize);
+        jdCkEntities = jdCkEntities.subList(start, Math.min(end, jdCkEntities.size()));
+        result.put("jdCkList", jdCkEntities);
+        return Result.success(result);
     }
 
     @Override

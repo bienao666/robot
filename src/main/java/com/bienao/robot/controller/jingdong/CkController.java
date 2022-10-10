@@ -84,9 +84,10 @@ public class CkController {
                            @RequestParam(value = "ptPin", required = false) String ptPin,
                            @RequestParam(value = "level", required = false) Integer level,
                            @RequestParam(value = "status", required = false) Integer status,
-                           @RequestParam(value = "remark", required = false) String remark) {
-        List<JdCkEntity> jdcks = ckService.getJdCks(ck, ptPin, level, status,remark);
-        return Result.success(jdcks);
+                           @RequestParam(value = "remark", required = false) String remark,
+                           @RequestParam(value = "pageNo") Integer pageNo,
+                           @RequestParam(value = "pageSize") Integer pageSize) {
+        return ckService.getJdCks(ck, ptPin, level, status,remark, pageNo, pageSize);
     }
 
     /**
