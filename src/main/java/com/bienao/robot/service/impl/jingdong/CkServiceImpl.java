@@ -300,29 +300,33 @@ public class CkServiceImpl implements CkService {
             if (StringUtils.isNotEmpty(qlName) && !qlEntity.getRemark().contains(qlName)) {
                 continue;
             }
-            List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
-            for (int i = 0; i < envs.size(); i++) {
-                QlEnv env = envs.get(i);
-                if ("JD_COOKIE".equals(env.getName())) {
-                    if (StringUtils.isNotEmpty(ck) && !env.getValue().contains(ck)) {
-                        continue;
+            try {
+                List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
+                for (int i = 0; i < envs.size(); i++) {
+                    QlEnv env = envs.get(i);
+                    if ("JD_COOKIE".equals(env.getName())) {
+                        if (StringUtils.isNotEmpty(ck) && !env.getValue().contains(ck)) {
+                            continue;
+                        }
+                        if (StringUtils.isNotEmpty(ptPin) && !env.getValue().contains(ptPin)) {
+                            continue;
+                        }
+                        if (status != null && !status.equals(env.getStatus())) {
+                            continue;
+                        }
+                        JdCkEntity jdCkEntity = new JdCkEntity();
+                        jdCkEntity.setQlId(qlEntity.getId());
+                        jdCkEntity.setQlRemark(qlEntity.getRemark());
+                        jdCkEntity.setId(env.getId());
+                        jdCkEntity.setCk(env.getValue());
+                        jdCkEntity.setRemark(env.getRemarks());
+                        jdCkEntity.setStatus(env.getStatus());
+                        jdCkEntity.setQlindex(i);
+                        jdCkEntities.add(jdCkEntity);
                     }
-                    if (StringUtils.isNotEmpty(ptPin) && !env.getValue().contains(ptPin)) {
-                        continue;
-                    }
-                    if (status != null && !status.equals(env.getStatus())) {
-                        continue;
-                    }
-                    JdCkEntity jdCkEntity = new JdCkEntity();
-                    jdCkEntity.setQlId(qlEntity.getId());
-                    jdCkEntity.setQlRemark(qlEntity.getRemark());
-                    jdCkEntity.setId(env.getId());
-                    jdCkEntity.setCk(env.getValue());
-                    jdCkEntity.setRemark(env.getRemarks());
-                    jdCkEntity.setStatus(env.getStatus());
-                    jdCkEntity.setQlindex(i);
-                    jdCkEntities.add(jdCkEntity);
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         int start = PageUtil.getStart(pageNo, pageSize) - pageSize;

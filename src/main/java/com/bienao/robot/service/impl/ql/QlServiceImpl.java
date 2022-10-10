@@ -126,18 +126,22 @@ public class QlServiceImpl implements QlService {
     public Result queryQls(List<Integer> ids) {
         List<QlEntity> qls = qlMapper.queryQls(ids);
         for (QlEntity ql : qls) {
-            JSONObject tokenJson = qlUtil.getToken(ql.getUrl(), ql.getClientID(), ql.getClientSecret());
-            if (tokenJson == null) {
-                ql.setStatus("异常");
-            } else {
-                ql.setStatus("正常");
-                ql.setToken(tokenJson.getString("token"));
-                ql.setTokenType(tokenJson.getString("token_type"));
-                qlMapper.updateQl(ql);
-                ql.setToken("******");
-                ql.setTokenType("******");
+            try {
+                JSONObject tokenJson = qlUtil.getToken(ql.getUrl(), ql.getClientID(), ql.getClientSecret());
+                if (tokenJson == null) {
+                    ql.setStatus("异常");
+                } else {
+                    ql.setStatus("正常");
+                    ql.setToken(tokenJson.getString("token"));
+                    ql.setTokenType(tokenJson.getString("token_type"));
+                    qlMapper.updateQl(ql);
+                    ql.setToken("******");
+                    ql.setTokenType("******");
+                }
+                ql.setClientSecret("******");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            ql.setClientSecret("******");
         }
         return Result.success(qls);
     }
