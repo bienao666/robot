@@ -27,7 +27,7 @@ public interface CommandMapper {
      * @param command
      * @return
      */
-    List<CommandEntity> queryCommand(String command,String function);
+    List<CommandEntity> queryCommand(String command,String function,Integer isBuiltIn);
 
     /**
      * 查询命令

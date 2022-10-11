@@ -182,6 +182,7 @@ public class WxServiceImpl implements WxService {
             } else {
                 weChatUtil.sendTextMsg("开始监听", content);
             }
+            return;
         }
 
         //取消监听群
@@ -193,6 +194,7 @@ public class WxServiceImpl implements WxService {
             } else {
                 weChatUtil.sendTextMsg("未监听此群，无法取消", content);
             }
+            return;
         }
         //判断是否在监听范围
         if (StringUtils.isNotEmpty(from_group)) {
@@ -216,6 +218,7 @@ public class WxServiceImpl implements WxService {
             } else {
                 weChatUtil.sendTextMsg(result.getMessage(), content);
             }
+            return;
         }
 
         //京东ck
@@ -430,7 +433,7 @@ public class WxServiceImpl implements WxService {
             return;
         }
 
-        List<CommandEntity> commandEntities = commandMapper.queryCommand("", "");
+        List<CommandEntity> commandEntities = commandMapper.queryCommand("", "",0);
         for (CommandEntity commandEntity : commandEntities) {
             if (msg.trim().equals(commandEntity.getCommand())) {
                 weChatUtil.sendTextMsg(commandEntity.getReply(), content);
@@ -543,7 +546,7 @@ public class WxServiceImpl implements WxService {
     private void handleCommand(JSONObject content) {
         boolean flag = weChatUtil.isMaster(content);
         if (flag){
-            List<CommandEntity> commandEntities = commandMapper.queryCommand(null, null);
+            List<CommandEntity> commandEntities = commandMapper.queryCommand(null, null,null);
             String msg = "";
             for (CommandEntity commandEntity : commandEntities) {
                 msg += commandEntity.getCommand() + " -> " + commandEntity.getFunction() + "\n";
