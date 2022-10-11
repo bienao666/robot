@@ -222,7 +222,7 @@ public class WxServiceImpl implements WxService {
         }
 
         //京东ck
-        if (ckPattern.matcher(msg.trim()).find()){
+        if (ckPattern.matcher(msg.replace(" ","").trim()).find()){
             addJdCk(msg,content);
             return;
         }
