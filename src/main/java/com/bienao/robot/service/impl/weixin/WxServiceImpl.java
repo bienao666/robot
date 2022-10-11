@@ -1973,7 +1973,6 @@ public class WxServiceImpl implements WxService {
         body.put("qlkey", 0);
         String resultStr = HttpRequest.post(jdlonginurl + "api/SendSMS")
                 .body(body.toJSONString())
-                .timeout(3000)
                 .execute().body();
         log.info("nark发送手机号结果：{}",resultStr);
         if (StringUtils.isNotEmpty(resultStr)) {
