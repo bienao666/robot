@@ -127,7 +127,10 @@ public class WxServiceImpl implements WxService {
         //同意好友添加
         Integer type = content.getInteger("type");
         if (14 == type) {
-            weChatUtil.agreeFriendVerify(content);
+            String isautoagreeaddwx = systemParamUtil.querySystemParam("ISAUTOAGREEADDWX");
+            if ("是".equals(isautoagreeaddwx)){
+                weChatUtil.agreeFriendVerify(content);
+            }
             return;
         }
 
