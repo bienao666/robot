@@ -29,6 +29,6 @@ INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('DDMCHELP', '东东
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ZDDDHELP', '种豆得豆助力个数(为空不限制，用于号太多的防风控)','',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ZFBHBUL', '支付宝红包二维码图片地址','',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('QLTOZLC', '青龙自动同步助力池(是/否)','否',1);
-INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('LEEKFRIENDLY', '韭菜友好(是/否)','否',1);
+INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('LEEKFRIENDLY', '青龙韭菜友好(是/否)','否',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ISAUTOAGREEADDWX', '微信自动添加好友(是/否)','否',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ISWXSAFE', '启动微信安全策略(是/否)','否',1);
