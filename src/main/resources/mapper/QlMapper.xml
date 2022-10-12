@@ -52,7 +52,7 @@
             <if test="token !=null and token !=''">
                 token=#{token},
             </if>
-            <if test="head !=null and head !=''">
+            <if test="head !=null">
                 head=#{head},
             </if>
             <if test="remark !=null and remark !=''">

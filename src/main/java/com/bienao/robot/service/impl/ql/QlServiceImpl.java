@@ -224,12 +224,7 @@ public class QlServiceImpl implements QlService {
     public Result oneKeyHead() {
         ArrayList<String> results = new ArrayList<>();
         //查询大车头
-        List<SystemParam> qlbighead = systemParamUtil.querySystemParams("QLBIGHEAD");
-        if (qlbighead.size() == 0) {
-            return Result.error(ErrorCodeConstant.SYSTEMPARAM_ERROR, "系统参数不存在");
-        }
-        SystemParam systemParam = qlbighead.get(0);
-        String qlBigHead = systemParam.getValue();
+        String qlBigHead = systemParamUtil.querySystemParam("QLBIGHEAD");
         if (StringUtils.isEmpty(qlBigHead)) {
             return Result.error(ErrorCodeConstant.SYSTEMPARAM_ERROR, "请先去系统参数设置大车头");
         }
@@ -284,6 +279,12 @@ public class QlServiceImpl implements QlService {
                     if ("JD_COOKIE".equals(name) && value.contains(qlBigHead)) {
                         //该青龙存在大车头
                         isContainBigHead = true;
+                        JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), 1000, 0);
+                        if (jsonObject == null) {
+                            results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置失败");
+                        } else {
+                            results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置成功");
+                        }
                     }
                 }
                 //该青龙没有大车头
@@ -292,7 +293,7 @@ public class QlServiceImpl implements QlService {
                     QlEnv env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), qlBigHeadJson.getName(),
                             qlBigHeadJson.getValue(),
                             qlBigHeadJson.getRemarks());
-                    JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), env.getId(), 0);
+                    JSONObject jsonObject = qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), 1000, 0);
                     if (jsonObject == null) {
                         results.add(ql.getUrl() + "(" + ql.getRemark() + ")" + "设置失败");
                     } else {
@@ -315,22 +316,15 @@ public class QlServiceImpl implements QlService {
     public Result cancelHead() {
         ArrayList<String> results = new ArrayList<>();
         //查询大车头
-        List<SystemParam> systems = systemParamUtil.querySystemParams("QLBIGHEAD");
-        if (systems.size() == 0) {
-            return Result.error(ErrorCodeConstant.SYSTEMPARAM_ERROR, "系统参数不存在");
-        }
-        SystemParam qlBigHead = systems.get(0);
-        String qlBigHeadValue = qlBigHead.getValue();
+        String qlBigHeadValue = systemParamUtil.querySystemParam("QLBIGHEAD");
         if (StringUtils.isEmpty(qlBigHeadValue)) {
             return Result.error(ErrorCodeConstant.SYSTEMPARAM_ERROR, "请先去系统参数设置大车头");
         }
         //查询大车头所属青龙
-        systems = systemParamUtil.querySystemParams("BIGHEADLOCATION");
-        if (systems.size() == 0) {
+        String bigHeadLocation = systemParamUtil.querySystemParam("BIGHEADLOCATION");
+        if (StringUtils.isEmpty(bigHeadLocation)) {
             return Result.error(ErrorCodeConstant.SYSTEMPARAM_ERROR, "系统参数不存在");
         }
-        SystemParam bigHeadLocation = systems.get(0);
-        String bigHeadLocationValue = bigHeadLocation.getValue();
 
         List<QlEntity> qls = qlMapper.queryQls(null);
 
@@ -340,7 +334,7 @@ public class QlServiceImpl implements QlService {
             for (QlEnv env : envs) {
                 String name = env.getName();
                 String value = env.getValue();
-                if ("JD_COOKIE".equals(name) && value.contains(qlBigHeadValue) && ql.getId() != Integer.parseInt(bigHeadLocationValue)) {
+                if ("JD_COOKIE".equals(name) && value.contains(qlBigHeadValue) && ql.getId() != Integer.parseInt(bigHeadLocation)) {
                     //删除大车头
                     ArrayList<Integer> ids = new ArrayList<>();
                     ids.add(env.getId());
@@ -754,10 +748,7 @@ public class QlServiceImpl implements QlService {
                 for (QlEnv env : envs) {
                     String ck = env.getValue();
                     if (ck.contains(smallHead)) {
-                        Integer id = env.getId();
-                        if (id != 0) {
-                            qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), env.getId(), 0);
-                        }
+                        qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), 1000, 0);
                         break;
                     }
                 }
