@@ -31,3 +31,4 @@ INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ZFBHBUL', '支付�
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('QLTOZLC', '青龙自动同步助力池(是/否)','否',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('LEEKFRIENDLY', '韭菜友好(是/否)','否',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ISAUTOAGREEADDWX', '微信自动添加好友(是/否)','否',1);
+INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ISWXSAFE', '启动微信安全策略(是/否)','否',1);

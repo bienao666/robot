@@ -623,6 +623,34 @@ public class WxServiceImpl implements WxService {
     }
 
     /**
+     * 微信安全措施
+     * @return
+     */
+    public boolean wxSafeCheck(String operate,JSONObject content){
+        String iswxsafe = systemParamUtil.querySystemParam("ISWXSAFE");
+        if ("否".equals(iswxsafe)){
+            return true;
+        }
+        String from_wxid = content.getString("from_wxid");
+        //限制一天只能查3次
+        String timesStr = redis.get(from_wxid + operate);
+        if (StringUtils.isEmpty(timesStr)) {
+            redis.put(from_wxid + operate, DateUtil.formatDateTime(DateUtil.date()));
+            return true;
+        } else {
+            //上次查询时间
+            DateTime lastTime = DateUtil.parse(redis.get(from_wxid + operate));
+            DateTime limitTime = DateUtil.offsetSecond(lastTime, 30);
+            if (limitTime.getTime() > DateUtil.date().getTime()) {
+//                weChatUtil.sendTextMsg("抱歉，请在" + DateUtil.formatDateTime(limitTime) + "后再试", content);
+                return false;
+            }
+            redis.put(from_wxid + operate, DateUtil.formatDateTime(DateUtil.date()));
+            return true;
+        }
+    }
+
+    /**
      * 查询京东资产
      *
      * @param content
@@ -792,8 +820,10 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleLSP(JSONObject content) {
-        String url = HttpRequest.get("https://api.uomg.com/api/rand.img3?format=images").execute().header("location");
-        weChatUtil.sendImageMsg(url, content);
+        if (wxSafeCheck("lsp",content)){
+            String url = HttpRequest.get("https://api.uomg.com/api/rand.img3?format=images").execute().header("location");
+            weChatUtil.sendImageMsg(url, content);
+        }
     }
 
     /**
@@ -1558,7 +1588,9 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleMJX(JSONObject content) {
-        weChatUtil.sendImageMsg("http://api.uomg.com/api/rand.img3", content);
+        if (wxSafeCheck("mjx",content)){
+            weChatUtil.sendImageMsg("http://api.uomg.com/api/rand.img3", content);
+        }
     }
 
     /**
@@ -1567,12 +1599,14 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleJuPai(JSONObject content) {
-        String msg = content.getString("msg");
-        msg = msg.replace("举牌", "").replace(" ", "");
-        if (StringUtils.isEmpty(msg)) {
-            weChatUtil.sendTextMsg("正确命令是：举牌 要举牌的内容", content);
-        } else {
-            weChatUtil.sendImageMsg("http://lkaa.top/API/pai/?msg=" + URLEncoder.encode(msg), content);
+        if (wxSafeCheck("jp", content)){
+            String msg = content.getString("msg");
+            msg = msg.replace("举牌", "").replace(" ", "");
+            if (StringUtils.isEmpty(msg)) {
+                weChatUtil.sendTextMsg("正确命令是：举牌 要举牌的内容", content);
+            } else {
+                weChatUtil.sendImageMsg("http://lkaa.top/API/pai/?msg=" + URLEncoder.encode(msg), content);
+            }
         }
     }
 
