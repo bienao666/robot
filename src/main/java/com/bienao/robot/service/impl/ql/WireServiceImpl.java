@@ -406,10 +406,6 @@ public class WireServiceImpl implements WireService {
         keys.add("M_WX_LUCK_DRAW_URL");
         addWire("M幸运抽奖","m_jd_wx_luckDraw.js",keys);
 
-        keys.add("SHOP_TOKENS");
-        keys.add("DPQDTK");
-        addWire("店铺签到","jd_shop_sign.js",keys);
-
         keys.add("jd_nzmhurl");
         addWire("女装盲盒","jd_nzmh.js",keys);
 
