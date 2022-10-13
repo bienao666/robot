@@ -42,6 +42,8 @@ public interface CkService {
 
     Result getJdCkList(String ck, String ptPin, Integer status,String qlName,Integer pageNo,Integer pageSize);
 
+    List<JdCkEntity> getJdCkListWithoutPage();
+
     Result enableJdCk(List<JSONObject> cks);
 
     Result disableJdCk(List<JSONObject> cks);

@@ -6,6 +6,7 @@ import com.bienao.robot.Constants.weixin.WXConstant;
 import com.bienao.robot.entity.Result;
 import com.bienao.robot.entity.jingdong.JdCkEntity;
 import com.bienao.robot.service.jingdong.CkService;
+import com.bienao.robot.service.jingdong.JdDhService;
 import com.bienao.robot.service.jingdong.JdService;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,9 @@ public class jdTask {
 
     @Autowired
     private SystemParamUtil systemParamUtil;
+
+    @Autowired
+    private JdDhService jdDhService;
 
     @Value("${task-function.shareHelp}")
     private boolean shareHelp;
@@ -185,5 +189,15 @@ public class jdTask {
         for (String k : clear) {
             redis.remove(k);
         }
+    }
+
+    /**
+     * 京东定时任务
+     */
+    @Scheduled(cron = "59 59 23 * * ?")
+    public void jdTimeTask(){
+        List<JdCkEntity> jdCkList = ckService.getJdCkListWithoutPage();
+        //健康社区兑换京豆
+        jdDhService.jkExchange(jdCkList);
     }
 }

@@ -341,6 +341,35 @@ public class CkServiceImpl implements CkService {
     }
 
     @Override
+    public List<JdCkEntity> getJdCkListWithoutPage(){
+        List<JdCkEntity> jdCkEntities = new ArrayList<>();
+        //查询所有青龙
+        List<QlEntity> qlEntities = qlMapper.queryQls(null);
+        for (QlEntity qlEntity : qlEntities) {
+            try {
+                List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
+                for (int i = 0; i < envs.size(); i++) {
+                    QlEnv env = envs.get(i);
+                    if ("JD_COOKIE".equals(env.getName())) {
+                        JdCkEntity jdCkEntity = new JdCkEntity();
+                        jdCkEntity.setQlId(qlEntity.getId());
+                        jdCkEntity.setQlRemark(qlEntity.getRemark());
+                        jdCkEntity.setId(env.getId());
+                        jdCkEntity.setCk(env.getValue());
+                        jdCkEntity.setRemark(env.getRemarks());
+                        jdCkEntity.setStatus(env.getStatus());
+                        jdCkEntity.setQlindex(i);
+                        jdCkEntities.add(jdCkEntity);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return jdCkEntities;
+    }
+
+    @Override
     public Result enableJdCk(List<JSONObject> cks) {
         HashMap<Integer, List<Integer>> map = new HashMap<>();
         for (JSONObject ck : cks) {
