@@ -4,6 +4,7 @@ import cn.hutool.cache.Cache;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.PageUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.Constants.PatternConstant;
 import com.bienao.robot.Constants.weixin.WXConstant;
 import com.bienao.robot.entity.QlCron;
 import com.bienao.robot.entity.QlEntity;
@@ -798,6 +799,33 @@ public class QlServiceImpl implements QlService {
                 qlUtil.moveEnv(ql.getUrl(),ql.getTokenType(),ql.getToken(),qlEnv.getId(),1000,++index);
             }
         }
+    }
+
+    /**
+     * 多青龙 ck分布优化
+     */
+    @Override
+    public void autoAdjust() {
+        HashMap<Integer, Integer> qlToCkCount = new HashMap<>();
+        HashMap<String, QlEnv> ptPinToQlEnv = new HashMap<>();
+        //青龙列表
+        List<QlEntity> qlEntities = qlMapper.queryQls(null);
+        for (int i = 0; i < qlEntities.size(); i++) {
+            QlEntity qlEntity = qlEntities.get(i);
+            List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
+            //获取当前有效ck数量
+            for (int j = 0; j < envs.size(); j++) {
+                QlEnv qlEnv = envs.get(j);
+                qlEnv.setQlId(i);
+                qlEnv.setQlIndex(j);
+                Matcher matcher = PatternConstant.jdPinPattern.matcher(qlEnv.getValue());
+                if (matcher.find()){
+                    String jdPin = matcher.group(1);
+                    //todo
+                }
+            }
+        }
+
     }
 
     public void sendMessage(JSONObject content, String ptPin, String wxPusherUid, QlEntity ql, String type) {

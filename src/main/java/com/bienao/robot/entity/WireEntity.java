@@ -36,7 +36,7 @@ public class WireEntity {
     private List<WireKeyEntity> keys;
 
     //0 禁用 | 1 启用
-    private String status;
+    private Integer status;
 
     //新增时间
     private String createdTime;

@@ -1,6 +1,8 @@
 package com.bienao.robot.mapper;
 
+import com.bienao.robot.entity.WireEntity;
 import com.bienao.robot.entity.WireKeyEntity;
+import org.apache.http.impl.conn.Wire;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -42,5 +44,5 @@ public interface WireKeyMapper{
      * @param key
      * @return
      */
-    String queryScript(String key);
+    WireEntity queryScript(String key);
 }

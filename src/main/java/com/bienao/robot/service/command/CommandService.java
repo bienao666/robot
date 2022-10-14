@@ -24,7 +24,7 @@ public interface CommandService {
      * @param command
      * @return
      */
-    Result queryCommand(String command, String function);
+    List<CommandEntity> queryCommand(String command, String function);
 
     /**
      * 修改命令

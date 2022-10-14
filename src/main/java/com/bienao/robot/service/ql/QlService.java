@@ -107,4 +107,6 @@ public interface QlService {
      * 韭菜友好设置
      */
     void leekFriendly();
+
+    void autoAdjust();
 }

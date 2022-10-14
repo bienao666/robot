@@ -222,11 +222,14 @@ public class WxServiceImpl implements WxService {
         }
 
         if (msg.contains("export ")) {
-            Result result = wireService.addActivity(msg);
-            if ("200".equals(result.getCode())) {
-                weChatUtil.sendTextMsg("线报添加成功，可去后台线报清单查看详情", content);
-            } else {
-                weChatUtil.sendTextMsg(result.getMessage(), content);
+            String islistenwire = systemParamUtil.querySystemParam("ISLISTENWIRE");
+            if (StringUtils.isNotEmpty(islistenwire) && "是".equals(islistenwire)){
+                Result result = wireService.addActivity(msg);
+                if ("200".equals(result.getCode())) {
+                    weChatUtil.sendTextMsg("线报添加成功，可去后台线报清单查看详情", content);
+                } else {
+                    weChatUtil.sendTextMsg(result.getMessage(), content);
+                }
             }
             return;
         }

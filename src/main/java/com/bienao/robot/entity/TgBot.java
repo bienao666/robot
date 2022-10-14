@@ -6,6 +6,7 @@ import com.bienao.robot.mapper.ForwardMapper;
 import com.bienao.robot.mapper.GroupMapper;
 import com.bienao.robot.service.ql.WireService;
 import com.bienao.robot.utils.ForwardUtil;
+import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
@@ -67,8 +68,10 @@ public class TgBot extends TelegramLongPollingBot {
             ApplicationContext applicationContext = SpringUtil.getApplicationContext();
 
             if (StringUtils.isNotEmpty(text)) {
+                SystemParamUtil systemParamUtil = applicationContext.getBean(SystemParamUtil.class);
+                String islistenwire = systemParamUtil.querySystemParam("ISLISTENWIRE");
                 //处理消息
-                if (text.contains("export ")) {
+                if (StringUtils.isNotEmpty(islistenwire) && "是".equals(islistenwire) && text.contains("export ")) {
                     WireService wireService = applicationContext.getBean(WireService.class);
                     Result result = wireService.addActivity(text);
                     if ("200".equals(result.getCode())) {

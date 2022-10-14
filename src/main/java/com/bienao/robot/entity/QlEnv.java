@@ -18,4 +18,8 @@ public class QlEnv {
     private String remarks;
     private String createdAt;
     private String updatedAt;
+    //所属青龙id
+    private Integer qlId;
+    //所属青龙位置
+    private Integer qlIndex;
 }

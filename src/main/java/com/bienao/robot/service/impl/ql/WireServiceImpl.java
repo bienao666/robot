@@ -250,6 +250,7 @@ public class WireServiceImpl implements WireService {
     @Override
     public Result addActivity(String wire) {
         String script = "";
+        int status = 0;
         List<String> list = Arrays.asList(wire.split("\\r?\\n"));
         for (String config : list) {
             if (config.contains("#") && (config.contains(".js") || config.contains(".py"))){
@@ -269,12 +270,16 @@ public class WireServiceImpl implements WireService {
                     return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"该线报活动已存在，添加失败");
                 }
                 Redis.wireRedis.put(key + value,"1",24 * 60 * 60 * 1000);
-                String s = wireKeyMapper.queryScript(key);
-                if (s!=null){
-                    script = s;
+                WireEntity wireEntity = wireKeyMapper.queryScript(key);
+                if (wireEntity!=null){
+                    script = wireEntity.getScript();
+                    status = wireEntity.getStatus();
                     break;
                 }
             }
+        }
+        if (status == 1){
+            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"该线报已被禁用");
         }
         if (StringUtils.isEmpty(script)){
             return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败，线报不存在，请先添加");

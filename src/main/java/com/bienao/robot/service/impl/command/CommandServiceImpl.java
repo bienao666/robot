@@ -75,9 +75,9 @@ public class CommandServiceImpl implements CommandService {
     }
 
     @Override
-    public Result queryCommand(String command, String function) {
+    public List<CommandEntity> queryCommand(String command, String function) {
         List<CommandEntity> commandEntities = commandMapper.queryCommand(command, function,null);
-        return Result.success(commandEntities);
+        return commandEntities;
     }
 
     @Override
