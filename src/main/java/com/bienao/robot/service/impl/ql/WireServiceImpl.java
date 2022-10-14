@@ -574,6 +574,15 @@ public class WireServiceImpl implements WireService {
         keys.add("DPQDTK");
         addWire("常规店铺签到","jd_dpqd.js",keys);
 
+        keys.add("jd_cart_item_activityUrl");
+        addWire("收藏大师-加购有礼","jd_txzj_cart_item.js",keys);
+
+        keys.add("jd_collect_item_activityUrl");
+        addWire("收藏大师-关注有礼","jd_txzj_collect_item.js",keys);
+
+        keys.add("jd_collect_shop_activityUrl");
+        addWire("收藏大师-关注商品","jd_collect_shop.js",keys);
+
         /*keys.add("M_WX_SHOP_GIFT_URL");
         addWire("","",keys);
 
