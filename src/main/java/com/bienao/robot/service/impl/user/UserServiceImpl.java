@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -144,5 +145,10 @@ public class UserServiceImpl implements UserService {
             user.setUpdatedTime(DateUtil.formatDateTime(new Date()));
             userMapper.updateUser(user);
         }
+    }
+
+    @Override
+    public List<User> queryUsers(User userQuery) {
+        return userMapper.queryUsers(userQuery);
     }
 }

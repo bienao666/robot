@@ -148,8 +148,15 @@ public class WxServiceImpl implements WxService {
             }
         }
 
+        //判断用户是否白名单
+        if (!checkUserStatus(content)){
+            return;
+        }
+
         //发送人
         String from_wxid = content.getString("from_wxid");
+
+
         String msg = content.getString("msg").trim();
 
         //转发
@@ -451,6 +458,26 @@ public class WxServiceImpl implements WxService {
                 handleLast(content, num, publicKey);
             }
         }
+    }
+
+    public boolean checkUserStatus(JSONObject content){
+        String from_wxid = content.getString("from_wxid");
+        User userQuery = new User();
+        userQuery.setWxid(from_wxid);
+        User user = userService.queryUser(userQuery);
+        if (user==null){
+            //新增
+            user = new User();
+            user.setWxid(from_wxid);
+            user.setWxName(content.getString("from_name"));
+            userService.addUser(user);
+        }else {
+            if (user.getStatus()==1){
+                //已拉黑
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

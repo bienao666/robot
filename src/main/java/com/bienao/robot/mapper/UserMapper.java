@@ -35,4 +35,6 @@ public interface UserMapper {
      * @return
      */
     List<User> queryUserByFunctionType(Integer functionType);
+
+    List<User> queryUsers(User userQuery);
 }

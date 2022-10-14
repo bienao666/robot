@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.User;
 import com.bienao.robot.entity.Result;
 
+import java.util.List;
+
 public interface UserService {
 
     User getUser(String username, String password);
@@ -36,4 +38,6 @@ public interface UserService {
     int updateUser(User user);
 
     void saveUser(JSONObject content, String from_wxid, String ptPin, String wxpusherUid);
+
+    List<User> queryUsers(User userQuery);
 }

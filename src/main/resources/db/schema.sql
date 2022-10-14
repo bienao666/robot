@@ -19,9 +19,13 @@ create table if not exists user (
                                            city varchar,
                                            ip varchar,
                                            functionType INTEGER,
+                                           status INTEGER DEFAULT 1,
+                                           `level` INTEGER DEFAULT 0,
                                            created_time varchar DEFAULT (datetime('now', 'localtime')),
                                            updated_time varchar DEFAULT (datetime('now', 'localtime'))
 );
+ALTER TABLE `user` ADD COLUMN `status` INTEGER DEFAULT 1;
+ALTER TABLE `user` ADD COLUMN `level` INTEGER DEFAULT 0;
 create table if not exists `group` (
                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
                                        groupid varchar,
