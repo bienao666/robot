@@ -71,7 +71,7 @@ public class TgBot extends TelegramLongPollingBot {
                 SystemParamUtil systemParamUtil = applicationContext.getBean(SystemParamUtil.class);
                 String islistenwire = systemParamUtil.querySystemParam("ISLISTENWIRE");
                 //处理消息
-                if (StringUtils.isNotEmpty(islistenwire) && "是".equals(islistenwire) && text.contains("export ")) {
+                if ("是".equals(islistenwire) && text.contains("export ")) {
                     WireService wireService = applicationContext.getBean(WireService.class);
                     Result result = wireService.addActivity(text);
                     if ("200".equals(result.getCode())) {
