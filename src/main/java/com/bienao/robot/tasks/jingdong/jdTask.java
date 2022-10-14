@@ -194,7 +194,7 @@ public class jdTask {
     /**
      * 京东定时任务
      */
-    @Scheduled(cron = "59 59 23 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void jdTimeTask(){
         List<JdCkEntity> jdCkList = ckService.getJdCkListWithoutPage();
         //健康社区兑换京豆
