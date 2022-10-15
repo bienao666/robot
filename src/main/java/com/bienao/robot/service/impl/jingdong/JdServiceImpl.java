@@ -611,8 +611,8 @@ public class JdServiceImpl implements JdService {
                     t = 1;
                 }
                 try {
-                    log.info("休息5s防止黑ip...");
-                    Thread.sleep(5000);
+                    log.info("休息30s防止黑ip...");
+                    Thread.sleep(3000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
