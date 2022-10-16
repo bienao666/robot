@@ -19,7 +19,7 @@ create table if not exists user (
                                            city varchar,
                                            ip varchar,
                                            functionType INTEGER,
-                                           status INTEGER DEFAULT 1,
+                                           status INTEGER DEFAULT 0,
                                            `level` INTEGER DEFAULT 0,
                                            created_time varchar DEFAULT (datetime('now', 'localtime')),
                                            updated_time varchar DEFAULT (datetime('now', 'localtime'))

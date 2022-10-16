@@ -473,6 +473,7 @@ public class WxServiceImpl implements WxService {
             user = new User();
             user.setWxid(from_wxid);
             user.setWxName(content.getString("from_name"));
+            user.setStatus(0);
             userService.addUser(user);
         }else {
             if (user.getStatus()==1){
