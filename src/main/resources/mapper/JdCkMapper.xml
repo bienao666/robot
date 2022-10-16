@@ -43,7 +43,7 @@
     </select>
 
     <select id="queryCksByLevels" resultType="jdCkEntity">
-        select * from jdck where 1=1 and level in (${levels}) and status = 0
+        select * from jdck where 1=1 and level in (${levels}) and status = 0 and jd = 0 order by level,created_time desc
     </select>
 
     <insert id="addCk" parameterType="jdCkEntity">
