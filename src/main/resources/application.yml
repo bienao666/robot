@@ -21,6 +21,8 @@ mybatis:
 
 JD_API_HOST: https://api.m.jd.com/client.action
 
+AUTH_ADDR: http://101.34.47.200:10027
+
 task-function:
   shareHelp: true
   resetCkStatus: true
