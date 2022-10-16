@@ -131,6 +131,7 @@ public class QlServiceImpl implements QlService {
                 JSONObject tokenJson = qlUtil.getToken(ql.getUrl(), ql.getClientID(), ql.getClientSecret());
                 if (tokenJson == null) {
                     ql.setStatus("异常");
+                    weChatUtil.sendTextMsgToMaster(ql.getRemark()+"青龙服务器状态异常");
                 } else {
                     ql.setStatus("正常");
                     ql.setToken(tokenJson.getString("token"));
