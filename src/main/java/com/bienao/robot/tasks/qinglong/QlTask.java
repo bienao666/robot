@@ -73,7 +73,7 @@ public class QlTask {
     /**
      * 青龙检测
      */
-    @Scheduled(cron = "0 */30 0-2,8-24 * * ?")
+    @Scheduled(cron = "0 */30 0-2,8-23 * * ?")
     public void checkQl(){
         qlService.queryQls(null);
     }
