@@ -714,7 +714,7 @@ public class WxServiceImpl implements WxService {
         User userQuery = new User();
         userQuery.setWxid(from_wxid);
         User user = userService.queryUser(userQuery);
-        if (user == null) {
+        if (StringUtils.isEmpty(user.getJdPtPin().replace("#",""))) {
             weChatUtil.sendTextMsg("尚未登陆，请先登陆", content);
             return;
         }
