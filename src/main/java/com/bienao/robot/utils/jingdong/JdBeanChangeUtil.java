@@ -209,11 +209,19 @@ public class JdBeanChangeUtil {
         if (StringUtils.isNotEmpty(JingXiang)){
             ReturnMessage += JingXiang;
         }
-        ReturnMessage += "\n【今日京豆】收"+todayIncomeBean+"豆";
+        if (todayIncomeBean != 0){
+            ReturnMessage += "\n【今日京豆】收"+todayIncomeBean+"豆";
+        }else {
+            ReturnMessage += "\n【今日京豆】查询异常";
+        }
         if (todayOutcomeBean != 0) {
             ReturnMessage += ",支"+todayOutcomeBean+"豆";
         }
-        ReturnMessage += "\n【昨日京豆】收"+incomeBean+"豆";
+        if (incomeBean != 0){
+            ReturnMessage += "\n【昨日京豆】收"+incomeBean+"豆";
+        }else {
+            ReturnMessage += "\n【昨日京豆】查询异常";
+        }
         if (expenseBean != 0) {
             ReturnMessage += ",支"+expenseBean+"豆";
         }
