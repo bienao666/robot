@@ -15,9 +15,12 @@ public class VersionServiceImpl implements VersionService {
     @Value("${AUTH_ADDR}")
     private String authAddr;
 
+    @Value("${VERSION}")
+    private String version;
+
     @Override
     public JSONObject queryVersion() {
-        String curVersion = "1.0.0";
+        String curVersion = version;
         JSONObject version = new JSONObject();
         version.put("curVersion",curVersion);
         try {
@@ -38,7 +41,7 @@ public class VersionServiceImpl implements VersionService {
     @Override
     public JSONObject queryNewestVersion() {
         JSONObject version = new JSONObject();
-        version.put("newestVersion","1.0.0");
+        version.put("newestVersion",version);
         return version;
     }
 }

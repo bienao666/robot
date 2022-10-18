@@ -483,8 +483,8 @@ public class WireServiceImpl implements WireService {
         keys.add("yhyauthorCode");
         addWire("邀请赢大礼/邀好友赢大礼","jd_yqhy.py",keys);
 
-        keys.add("jd_wxShopFollowActivity_activityId");
-        addWire("关注抽奖","jd_wxShopFollowActivity.js",keys);
+        keys.add("jd_wxShopFollowActivity_activityUrl");
+        addWire("关注店铺有礼","jd_wxShopFollowActivity.js",keys);
 
         keys.add("jd_wxUnPackingActivity_activityId");
         addWire("LZ让福袋飞通用活动","jd_wxUnPackingActivity.js",keys);
