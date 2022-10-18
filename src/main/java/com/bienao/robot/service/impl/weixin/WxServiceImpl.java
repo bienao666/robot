@@ -261,10 +261,10 @@ public class WxServiceImpl implements WxService {
             return;
         }
         //功能列表
-        if ("菜单".equals(msg)) {
+        /*if ("菜单".equals(msg)) {
             handleFunctionList(content);
             return;
-        }
+        }*/
         //转发
         if (msg.startsWith("转发")) {
             handleForward(content);

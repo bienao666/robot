@@ -588,6 +588,9 @@ public class WireServiceImpl implements WireService {
         keys.add("jd_collect_shop_activityUrl");
         addWire("收藏大师-关注商品","jd_collect_shop.js",keys);
 
+        keys.add("jd_categoryUnion_activityId");
+        addWire("品类联合任务","jd_categoryUnion.js",keys);
+
         /*keys.add("M_WX_SHOP_GIFT_URL");
         addWire("","",keys);
 
