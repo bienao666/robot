@@ -43,6 +43,7 @@ public class VersionController {
     @PassToken
     @GetMapping("/queryNewestVersion")
     public Result queryNewestVersion() {
-        return Result.success(versionService.queryNewestVersion());
+        JSONObject newestVersion = versionService.queryNewestVersion();
+        return Result.success(newestVersion);
     }
 }

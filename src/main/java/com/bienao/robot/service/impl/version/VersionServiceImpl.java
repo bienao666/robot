@@ -40,8 +40,8 @@ public class VersionServiceImpl implements VersionService {
 
     @Override
     public JSONObject queryNewestVersion() {
-        JSONObject version = new JSONObject();
-        version.put("newestVersion",version);
-        return version;
+        JSONObject res = new JSONObject();
+        res.put("newestVersion",version);
+        return res;
     }
 }
