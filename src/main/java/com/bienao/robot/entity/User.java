@@ -25,7 +25,7 @@ public class User {
     //微信名称
     private String wxName;
 
-    private String jdPtPin;
+    private String jdPtPin = "";
 
     private List<String> jdPtPinList;
 

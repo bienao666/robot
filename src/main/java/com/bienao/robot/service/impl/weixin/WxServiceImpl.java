@@ -251,6 +251,7 @@ public class WxServiceImpl implements WxService {
         //查看当前操作
         String operate = redis.get(from_wxid + "operate");
         if (StringUtils.isNotEmpty(operate)) {
+            log.info("处理当前操作：{}", operate);
             handleOperate(content, operate, msg, from_wxid);
             return;
         }
@@ -693,10 +694,7 @@ public class WxServiceImpl implements WxService {
         String from_wxid = content.getString("from_wxid");
         //限制一天只能查3次
         String timesStr = redis.get(from_wxid + "QueryTimes");
-        if (StringUtils.isEmpty(timesStr)) {
-            redis.put(from_wxid + "QueryTimes", "1");
-            redis.put(from_wxid + "QueryTime", DateUtil.formatDateTime(DateUtil.date()));
-        } else {
+        if (StringUtils.isNotEmpty(timesStr)) {
             Integer times = Integer.parseInt(timesStr);
             if (times > 3) {
                 weChatUtil.sendTextMsg("抱歉，今日查询次数已耗尽，请明日再查询（robot保护京东账号策略：一天只能查三次）", content);
@@ -710,14 +708,12 @@ public class WxServiceImpl implements WxService {
                 weChatUtil.sendTextMsg("抱歉，请在" + DateUtil.formatDateTime(limitTime) + "后查询（robot保护京东账号策略：查询间隔3小时）", content);
                 return;
             }
-            redis.put(from_wxid + "QueryTimes", String.valueOf(times + 1));
-            redis.put(from_wxid + "QueryTime", DateUtil.formatDateTime(DateUtil.date()));
         }
         User userQuery = new User();
         userQuery.setWxid(from_wxid);
         User user = userService.queryUser(userQuery);
-        if (StringUtils.isEmpty(user.getJdPtPin().replace("#",""))) {
-            weChatUtil.sendTextMsg("尚未登陆，请先登陆", content);
+        if (StringUtils.isEmpty(user.getJdPtPin().replace("#",""))||"null".equals(user.getJdPtPin().replace("#",""))) {
+            weChatUtil.sendTextMsg("未查询到账号，请先登陆", content);
             return;
         }
         String jdPtPins = user.getJdPtPin();
@@ -736,9 +732,17 @@ public class WxServiceImpl implements WxService {
                 weChatUtil.sendTextMsg(jdBeanChange, content);
             } catch (Exception e) {
                 e.printStackTrace();
-                weChatUtil.sendTextMsg("robot异常，请联系管理员维护", content);
+                weChatUtil.sendTextMsg("京东资产查询接口异常，请稍后再试", content);
                 return;
             }
+        }
+        if (StringUtils.isEmpty(timesStr)){
+            redis.put(from_wxid + "QueryTimes", "1");
+            redis.put(from_wxid + "QueryTime", DateUtil.formatDateTime(DateUtil.date()));
+        }else {
+            Integer times = Integer.parseInt(timesStr);
+            redis.put(from_wxid + "QueryTimes", String.valueOf(times + 1));
+            redis.put(from_wxid + "QueryTime", DateUtil.formatDateTime(DateUtil.date()));
         }
     }
 
@@ -962,7 +966,7 @@ public class WxServiceImpl implements WxService {
                 e.printStackTrace();
             }
             if (StringUtils.isEmpty(wxpusherUid)) {
-                weChatUtil.sendTextMsg("资产推送配置失败，可重新登陆或者联系管理员手动配置", content);
+                weChatUtil.sendTextMsg("资产推送配置失败，可联系管理员手动配置", content);
             }
             //保存ck
             qlService.addJdCk(content, ck, ptPin, wxpusherUid);
