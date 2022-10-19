@@ -33,3 +33,4 @@ INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('LEEKFRIENDLY', '�
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ISAUTOAGREEADDWX', '微信自动添加好友(是/否)','否',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ISWXSAFE', '启动微信安全策略(是/否)','否',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ISLISTENWIRE', '启动线报监听(是/否)','是',1);
+INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ISCOMPAREGOODSPRICE', '启动比价(是/否)','否',1);

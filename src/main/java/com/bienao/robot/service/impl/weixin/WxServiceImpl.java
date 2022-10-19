@@ -416,13 +416,16 @@ public class WxServiceImpl implements WxService {
             handleWeather(content);
             return;
         }
-        //比价
-        if ("比价".equals(msg)) {
-            weChatUtil.sendTextMsg("请直接发送商品连接，我会自动识别", content);
-        }
-        if (msg.contains("item.m.jd.com") || msg.contains("m.tb.cn") || msg.contains("mobile.yangkeduo.com")) {
-            handleGoods(msg, content);
-            return;
+        if ("是".equals(systemParamUtil.querySystemParam("ISCOMPAREGOODSPRICE"))){
+            //比价
+            if ("比价".equals(msg)) {
+                weChatUtil.sendTextMsg("请直接发送商品连接，我会自动识别", content);
+                return;
+            }
+            if (msg.contains("item.m.jd.com") || msg.contains("m.tb.cn") || msg.contains("mobile.yangkeduo.com")) {
+                handleGoods(msg, content);
+                return;
+            }
         }
 
         //查询我的uid
