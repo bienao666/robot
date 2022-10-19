@@ -37,4 +37,6 @@ public interface JdFruitMapper {
      * @return
      */
     int addJdFruit(JdFruitEntity jdFruitEntity);
+
+    void clear();
 }

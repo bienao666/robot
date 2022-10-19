@@ -31,4 +31,6 @@ public interface JdPlantMapper {
      * @return
      */
     int addJdPlant(JdPlantEntity jdPlantEntity);
+
+    void clear();
 }

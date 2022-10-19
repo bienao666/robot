@@ -48,4 +48,8 @@
     <insert id="addJdFruit" parameterType="jdFruitEntity">
         insert into jdFruit(help_code,ckid,is_fruit_hei) values (#{helpCode},#{ckId},#{isFruitHei});
     </insert>
+
+    <delete id="clear">
+        delete from jdFruit where ckid not in (select id from jdck);
+    </delete>
 </mapper>

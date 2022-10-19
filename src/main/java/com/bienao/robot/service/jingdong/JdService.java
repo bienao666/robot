@@ -51,4 +51,7 @@ public interface JdService {
     void qlToZlc();
 
     List getHelpList(String type);
+
+    void clear();
+
 }

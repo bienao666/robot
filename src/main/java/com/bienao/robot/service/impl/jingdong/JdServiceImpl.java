@@ -925,6 +925,13 @@ public class JdServiceImpl implements JdService {
         return list;
     }
 
+    @Override
+    public void clear() {
+        jdFruitMapper.clear();
+        jdPetMapper.clear();
+        jdPlantMapper.clear();
+    }
+
     /**
      * 东东农场助力
      *

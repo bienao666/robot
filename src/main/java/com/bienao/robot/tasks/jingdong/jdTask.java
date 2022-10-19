@@ -200,4 +200,12 @@ public class jdTask {
         //健康社区兑换京豆
         jdDhService.jkExchange(jdCkList);
     }
+
+    /**
+     * 清理无效的数据
+     */
+    @Scheduled(cron = "0 0 23 * * ?")
+    public void clear(){
+        jdService.clear();
+    }
 }

@@ -34,4 +34,8 @@
     <insert id="addJdPlant" parameterType="JdPlantEntity">
         insert into jdPlant(help_code,ckid,is_Plant_hei) values (#{helpCode},#{ckId},#{isPlantHei});
     </insert>
+
+    <delete id="clear">
+        delete from jdPlant where ckid not in (select id from jdck);
+    </delete>
 </mapper>

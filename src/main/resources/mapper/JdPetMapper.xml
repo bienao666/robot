@@ -34,4 +34,8 @@
     <insert id="addJdPet" parameterType="JdPetEntity">
         insert into jdPet(help_code,ckid,is_pet_hei) values (#{helpCode},#{ckId},#{isPetHei});
     </insert>
+
+    <delete id="clear">
+        delete from jdPet where ckid not in (select id from jdck);
+    </delete>
 </mapper>

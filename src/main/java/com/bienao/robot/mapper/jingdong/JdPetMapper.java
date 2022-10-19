@@ -31,4 +31,6 @@ public interface JdPetMapper {
      * @return
      */
     int addJdPet(JdPetEntity jdPetEntity);
+
+    void clear();
 }
