@@ -58,14 +58,12 @@
         update user
         <set>
             jd_pt_pin = #{jdPtPin},
+            wxpusheruid = #{wxpusheruid},
             <if test="wxid != null and wxid != ''">
                 wxid = #{wxid},
             </if>
             <if test="wxName != null and wxName != ''">
                 wxName = #{wxName},
-            </if>
-            <if test="wxpusheruid != null and wxpusheruid != ''">
-                wxpusheruid = #{wxpusheruid},
             </if>
             <if test="city != null and city != ''">
                 city = #{city},
