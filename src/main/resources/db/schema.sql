@@ -64,7 +64,7 @@ create table if not exists `wireKey` (
 create table if not exists `wirelist` (
                                          id INTEGER PRIMARY KEY AUTOINCREMENT,
                                          script varchar,
-                                         content varchar UNIQUE,
+                                         content varchar,
                                          result varchar,
                                          created_time varchar DEFAULT (datetime('now', 'localtime')),
                                          updated_time varchar DEFAULT (datetime('now', 'localtime'))

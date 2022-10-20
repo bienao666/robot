@@ -44,5 +44,5 @@ public interface WireKeyMapper{
      * @param key
      * @return
      */
-    WireEntity queryScript(String key);
+    List<WireEntity> queryScript(String key);
 }

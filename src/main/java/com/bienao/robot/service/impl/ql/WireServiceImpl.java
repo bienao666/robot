@@ -249,8 +249,7 @@ public class WireServiceImpl implements WireService {
      */
     @Override
     public Result addActivity(String wire) {
-        String script = "";
-        int status = 0;
+        List<WireEntity> wires = new ArrayList<>();
         List<String> list = Arrays.asList(wire.split("\\r?\\n"));
         for (String config : list) {
             if (config.contains("#") && (config.contains(".js") || config.contains(".py"))){
@@ -270,33 +269,28 @@ public class WireServiceImpl implements WireService {
                     return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"该线报活动已存在，添加失败");
                 }
                 Redis.wireRedis.put(key + value,"1",24 * 60 * 60 * 1000);
-                WireEntity wireEntity = wireKeyMapper.queryScript(key);
-                if (wireEntity!=null){
-                    script = wireEntity.getScript();
-                    status = wireEntity.getStatus();
+                List<WireEntity> wireEntities = wireKeyMapper.queryScript(key);
+                if (wireEntities != null) {
+                    for (WireEntity wireEntity : wireEntities) {
+                        if (wireEntity.getStatus() != 1) {
+                            wires.add(wireEntity);
+                        }
+                    }
                     break;
                 }
             }
         }
-        if (status == 1){
-            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"该线报已被禁用");
-        }
-        if (StringUtils.isEmpty(script)){
+
+        if (wires.size()==0){
             return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败，线报不存在，请先添加");
         }
-        int i = 0;
-        try {
-            i = wirelistMapper.addActivity(script,wire);
-        } catch (Exception e) {
-            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"该线报活动已存在，添加失败");
+
+        for (WireEntity wireEntity : wires) {
+            wirelistMapper.addActivity(wireEntity.getScript(),wire);
+            Integer maxId = wirelistMapper.queryMaxId();
+            handleWire(maxId,wireEntity.getScript(),wire);
         }
-        Integer maxId = wirelistMapper.queryMaxId();
-        handleWire(maxId,script,wire);
-        if (i!=0){
-            return Result.success("添加成功");
-        }else {
-            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败");
-        }
+        return Result.success("添加成功");
     }
 
     /**
