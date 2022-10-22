@@ -995,7 +995,7 @@ public class JdServiceImpl implements JdService {
                 }
             } else if ("400".equals(resultObject.getString("code"))) {
                 log.info("东东农场火爆 ‼️‼️");
-//                toHelpJdFruitEntity.setIsFruitHei(1);
+                toHelpJdFruitEntity.setIsFruitHei(1);
                 jdFruitEntity.setIsFruitHei(1);
 //                jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
             } else if ("3".equals(resultObject.getString("code"))) {
