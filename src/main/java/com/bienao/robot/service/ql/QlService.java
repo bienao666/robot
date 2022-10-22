@@ -108,5 +108,8 @@ public interface QlService {
      */
     void leekFriendly();
 
+    /**
+     * 多青龙 ck分布优化
+     */
     void autoAdjust();
 }

@@ -77,4 +77,15 @@ public class QlTask {
     public void checkQl(){
         qlService.queryQls(null);
     }
+
+    /**
+     * 多青龙 ck分布优化
+     */
+    @Scheduled(cron = "0 0 22 * * ?")
+    public void autoAdjust(){
+        String leekFriendly = systemParamUtil.querySystemParam("QLCKAUTOADJUST");
+        if ("是".equals(leekFriendly)){
+            qlService.autoAdjust();
+        }
+    }
 }
