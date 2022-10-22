@@ -1127,7 +1127,7 @@ public class JdServiceImpl implements JdService {
             } else if ("已经助过力".equals(resultObject.getString("message"))) {
                 log.info("此账号今天已经跑过助力了，跳出....");
             } else if ("1002".equals(resultObject.getString("resultCode"))) {
-//                toHelpJdPetEntity.setIsPetHei(1);
+                toHelpJdPetEntity.setIsPetHei(1);
                 jdPetEntity.setIsPetHei(1);
                 log.info("此账号火爆，跳出....");
             } else if ("411".equals(resultObject.getString("resultCode"))) {
