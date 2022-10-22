@@ -1196,7 +1196,7 @@ public class JdServiceImpl implements JdService {
                 }
             } else if ("3".equals(resultObject.getString("code"))) {
                 jdPlantEntity.setIsPlantHei(1);
-//                toHelpJdPlantEntity.setIsPlantHei(1);
+                toHelpJdPlantEntity.setIsPlantHei(1);
             } else {
                 log.info("种豆得豆助力失败:{}", resultObject.toJSONString());
             }
