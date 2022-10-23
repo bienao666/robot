@@ -481,9 +481,11 @@ public class WxServiceImpl implements WxService {
         }else {
             if (user.getStatus()==1){
                 //已拉黑
+                log.info(from_wxid+"该用户已拉黑");
                 return false;
             }
         }
+        log.info(from_wxid+"该用户正常");
         return true;
     }
 
