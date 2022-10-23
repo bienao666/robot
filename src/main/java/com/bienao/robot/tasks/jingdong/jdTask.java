@@ -151,7 +151,7 @@ public class jdTask {
     /**
      * 统计京豆收益
      */
-    @Scheduled(cron = "0 */30 * * * ?")
+    @Scheduled(cron = "0 30 8-22/2 * * ?")
     public void countJd(){
         if (countJd){
             jdService.countJd();
