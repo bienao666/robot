@@ -226,7 +226,7 @@ public class WxServiceImpl implements WxService {
             if ("是".equals(islistenwire)){
                 Result result = wireService.addActivity(msg);
                 if ("200".equals(result.getCode())) {
-                    weChatUtil.sendTextMsg("线报添加成功，可去后台线报清单查看详情", content);
+                    weChatUtil.sendTextMsg("线报添加成功", content);
                 } else {
                     weChatUtil.sendTextMsg(result.getMessage(), content);
                 }

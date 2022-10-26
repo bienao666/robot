@@ -10,6 +10,7 @@ public class QlEnv {
     //变量值
     private String value;
     private String timestamp;
+    //0启用 1禁用
     private Integer status;
     private String position;
     //变量名

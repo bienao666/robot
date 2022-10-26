@@ -132,16 +132,63 @@ public class QlServiceImpl implements QlService {
                 JSONObject tokenJson = qlUtil.getToken(ql.getUrl(), ql.getClientID(), ql.getClientSecret());
                 if (tokenJson == null) {
                     ql.setStatus("异常");
-                    weChatUtil.sendTextMsgToMaster(ql.getRemark()+"青龙服务器状态异常");
+                    weChatUtil.sendTextMsgToMaster(ql.getRemark() + "青龙服务器状态异常");
                 } else {
                     ql.setStatus("正常");
                     ql.setToken(tokenJson.getString("token"));
                     ql.setTokenType(tokenJson.getString("token_type"));
                     qlMapper.updateQl(ql);
+                    //获取当前青龙的京东ck
+                    List<QlEnv> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
+                    String first = "";
+                    Integer validCount = 0;
+                    Integer invalidCount = 0;
+                    Integer count = 0;
+                    for (QlEnv env : envs) {
+                        if ("JD_COOKIE".equals(env.getName())) {
+                            count++;
+                            if (env.getStatus() == 0) {
+                                validCount++;
+                            }
+                            if (env.getStatus() == 1) {
+                                invalidCount++;
+                            }
+                            if (StringUtils.isEmpty(first)) {
+                                Matcher matcher = PatternConstant.ckPattern.matcher(env.getValue());
+                                if (matcher.find()) {
+                                    first = matcher.group(2);
+                                }
+                            }
+                        }
+                    }
+                    ql.setCurFirst(first);
+                    ql.setValidCount(validCount);
+                    ql.setInvalidCount(invalidCount);
+                    ql.setCount(count);
                     ql.setToken("******");
                     ql.setTokenType("******");
                 }
                 ql.setClientSecret("******");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return Result.success(qls);
+    }
+
+    /**
+     * 青龙检测
+     */
+    @Override
+    public Result checkQl() {
+        List<QlEntity> qls = qlMapper.queryQls(null);
+        for (QlEntity ql : qls) {
+            try {
+                JSONObject tokenJson = qlUtil.getToken(ql.getUrl(), ql.getClientID(), ql.getClientSecret());
+                if (tokenJson == null) {
+                    ql.setStatus("异常");
+                    weChatUtil.sendTextMsgToMaster(ql.getRemark() + "青龙服务器状态异常");
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -717,7 +764,7 @@ public class QlServiceImpl implements QlService {
                             ArrayList<Integer> ids = new ArrayList<>();
                             ids.add(env.getId());
                             qlUtil.enableEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), ids);
-                            qlUtil.moveEnv(ql.getUrl(),ql.getTokenType(),ql.getToken(),env.getId(),1000,6);
+                            qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), 1000, 6);
                         } else {
                             weChatUtil.sendTextMsg("更新失败，请联系管理员", content);
                         }
@@ -735,7 +782,7 @@ public class QlServiceImpl implements QlService {
         QlEnv env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), "JD_COOKIE", ck, ptPin + "@@" + System.currentTimeMillis() + "@@" + wxPusherUid);
         if (env != null) {
             sendMessage(content, ptPin, wxPusherUid, ql, "添加");
-            qlUtil.moveEnv(ql.getUrl(),ql.getTokenType(),ql.getToken(),env.getId(),1000,6);
+            qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), 1000, 6);
         } else {
             weChatUtil.sendTextMsg("添加失败，请联系管理员", content);
         }
@@ -766,7 +813,7 @@ public class QlServiceImpl implements QlService {
     public void leekFriendly() {
         List<QlEntity> qlEntities = qlMapper.queryQls(null);
         for (QlEntity ql : qlEntities) {
-            log.info("青龙服务器：{}开始韭菜友好排序。。。",ql.getRemark());
+            log.info("青龙服务器：{}开始韭菜友好排序。。。", ql.getRemark());
             List<QlEnv> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
             //保留前五个ck不动
             int limit = 5;
@@ -777,11 +824,11 @@ public class QlServiceImpl implements QlService {
             TreeMap<Integer, QlEnv> treeMap = new TreeMap<>();
             for (int i = 0; i < envs.size(); i++) {
                 QlEnv env = envs.get(i);
-                if (!"JD_COOKIE".equals(env.getName())){
+                if (!"JD_COOKIE".equals(env.getName())) {
                     continue;
                 }
                 count++;
-                if (count<=limit){
+                if (count <= limit) {
                     index = i;
                     continue;
                 }
@@ -789,16 +836,16 @@ public class QlServiceImpl implements QlService {
                 JdCkEntity jdCkEntityQuery = new JdCkEntity();
                 jdCkEntityQuery.setCk(env.getValue());
                 JdCkEntity jdCkEntity = jdCkMapper.queryCk(jdCkEntityQuery);
-                if (jdCkEntity!=null){
+                if (jdCkEntity != null) {
                     Integer jd = jdCkEntity.getJd();
-                    if (jd>10){
-                        treeMap.put(jd,env);
+                    if (jd > 10) {
+                        treeMap.put(jd, env);
                     }
                 }
             }
             for (Map.Entry<Integer, QlEnv> entry : treeMap.entrySet()) {
                 QlEnv qlEnv = entry.getValue();
-                qlUtil.moveEnv(ql.getUrl(),ql.getTokenType(),ql.getToken(),qlEnv.getId(),1000,++index);
+                qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), qlEnv.getId(), 1000, ++index);
             }
         }
     }
@@ -820,95 +867,86 @@ public class QlServiceImpl implements QlService {
                 //获取当前有效ck数量
                 for (int j = 0; j < envs.size(); j++) {
                     QlEnv qlEnv = envs.get(j);
-                    if (qlEnv.getName().equals("JD_COOKIE")){
+                    if (qlEnv.getName().equals("JD_COOKIE")) {
                         qlEnv.setQlId(qlEntity.getId());
                         qlEnv.setQlIndex(j);
                         Matcher matcher = PatternConstant.jdPinPattern.matcher(qlEnv.getValue());
-                        if (matcher.find()){
+                        if (matcher.find()) {
                             String jdPin = matcher.group(1);
                             QlEnv qlEnv1 = ptPinToQlEnv.get(jdPin);
-                            if (qlEnv1==null){
+                            if (qlEnv1 == null) {
                                 //未出现过
-                                ptPinToQlEnv.put(jdPin,qlEnv);
-                                countQlCkCounts(qlToCkCount,qlEnv.getQlId(),1);
-                                operateQlToQlEnvs(qlToQlEnvs,qlEnv.getQlId(),qlEnv,0);
-                            }else {
+                                ptPinToQlEnv.put(jdPin, qlEnv);
+                                countQlCkCounts(qlToCkCount, qlEnv.getQlId(), 1);
+                                operateQlToQlEnvs(qlToQlEnvs, qlEnv.getQlId(), qlEnv, 0);
+                            } else {
                                 //出现过，两个重复ck
-                                if (qlEnv.getValue().equals(qlEnv1.getValue())){
+                                if (qlEnv.getValue().equals(qlEnv1.getValue())) {
                                     //ck相同，删一个索引靠后的
-                                    if (qlEnv.getQlIndex()<qlEnv1.getQlIndex()){
+                                    if (qlEnv.getQlIndex() < qlEnv1.getQlIndex()) {
                                         //删除qlEnv1
-                                        deleteQlCk(qlMapper.queryQl(qlEnv1.getQlId()),qlEnv1);
+                                        deleteQlCk(qlMapper.queryQl(qlEnv1.getQlId()), qlEnv1);
                                         //添加qlEnv
-                                        ptPinToQlEnv.put(jdPin,qlEnv);
+                                        ptPinToQlEnv.put(jdPin, qlEnv);
                                         //qlEnv1所在青龙的ck个数-1
-                                        countQlCkCounts(qlToCkCount,qlEnv1.getQlId(),-1);
+                                        countQlCkCounts(qlToCkCount, qlEnv1.getQlId(), -1);
                                         //qlEnv所在青龙的ck个数+1
-                                        countQlCkCounts(qlToCkCount,qlEnv.getQlId(),1);
+                                        countQlCkCounts(qlToCkCount, qlEnv.getQlId(), 1);
                                         //qlEnv1所在青龙减去
-                                        operateQlToQlEnvs(qlToQlEnvs,qlEnv1.getQlId(),qlEnv1,1);
+                                        operateQlToQlEnvs(qlToQlEnvs, qlEnv1.getQlId(), qlEnv1, 1);
                                         //qlEnv所在青龙加上
-                                        operateQlToQlEnvs(qlToQlEnvs,qlEnv.getQlId(),qlEnv,0);
-                                    }else {
+                                        operateQlToQlEnvs(qlToQlEnvs, qlEnv.getQlId(), qlEnv, 0);
+                                    } else {
                                         //删除qlEnv
-                                        deleteQlCk(qlEntity,qlEnv);
+                                        deleteQlCk(qlEntity, qlEnv);
                                     }
-                                }else {
+                                } else {
                                     //ck不相同，有一个无效，删一个无效的索引
-                                    boolean isValid = false;
-                                    boolean isValid1 = false;
-                                    JSONObject jsonObject = JDUtil.queryDetail(qlEnv.getValue());
-                                    if (jsonObject!=null){
-                                        isValid = true;
-                                    }
-                                    jsonObject = JDUtil.queryDetail(qlEnv1.getValue());
-                                    if (jsonObject!=null){
-                                        isValid1 = true;
-                                    }
-
-                                    if (isValid&&isValid1){
+                                    boolean isValid = JDUtil.isVaild(qlEnv.getValue());
+                                    boolean isValid1 = JDUtil.isVaild(qlEnv1.getValue());
+                                    if (isValid && isValid1) {
                                         //两个都有效，删除老数据
-                                        if (DateUtil.parse(qlEnv.getCreatedAt()).getTime()<DateUtil.parse(qlEnv1.getCreatedAt()).getTime()){
+                                        if (DateUtil.parse(qlEnv.getCreatedAt()).getTime() < DateUtil.parse(qlEnv1.getCreatedAt()).getTime()) {
                                             //删除qlEnv
-                                            deleteQlCk(qlEntity,qlEnv);
-                                        }else {
+                                            deleteQlCk(qlEntity, qlEnv);
+                                        } else {
                                             //删除qlEnv1
-                                            deleteQlCk(qlMapper.queryQl(qlEnv1.getQlId()),qlEnv1);
+                                            deleteQlCk(qlMapper.queryQl(qlEnv1.getQlId()), qlEnv1);
                                             //添加qlEnv
-                                            ptPinToQlEnv.put(jdPin,qlEnv);
+                                            ptPinToQlEnv.put(jdPin, qlEnv);
                                             //qlEnv1所在青龙的ck个数-1
-                                            countQlCkCounts(qlToCkCount,qlEnv1.getQlId(),-1);
+                                            countQlCkCounts(qlToCkCount, qlEnv1.getQlId(), -1);
                                             //qlEnv所在青龙的ck个数+1
-                                            countQlCkCounts(qlToCkCount,qlEnv.getQlId(),1);
+                                            countQlCkCounts(qlToCkCount, qlEnv.getQlId(), 1);
                                             //qlEnv1所在青龙减去
-                                            operateQlToQlEnvs(qlToQlEnvs,qlEnv1.getQlId(),qlEnv1,1);
+                                            operateQlToQlEnvs(qlToQlEnvs, qlEnv1.getQlId(), qlEnv1, 1);
                                             //qlEnv所在青龙加上
-                                            operateQlToQlEnvs(qlToQlEnvs,qlEnv.getQlId(),qlEnv,0);
+                                            operateQlToQlEnvs(qlToQlEnvs, qlEnv.getQlId(), qlEnv, 0);
                                         }
-                                    }else {
-                                        if (isValid||isValid1){
+                                    } else {
+                                        if (isValid || isValid1) {
                                             //一个无效，一个有效，删除无效
-                                            if (!isValid){
+                                            if (!isValid) {
                                                 //删除qlEnv
-                                                deleteQlCk(qlEntity,qlEnv);
+                                                deleteQlCk(qlEntity, qlEnv);
                                             }
-                                            if (!isValid1){
+                                            if (!isValid1) {
                                                 //删除qlEnv1
-                                                deleteQlCk(qlMapper.queryQl(qlEnv1.getQlId()),qlEnv1);
+                                                deleteQlCk(qlMapper.queryQl(qlEnv1.getQlId()), qlEnv1);
                                                 //添加qlEnv
-                                                ptPinToQlEnv.put(jdPin,qlEnv);
+                                                ptPinToQlEnv.put(jdPin, qlEnv);
                                                 //qlEnv1所在青龙的ck个数-1
-                                                countQlCkCounts(qlToCkCount,qlEnv1.getQlId(),-1);
+                                                countQlCkCounts(qlToCkCount, qlEnv1.getQlId(), -1);
                                                 //qlEnv所在青龙的ck个数+1
-                                                countQlCkCounts(qlToCkCount,qlEnv.getQlId(),1);
+                                                countQlCkCounts(qlToCkCount, qlEnv.getQlId(), 1);
                                                 //qlEnv1所在青龙减去
-                                                operateQlToQlEnvs(qlToQlEnvs,qlEnv1.getQlId(),qlEnv1,1);
+                                                operateQlToQlEnvs(qlToQlEnvs, qlEnv1.getQlId(), qlEnv1, 1);
                                                 //qlEnv所在青龙加上
-                                                operateQlToQlEnvs(qlToQlEnvs,qlEnv.getQlId(),qlEnv,0);
+                                                operateQlToQlEnvs(qlToQlEnvs, qlEnv.getQlId(), qlEnv, 0);
                                             }
-                                        }else {
+                                        } else {
                                             //两个都无效，删除qlEnv
-                                            deleteQlCk(qlEntity,qlEnv);
+                                            deleteQlCk(qlEntity, qlEnv);
                                         }
                                     }
                                 }
@@ -927,37 +965,37 @@ public class QlServiceImpl implements QlService {
         //ck总数
         Integer cks = 0;
         for (Map.Entry<Integer, Integer> entry : qlToCkCount.entrySet()) {
-            cks+=entry.getValue();
+            cks += entry.getValue();
         }
         //ck平均值
-        Integer average = cks/qlCount + 1;
+        Integer average = cks / qlCount + 1;
         //ck转移
         for (Map.Entry<Integer, Integer> count : qlToCkCount.entrySet()) {
-            if (count.getValue()>average){
+            if (count.getValue() > average) {
                 //ck数大于平均值
                 for (Map.Entry<Integer, Integer> count1 : qlToCkCount.entrySet()) {
-                    if (count1.getValue()<average){
+                    if (count1.getValue() < average) {
                         //往ck数小于平均值的青龙上转
-                        if (!count.getKey().equals(count1.getKey())){
+                        if (!count.getKey().equals(count1.getKey())) {
                             try {
                                 QlEntity qlEntity = qlMapper.queryQl(count.getKey());
                                 QlEntity qlEntity1 = qlMapper.queryQl(count1.getKey());
                                 List<QlEnv> qlEnvs = qlToQlEnvs.get(count.getKey());
                                 List<QlEnv> qlEnvs1 = qlToQlEnvs.get(count1.getKey());
-                                for (int i = average+1; i < qlEnvs.size(); i++) {
-                                    if (count1.getValue()>average){
+                                for (int i = average + 1; i < qlEnvs.size(); i++) {
+                                    if (count1.getValue() > average) {
                                         break;
                                     }
                                     QlEnv qlEnv = qlEnvs.get(i);
                                     QlEnv res = qlUtil.addEnvs(qlEntity1.getUrl(), qlEntity1.getTokenType(), qlEntity1.getToken(), qlEnv.getName(), qlEnv.getValue(), qlEnv.getRemarks());
-                                    if (res!=null){
+                                    if (res != null) {
                                         //添加成功
                                         qlEnvs1.add(qlEnv);
-                                        count1.setValue(count1.getValue()+1);
+                                        count1.setValue(count1.getValue() + 1);
                                         //原青龙上删除数据
-                                        deleteQlCk(qlEntity,qlEnv);
+                                        deleteQlCk(qlEntity, qlEnv);
                                         qlEnvs.remove(qlEnv);
-                                        count.setValue(count.getValue()-1);
+                                        count.setValue(count.getValue() - 1);
                                     }
                                 }
                             } catch (Exception e) {
@@ -970,36 +1008,72 @@ public class QlServiceImpl implements QlService {
         }
     }
 
-    private void countQlCkCounts(HashMap<Integer, Integer> qlToCkCount, Integer qlID, Integer value){
+    @Override
+    public void checkCk() {
+        List<QlEntity> qls = qlMapper.queryQls(null);
+        for (QlEntity ql : qls) {
+            List<QlEnv> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
+            ArrayList<Integer> enableList = new ArrayList<>();
+            ArrayList<Integer> disableList = new ArrayList<>();
+            for (QlEnv env : envs) {
+                if ("JD_COOKIE".equals(env.getName())) {
+                    if (JDUtil.isVaild(env.getValue())) {
+                        //有效
+                        if (env.getStatus() == 1) {
+                            enableList.add(env.getId());
+                        }
+                    } else {
+                        //无效
+                        if (env.getStatus() == 0) {
+                            disableList.add(env.getId());
+                        }
+                    }
+                    //休息5s防止黑ip
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            if (enableList.size() > 0) {
+                qlUtil.enableEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), enableList);
+            }
+            if (disableList.size() > 0) {
+                qlUtil.disableEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), disableList);
+            }
+        }
+    }
+
+    private void countQlCkCounts(HashMap<Integer, Integer> qlToCkCount, Integer qlID, Integer value) {
         Integer count = qlToCkCount.get(qlID);
-        if (count==null){
-            qlToCkCount.put(qlID,1);
-        }else {
-            qlToCkCount.put(qlID,count+value);
+        if (count == null) {
+            qlToCkCount.put(qlID, 1);
+        } else {
+            qlToCkCount.put(qlID, count + value);
         }
     }
 
     /**
-     *
      * @param qlToQlEnvs
      * @param qlID
      * @param qlEnv
-     * @param operate 0增加 1删除
+     * @param operate    0增加 1删除
      */
-    private void operateQlToQlEnvs(HashMap<Integer, List<QlEnv>> qlToQlEnvs, Integer qlID, QlEnv qlEnv, Integer operate){
+    private void operateQlToQlEnvs(HashMap<Integer, List<QlEnv>> qlToQlEnvs, Integer qlID, QlEnv qlEnv, Integer operate) {
         List<QlEnv> qlEnvs = qlToQlEnvs.get(qlID);
-        if (qlEnvs==null){
+        if (qlEnvs == null) {
             qlEnvs = new ArrayList<>();
         }
-        if (operate==0){
+        if (operate == 0) {
             qlEnvs.add(qlEnv);
-        }else {
+        } else {
             qlEnvs.remove(qlEnv);
         }
-        qlToQlEnvs.put(qlID,qlEnvs);
+        qlToQlEnvs.put(qlID, qlEnvs);
     }
 
-    private void deleteQlCk(QlEntity qlEntity,QlEnv qlEnv){
+    private void deleteQlCk(QlEntity qlEntity, QlEnv qlEnv) {
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(qlEnv.getId());
         qlUtil.deleteEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), ids);

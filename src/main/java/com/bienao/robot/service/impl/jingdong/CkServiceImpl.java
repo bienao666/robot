@@ -321,7 +321,14 @@ public class CkServiceImpl implements CkService {
                         jdCkEntity.setCk(env.getValue());
                         jdCkEntity.setRemark(env.getRemarks());
                         jdCkEntity.setStatus(env.getStatus());
-                        jdCkEntity.setQlindex(i);
+                        jdCkEntity.setQlindex(i+1);
+                        //查询前一天的收益
+                        JdCkEntity query = new JdCkEntity();
+                        query.setCk(env.getValue());
+                        JdCkEntity queryRes = jdCkMapper.queryCk(query);
+                        if (queryRes!=null){
+                            jdCkEntity.setJd(queryRes.getJd());
+                        }
                         jdCkEntities.add(jdCkEntity);
                     }
                 }

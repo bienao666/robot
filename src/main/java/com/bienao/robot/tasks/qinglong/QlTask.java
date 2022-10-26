@@ -73,15 +73,23 @@ public class QlTask {
     /**
      * 青龙检测
      */
-    @Scheduled(cron = "0 */30 0-2,8-23 * * ?")
+    @Scheduled(cron = "0 */30 * * * ?")
     public void checkQl(){
-        qlService.queryQls(null);
+        qlService.checkQl();
+    }
+
+    /**
+     * ck检测
+     */
+    @Scheduled(cron = "0 30 10,22 * * ?")
+    public void checkck(){
+        qlService.checkCk();
     }
 
     /**
      * 多青龙 ck分布优化
      */
-    @Scheduled(cron = "0 0 22 * * ?")
+    @Scheduled(cron = "0 30 11,16,21 * * ?")
     public void autoAdjust(){
         String leekFriendly = systemParamUtil.querySystemParam("QLCKAUTOADJUST");
         if ("是".equals(leekFriendly)){

@@ -28,7 +28,7 @@ public class JdDhServiceImpl implements JdDhService {
             String ck = jdCkEntity.getCk();
             Matcher matcher = PatternConstant.ckPattern.matcher(ck);
             if (matcher.find()) {
-                String userName = matcher.group(1);
+                String userName = matcher.group(2);
                 log.info("******开始健康社区兑换京豆【京东账号：{}】*********",userName);
                 JSONObject body = new JSONObject();
                 body.put("commodityType",2);

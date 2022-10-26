@@ -638,9 +638,9 @@ public class JdServiceImpl implements JdService {
         String dateTime = DateUtil.formatDateTime(date);
         int i = 0;
         if (jdJdMapper.queryJdByDate(dateTime) == null){
-            i = jdJdMapper.updateJdByDate(dateTime, jdCount);
-        }else {
             i = jdJdMapper.addJdDate(dateTime, jdCount);
+        }else {
+            i = jdJdMapper.updateJdByDate(dateTime, jdCount);
         }
         if (i == 1) {
             log.info("京豆数据更新成功！！！");

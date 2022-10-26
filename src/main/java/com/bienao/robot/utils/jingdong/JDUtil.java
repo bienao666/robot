@@ -41,4 +41,35 @@ public class JDUtil {
             return new JSONObject();
         }
     }
+
+    /**
+     * 查询当前ck信息
+     *
+     * @param ck
+     * @return
+     */
+    public static boolean isVaild(String ck) {
+        String result = HttpRequest.get("https://me-api.jd.com/user_new/info/GetJDUserInfoUnion")
+                .header("Host", "me-api.jd.com")
+                .header("Accept", "*/*")
+                .header("Connection", "keep-alive")
+                .header("Cookie", ck)
+                .header("User-Agent", GetUserAgentUtil.getUserAgent())
+                .header("Accept-Language", "zh-cn")
+                .header("Referer", "https://home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&")
+                .header("Accept-Encoding", "gzip, deflate, br")
+                .execute().body();
+        log.info("查询当前ck结果：{}", result);
+        if (StringUtils.isEmpty(result)) {
+            log.info("京东服务器返回空数据");
+            return true;
+        } else {
+            JSONObject resultObject = JSONObject.parseObject(result);
+            if ("1001".equals(resultObject.getString("retcode"))) {
+                //ck过期
+                return false;
+            }
+            return true;
+        }
+    }
 }

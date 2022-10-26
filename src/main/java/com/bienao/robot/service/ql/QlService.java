@@ -27,6 +27,11 @@ public interface QlService {
     Result queryQls(List<Integer> ids);
 
     /**
+     * 青龙检测
+     */
+    Result checkQl();
+
+    /**
      * 更新青龙
      * @param ql
      */
@@ -112,4 +117,9 @@ public interface QlService {
      * 多青龙 ck分布优化
      */
     void autoAdjust();
+
+    /**
+     * ck检测
+     */
+    void checkCk();
 }
