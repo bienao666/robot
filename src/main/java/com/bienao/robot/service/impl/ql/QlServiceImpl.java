@@ -775,16 +775,18 @@ public class QlServiceImpl implements QlService {
             }
             qlCkCountList.add(ckCount);
         }
-        //新增
-        Integer min = Collections.min(qlCkCountList);
-        int i = qlCkCountList.indexOf(min);
-        QlEntity ql = qls.get(i);
-        QlEnv env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), "JD_COOKIE", ck, ptPin + "@@" + System.currentTimeMillis() + "@@" + wxPusherUid);
-        if (env != null) {
-            sendMessage(content, ptPin, wxPusherUid, ql, "添加");
-            qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), 1000, 6);
-        } else {
-            weChatUtil.sendTextMsg("添加失败，请联系管理员", content);
+        if (!isReturn) {
+            //新增
+            Integer min = Collections.min(qlCkCountList);
+            int i = qlCkCountList.indexOf(min);
+            QlEntity ql = qls.get(i);
+            QlEnv env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), "JD_COOKIE", ck, ptPin + "@@" + System.currentTimeMillis() + "@@" + wxPusherUid);
+            if (env != null) {
+                sendMessage(content, ptPin, wxPusherUid, ql, "添加");
+                qlUtil.moveEnv(ql.getUrl(),ql.getTokenType(),ql.getToken(),env.getId(),1000,6);
+            } else {
+                weChatUtil.sendTextMsg("添加失败，请联系管理员", content);
+            }
         }
     }
 

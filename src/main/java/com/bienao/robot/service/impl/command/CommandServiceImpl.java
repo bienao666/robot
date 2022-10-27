@@ -58,6 +58,7 @@ public class CommandServiceImpl implements CommandService {
         addCommandEntities("禁用 xxx","禁用京东ck xxx","禁用成功",1,commands,commandEntities);
         addCommandEntities("转发 群号1 群号2","转发群号1的消息到群号2","",1,commands,commandEntities);
         addCommandEntities("取消转发 群号1 群号2","取消转发群号1的消到群号2","",1,commands,commandEntities);
+        addCommandEntities("扭","随机获取一个小姐姐跳舞短视频","",1,commands,commandEntities);
         if (commandEntities.size()>0){
             commandMapper.addCommands(commandEntities);
         }

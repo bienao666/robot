@@ -261,6 +261,11 @@ public class WxServiceImpl implements WxService {
             handleSetSysParam(content);
             return;
         }
+        //扭一扭
+        if ("扭".equals(msg) || "扭一扭".equals(msg)){
+            handleNiuYiNiu(content);
+            return;
+        }
         //功能列表
         /*if ("菜单".equals(msg)) {
             handleFunctionList(content);
@@ -465,6 +470,16 @@ public class WxServiceImpl implements WxService {
                 handleLast(content, num, publicKey);
             }
         }
+    }
+
+    /**
+     * 扭一扭
+     * @param content
+     */
+    private void handleNiuYiNiu(JSONObject content) {
+        String url = "http://api.qemao.com/api/douyin/";
+        url += HttpRequest.get(url).execute().header("location").replace("./","");
+        weChatUtil.sendVideoMsg(url,content);
     }
 
     public boolean checkUserStatus(JSONObject content){
