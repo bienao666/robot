@@ -12,7 +12,7 @@ create table if not exists systemParam (
 );
 create table if not exists user (
                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                           wxid varchar,
+                                           wxid varchar UNIQUE,
                                            wxName varchar,
                                            jd_pt_pin varchar,
                                            wxpusheruid varchar,
