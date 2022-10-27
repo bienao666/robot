@@ -212,6 +212,7 @@ public class WireServiceImpl implements WireService {
                                 Integer id = cron.getId();
                                 List<Integer> cronIds = new ArrayList<>();
                                 cronIds.add(id);
+                                qlUtil.stopCron(url, ql.getTokenType(), ql.getToken(), cronIds);
                                 boolean flag = qlUtil.runCron(url, ql.getTokenType(), ql.getToken(), cronIds);
                                 if (flag) {
                                     result.add(url + "(" + remark + ")" + " 线报 执行成功");
@@ -304,8 +305,8 @@ public class WireServiceImpl implements WireService {
      * @return
      */
     @Override
-    public Result queryActivity(Integer pageNo,Integer pageSize) {
-        List<WireActivityEntity> wireActivityEntities = wirelistMapper.queryActivity();
+    public Result queryActivity(Integer pageNo,Integer pageSize, String content) {
+        List<WireActivityEntity> wireActivityEntities = wirelistMapper.queryActivity(content);
         int start = PageUtil.getStart(pageNo, pageSize) - pageSize;
         int end = PageUtil.getEnd(pageNo, pageSize) - pageSize;
         JSONObject result = new JSONObject();

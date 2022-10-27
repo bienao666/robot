@@ -9,7 +9,11 @@
     </insert>
 
     <select id="queryActivity" resultType="wireActivityEntity">
-        select * from wirelist order by created_time desc
+        select * from wirelist where 1=1
+        <if test="content !=null and content !=''">
+            and (script like ('%'||#{content}||'%') or content like ('%'||#{content}||'%'))
+        </if>
+        order by created_time desc
     </select>
 
     <select id="queryToBeExecutedActivity" resultType="wireActivityEntity">
