@@ -586,26 +586,31 @@ public class JdServiceImpl implements JdService {
                     if ("0".equals(jingBeanBalanceDetail.getString("code"))) {
                         page++;
                         List<JSONObject> detailList = jingBeanBalanceDetail.getJSONArray("detailList").toJavaList(JSONObject.class);
-                        for (JSONObject detail : detailList) {
-                            Long time = DateUtil.parse(detail.getString("date")).getTime();
+                        if (detailList.size()==0){
+                            //跳出
+                            t = 1;
+                        }else {
+                            for (JSONObject detail : detailList) {
+                                Long time = DateUtil.parse(detail.getString("date")).getTime();
                         /*if (time >= end){
                             //今天
 
                         }*/
-                            if (time <= end && time >= begin) {
-                                //昨天
-                                String eventMassage = detail.getString("eventMassage");
-                                if (!eventMassage.contains("退还") && !eventMassage.contains("物流") && !eventMassage.contains("扣赠")) {
-                                    int amount = Integer.parseInt(detail.getString("amount"));
-                                    if (amount > 0) {
-                                        yesterday += amount;
+                                if (time <= end && time >= begin) {
+                                    //昨天
+                                    String eventMassage = detail.getString("eventMassage");
+                                    if (!eventMassage.contains("退还") && !eventMassage.contains("物流") && !eventMassage.contains("扣赠")) {
+                                        int amount = Integer.parseInt(detail.getString("amount"));
+                                        if (amount > 0) {
+                                            yesterday += amount;
 
+                                        }
                                     }
                                 }
-                            }
-                            if (time < begin) {
-                                //前天跳出
-                                t = 1;
+                                if (time < begin) {
+                                    //前天跳出
+                                    t = 1;
+                                }
                             }
                         }
                     } else if ("3".equals(jingBeanBalanceDetail.getString("code"))) {
@@ -621,7 +626,7 @@ public class JdServiceImpl implements JdService {
                     t = 1;
                 }
                 try {
-                    log.info("休息30s防止黑ip...");
+                    log.info("休息60s防止黑ip...");
                     Thread.sleep(6000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
