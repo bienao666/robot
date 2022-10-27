@@ -255,6 +255,9 @@ public class WireServiceImpl implements WireService {
             if (config.contains("#") && (config.contains(".js") || config.contains(".py"))){
                 continue;
             }
+            if (config.contains("并发变量") || config.contains("你的助力码")){
+                continue;
+            }
             if (config.contains("=")){
                 //export 参数名
                 String s1 = config.split("=")[0];
