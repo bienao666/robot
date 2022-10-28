@@ -150,6 +150,9 @@ public class WireServiceImpl implements WireService {
                     if (!config.contains("export")){
                         continue;
                     }
+                    if (config.contains("并发变量") || config.contains("你的助力码")){
+                        continue;
+                    }
                     if (config.contains("=")){
                         StringBuffer stringBuffer = new StringBuffer(configs);
                         //export 参数名
@@ -209,6 +212,7 @@ public class WireServiceImpl implements WireService {
                                 Integer id = cron.getId();
                                 List<Integer> cronIds = new ArrayList<>();
                                 cronIds.add(id);
+                                qlUtil.stopCron(url, ql.getTokenType(), ql.getToken(), cronIds);
                                 boolean flag = qlUtil.runCron(url, ql.getTokenType(), ql.getToken(), cronIds);
                                 if (flag) {
                                     result.add(url + "(" + remark + ")" + " 线报 执行成功");
@@ -251,6 +255,7 @@ public class WireServiceImpl implements WireService {
     public Result addActivity(String wire) {
         List<WireEntity> wires = new ArrayList<>();
         List<String> list = Arrays.asList(wire.split("\\r?\\n"));
+        StringBuilder s = new StringBuilder();
         for (String config : list) {
             if (config.contains("#") && (config.contains(".js") || config.contains(".py"))){
                 continue;
@@ -264,11 +269,7 @@ public class WireServiceImpl implements WireService {
                 }
                 String key = s1.replace("export", "").replace(" ", "");
                 String value = config.split("=")[1];
-                String redis = Redis.wireRedis.get(key + value);
-                if (StringUtils.isNotEmpty(redis)){
-                    return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"该线报活动已存在，添加失败");
-                }
-                Redis.wireRedis.put(key + value,"1",24 * 60 * 60 * 1000);
+                s.append(key).append(value);
                 List<WireEntity> wireEntities = wireKeyMapper.queryScript(key);
                 if (wireEntities != null) {
                     for (WireEntity wireEntity : wireEntities) {
@@ -280,6 +281,11 @@ public class WireServiceImpl implements WireService {
                 }
             }
         }
+        String redis = Redis.wireRedis.get(s.toString());
+        if (StringUtils.isNotEmpty(redis)){
+            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"该线报活动已存在，添加失败");
+        }
+        Redis.wireRedis.put(s.toString(),"1",24 * 60 * 60 * 1000);
 
         if (wires.size()==0){
             return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败，线报不存在，请先添加");
@@ -299,8 +305,8 @@ public class WireServiceImpl implements WireService {
      * @return
      */
     @Override
-    public Result queryActivity(Integer pageNo,Integer pageSize) {
-        List<WireActivityEntity> wireActivityEntities = wirelistMapper.queryActivity();
+    public Result queryActivity(Integer pageNo,Integer pageSize, String content) {
+        List<WireActivityEntity> wireActivityEntities = wirelistMapper.queryActivity(content);
         int start = PageUtil.getStart(pageNo, pageSize) - pageSize;
         int end = PageUtil.getEnd(pageNo, pageSize) - pageSize;
         JSONObject result = new JSONObject();

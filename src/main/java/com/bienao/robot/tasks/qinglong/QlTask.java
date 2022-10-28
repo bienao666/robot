@@ -89,7 +89,7 @@ public class QlTask {
     /**
      * 多青龙 ck分布优化
      */
-    @Scheduled(cron = "0 30 11,16,21 * * ?")
+    @Scheduled(cron = "0 30 */3 * * ?")
     public void autoAdjust(){
         String leekFriendly = systemParamUtil.querySystemParam("QLCKAUTOADJUST");
         if ("是".equals(leekFriendly)){

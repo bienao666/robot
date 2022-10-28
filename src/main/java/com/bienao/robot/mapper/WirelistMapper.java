@@ -13,7 +13,7 @@ public interface WirelistMapper {
 
     List<WireActivityEntity> queryToBeExecutedActivity();
 
-    List<WireActivityEntity> queryActivity();
+    List<WireActivityEntity> queryActivity(String content);
 
     Integer queryMaxId();
 
