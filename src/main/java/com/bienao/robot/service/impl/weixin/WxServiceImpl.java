@@ -891,6 +891,7 @@ public class WxServiceImpl implements WxService {
     private void handleOperate(JSONObject content, String operate, String msg, String from_wxid) {
         //京东登陆
         if ("readPhone".equals(operate)) {
+            log.info("京东登陆-readPhone");
             if (VerifyUtil.verifyPhone(msg)) {
                 redis.put(from_wxid + "phone", msg, 5 * 60 * 1000);
                 if (sendSMS(msg)) {
@@ -908,6 +909,7 @@ public class WxServiceImpl implements WxService {
         }
         //京东登陆
         if ("readIdentifyingCode".equals(operate)) {
+            log.info("京东登陆-readIdentifyingCode");
             String phone = redis.get(from_wxid + "phone");
             String ck = verifyCode(phone, msg);
             if (StringUtils.isEmpty(ck)) {
