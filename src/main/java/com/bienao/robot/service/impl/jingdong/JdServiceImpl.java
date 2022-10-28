@@ -2,8 +2,10 @@ package com.bienao.robot.service.impl.jingdong;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.net.URLDecoder;
 import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.core.net.URLEncoder;
+import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.EscapeUtil;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONObject;
@@ -575,7 +577,7 @@ public class JdServiceImpl implements JdService {
             int yesterday = 0;
             int t = 0;
             do {
-                log.info("统计" + jdCkEntity.getRemark() + "京豆中。。。");
+                log.info("统计" + URLDecoder.decode(jdCkEntity.getRemark(), CharsetUtil.defaultCharset()) + "京豆中。。。");
                 JSONObject jingBeanBalanceDetail = null;
                 try {
                     jingBeanBalanceDetail = getJingBeanBalanceDetail(jdCkEntity.getCk(), page, pageSize);
