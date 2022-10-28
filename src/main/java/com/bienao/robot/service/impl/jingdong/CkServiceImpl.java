@@ -130,6 +130,7 @@ public class CkServiceImpl implements CkService {
             //更新
             jdck.setCk(jdCkEntity.getCk());
             jdck.setUpdatedTime(DateUtil.formatDateTime(new Date()));
+            jdck.setStatus(0);
             if (StringUtils.isNotEmpty(jdCkEntity.getRemark())) {
                 jdck.setRemark(jdCkEntity.getRemark());
             }
@@ -179,6 +180,7 @@ public class CkServiceImpl implements CkService {
             //更新
             jdck.setCk(jdCkEntity.getCk());
             jdck.setUpdatedTime(DateUtil.formatDateTime(new Date()));
+            jdck.setStatus(0);
             if (StringUtils.isNotEmpty(jdCkEntity.getRemark())) {
                 jdck.setRemark(jdCkEntity.getRemark());
             }
@@ -222,6 +224,10 @@ public class CkServiceImpl implements CkService {
                 jdCkEntity.setStatus(1);
                 jdCkMapper.updateCk(jdCkEntity);
             } else {
+                if (jdCkEntity.getStatus()==1){
+                    jdCkEntity.setStatus(0);
+                    jdCkMapper.updateCk(jdCkEntity);
+                }
                 if (StringUtils.isEmpty(jdCkEntity.getRemark())) {
                     JSONObject baseInfo = jsonObject.getJSONObject("baseInfo");
                     if (baseInfo != null) {

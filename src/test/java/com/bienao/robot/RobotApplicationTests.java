@@ -1,5 +1,7 @@
 package com.bienao.robot;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.net.URLEncoder;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.QlEnv;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.List;
 
@@ -63,4 +66,36 @@ class RobotApplicationTests {
             qlUtil.addEnvs(url2, tokenType2, token2, env.getName(),env.getValue(),env.getRemarks());
         }
     }
+
+    /**
+     * 京粉数据查询
+     */
+    /*@Test
+    public void jingfen(){
+        String cookie = "pt_key=AAJjWyaGADDjVy6B2y4LrjwVxU4Blq1QCRZgG5QefdMAACbqDJeLNthlOh9-sH8aA92rTIxo_SA;pt_pin=2022414474;";
+        String date = DateUtil.formatDateTime(DateUtil.date());
+        JSONObject param = new JSONObject();
+        param.put("startDate",date);
+        param.put("endDate",date);
+        param.put("mediaId","");
+        param.put("proCont","");
+        param.put("promotionId","");
+        param.put("sourceEmt","");
+        param.put("pageNo",1);
+        param.put("pageSize",20);
+        JSONObject body = new JSONObject();
+        body.put("funName","querySpreadEffectData");
+        body.put("param",param.toJSONString());
+        URLEncoder urlEncoder = URLEncoder.createDefault();
+        String resStr = HttpRequest.get("https://api.m.jd.com/api?appid=unionpc&body=" + urlEncoder.encode(body.toJSONString(), Charset.defaultCharset()) + "&functionId=union_report&loginType=2")
+                .header("authority", "api.m.jd.com")
+                .header("origin", "https://union.jd.com")
+                .header("referer", "https://union.jd.com/")
+                .header("accept-language", "zh-CN,zh;q=0.9,en;q=0.8")
+                .header("cookie", cookie)
+                .execute().body();
+        System.out.println(resStr);
+    }*/
+
+
 }
