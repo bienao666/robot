@@ -736,6 +736,9 @@ public class WxServiceImpl implements WxService {
         String jdPtPins = user.getJdPtPin();
         String[] split = jdPtPins.split("#");
         for (String jdPtPin : split) {
+            if (StringUtils.isEmpty(jdPtPin)){
+                continue;
+            }
             JdCkEntity jdCkEntityQuery = new JdCkEntity();
             jdCkEntityQuery.setPtPin(jdPtPin);
             JdCkEntity jdCkEntity = jdCkMapper.queryCk(jdCkEntityQuery);
