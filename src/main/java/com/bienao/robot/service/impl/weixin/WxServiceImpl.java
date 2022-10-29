@@ -1894,7 +1894,7 @@ public class WxServiceImpl implements WxService {
         StringBuilder result = new StringBuilder();
         String key = systemParamUtil.querySystemParam("HEFENGKEY");
         if (StringUtils.isEmpty(key)) {
-            weChatUtil.sendTextMsg("请先去 https://dev.qweather.com 网站注册申请key，对机器人发送：设置 和风key 你的key", content);
+            weChatUtil.sendTextMsg("请先去 https://dev.qweather.com 网站注册申请key并配置系统参数", content);
             return;
         }
         try {
