@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 public class WireEntity {
 
     //序号
+    @NotNull(message = "id为空")
     private Integer id;
 
     //活动名称
@@ -34,6 +36,10 @@ public class WireEntity {
 
     //洞察变量
     private List<WireKeyEntity> keys;
+
+    //是否需要设置大车头
+    @NotNull(message = "是否需要设置大车头为空")
+    private Integer setHead;
 
     //0 禁用 | 1 启用
     private Integer status;

@@ -35,7 +35,14 @@ public interface WireMapper {
      * @param key
      * @return
      */
-    List<WireEntity> queryWire(String key);
+    List<WireEntity> queryWires(String key);
+
+    /**
+     * 查询活动
+     * @param script
+     * @return
+     */
+    WireEntity queryWire(String script);
 
     /**
      * 修改线报活动

@@ -82,10 +82,6 @@ public class WireController {
         log.info("开始updateWire：{}",System.currentTimeMillis());
         Result result;
         try {
-            Integer id = wireEntity.getId();
-            if (id==null){
-                return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"参数异常");
-            }
             result = wireService.updateWire(wireEntity);
         } catch (Exception e) {
             e.printStackTrace();

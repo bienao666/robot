@@ -98,11 +98,14 @@ public class WireServiceImpl implements WireService {
     public Result updateWire(WireEntity wireEntity) {
         wireEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
         wireMapper.updateWire(wireEntity);
-        ArrayList<Integer> ids = new ArrayList<>();
-        ids.add(wireEntity.getId());
-        wireKeyMapper.deleteWireKey(ids);
-        for (WireKeyEntity key : wireEntity.getKeys()) {
-            wireKeyMapper.addWireKey(wireEntity.getId(),key.getKey());
+        List<WireKeyEntity> keys = wireEntity.getKeys();
+        if (keys!=null && keys.size()>0){
+            ArrayList<Integer> ids = new ArrayList<>();
+            ids.add(wireEntity.getId());
+            wireKeyMapper.deleteWireKey(ids);
+            for (WireKeyEntity key : wireEntity.getKeys()) {
+                wireKeyMapper.addWireKey(wireEntity.getId(),key.getKey());
+            }
         }
         return Result.success("修改成功");
     }
@@ -325,7 +328,7 @@ public class WireServiceImpl implements WireService {
      */
     @Override
     public Result queryWire(String key,Integer pageNo,Integer pageSize) {
-        List<WireEntity> wireEntities = wireMapper.queryWire(key);
+        List<WireEntity> wireEntities = wireMapper.queryWires(key);
         int start = PageUtil.getStart(pageNo, pageSize) - pageSize;
         int end = PageUtil.getEnd(pageNo, pageSize) - pageSize;
         JSONObject result = new JSONObject();
@@ -372,16 +375,22 @@ public class WireServiceImpl implements WireService {
         }
         //该任务都是未运行中
         if (!status.contains(0)){
-            //配置大车头
-            qlService.oneKeyHead();
+            //是否需要设置大车头
+            WireEntity wireEntity = wireMapper.queryWire(script);
+            if (wireEntity.getSetHead()==1){
+                //配置大车头
+                qlService.oneKeyHead();
+            }
             //执行该任务
             try {
                 handleActivity(id,script,content);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            //取消大车头
-            qlService.cancelHead();
+            if (wireEntity.getSetHead()==1){
+                //取消大车头
+                qlService.cancelHead();
+            }
         }
     }
     @Async("asyncServiceExecutor")

@@ -28,7 +28,7 @@
         </collection >
     </resultMap>
 
-    <select id="queryWire" resultMap="wireEntityMap">
+    <select id="queryWires" resultMap="wireEntityMap">
         select * from wire
         where id in (select id from wire where 1=1
             <if test="key !=null and key !=''">
@@ -40,6 +40,13 @@
                 and key like '%'||#{key}||'%'
             </if>)
         order by created_time desc
+    </select>
+
+    <select id="queryWire" resultType="wireEntity">
+        select * from wire where 1=1
+        <if test="script !=null and script !=''">
+            and script=#{script}
+        </if>
     </select>
 
     <select id="queryWireKeyEntity" resultType="wireKeyEntity">
@@ -57,6 +64,9 @@
             </if>
             <if test="status !=null">
                 status=#{status},
+            </if>
+            <if test="setHead !=null">
+                set_head=#{setHead},
             </if>
             <if test="updatedTime !=null">
                 updated_time=#{updatedTime},
