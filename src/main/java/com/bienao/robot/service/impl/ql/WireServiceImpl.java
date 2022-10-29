@@ -140,6 +140,14 @@ public class WireServiceImpl implements WireService {
     @Override
     public Result handleActivity(Integer wireListId,String script,String wire) {
         log.info("执行线报活动：{}->{}",script,wire);
+
+        //是否需要设置大车头
+        WireEntity wireEntity = wireMapper.queryWire(script);
+        if (wireEntity.getSetHead()==1){
+            //配置大车头
+            qlService.oneKeyHead();
+        }
+
         ArrayList<String> result = new ArrayList<>();
         List<String> list = Arrays.asList(wire.split("\\r?\\n"));
         ArrayList<String> keys = new ArrayList<>();
@@ -240,6 +248,12 @@ public class WireServiceImpl implements WireService {
                 }
             }
         }
+
+        if (wireEntity.getSetHead()==1){
+            //取消大车头
+            qlService.cancelHead();
+        }
+
         //更新线报表
         if (result.size()!=0){
             wirelistMapper.updateWirelist(wireListId,JSONObject.toJSONString(result),DateUtil.formatDateTime(new Date()));
@@ -375,21 +389,11 @@ public class WireServiceImpl implements WireService {
         }
         //该任务都是未运行中
         if (!status.contains(0)){
-            //是否需要设置大车头
-            WireEntity wireEntity = wireMapper.queryWire(script);
-            if (wireEntity.getSetHead()==1){
-                //配置大车头
-                qlService.oneKeyHead();
-            }
             //执行该任务
             try {
                 handleActivity(id,script,content);
             } catch (Exception e) {
                 e.printStackTrace();
-            }
-            if (wireEntity.getSetHead()==1){
-                //取消大车头
-                qlService.cancelHead();
             }
         }
     }

@@ -52,9 +52,9 @@ public class QlTask {
 
     /**
      * 设置小车头
-     * 5分钟设置一次
+     * 10分钟设置一次
      */
-    @Scheduled(cron = "0 */5 * * * ?")
+    @Scheduled(cron = "0 */10 * * * ?")
     public void setSmallHead(){
         qlService.setSmallHead();
     }
