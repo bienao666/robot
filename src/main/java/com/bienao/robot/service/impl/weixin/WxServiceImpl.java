@@ -743,8 +743,8 @@ public class WxServiceImpl implements WxService {
             jdCkEntityQuery.setPtPin(jdPtPin);
             JdCkEntity jdCkEntity = jdCkMapper.queryCk(jdCkEntityQuery);
             if (jdCkEntity != null && jdCkEntity.getStatus() == 1) {
-                weChatUtil.sendTextMsg("京东账号已过期，请重新登陆", content);
-                return;
+                weChatUtil.sendTextMsg(jdPtPin+"京东账号已过期，请重新登陆", content);
+                continue;
             }
             String jdBeanChange = null;
             try {
@@ -752,8 +752,8 @@ public class WxServiceImpl implements WxService {
                 weChatUtil.sendTextMsg(jdBeanChange, content);
             } catch (Exception e) {
                 e.printStackTrace();
-                weChatUtil.sendTextMsg("京东资产查询接口异常，请稍后再试", content);
-                return;
+                weChatUtil.sendTextMsg(jdPtPin+"京东资产查询接口异常，请稍后再试", content);
+                continue;
             }
         }
         if (StringUtils.isEmpty(timesStr)){
@@ -988,7 +988,7 @@ public class WxServiceImpl implements WxService {
                 e.printStackTrace();
             }
             if (StringUtils.isEmpty(wxpusherUid)) {
-                weChatUtil.sendTextMsg("资产推送配置失败，可联系管理员手动配置", content);
+                weChatUtil.sendTextMsg("未扫码，资产推送配置失败", content);
             }
             //保存ck
             qlService.addJdCk(content, ck, ptPin, wxpusherUid);
@@ -996,7 +996,7 @@ public class WxServiceImpl implements WxService {
             //保存ck
             qlService.addJdCk(content, ck, ptPin, "");
         }
-        //保存cookie
+        //保存本地cookie
         JdCkEntity jdCkEntity = new JdCkEntity();
         jdCkEntity.setCk(ck);
         jdCkEntity.setPtPin(ptPin);

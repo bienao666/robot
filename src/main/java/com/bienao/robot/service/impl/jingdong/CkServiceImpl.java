@@ -152,23 +152,8 @@ public class CkServiceImpl implements CkService {
     public boolean addCkWithOutCheck(JdCkEntity jdCkEntity) {
         //判断ck是否已经添加
         JdCkEntity jdCkEntityQuery = new JdCkEntity();
-        jdCkEntityQuery.setCk(jdCkEntity.getCk());
+        jdCkEntityQuery.setPtPin(jdCkEntity.getPtPin());
         JdCkEntity jdck = jdCkMapper.queryCk(jdCkEntityQuery);
-        if (jdck != null) {
-            return true;
-        }
-
-        String ptPin = "";
-        Matcher matcher = jdPinPattern.matcher(jdCkEntity.getCk());
-        if (matcher.find()) {
-            ptPin = matcher.group(1);
-        }
-        jdCkEntity.setPtPin(ptPin);
-
-        //判断pt_pin是否存在
-        jdCkEntityQuery = new JdCkEntity();
-        jdCkEntityQuery.setPtPin(ptPin);
-        jdck = jdCkMapper.queryCk(jdCkEntityQuery);
         if (jdck == null) {
             //添加
             int i = jdCkMapper.addCk(jdCkEntity);
