@@ -43,9 +43,11 @@ create table if not exists `ql` (
                                        token varchar,
                                        head varchar,
                                        remark varchar,
+                                       `type` INTEGER DEFAULT 0,
                                        created_time varchar DEFAULT (datetime('now', 'localtime')),
                                        updated_time varchar DEFAULT (datetime('now', 'localtime'))
 );
+alter TABLE  `ql` add `type` INTEGER DEFAULT 0;
 create table if not exists `wire` (
                                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                                     activity_name varchar,
@@ -79,10 +81,12 @@ create table if not exists `jdck` (
                                       `status` INTEGER DEFAULT '0',
                                       `level` INTEGER DEFAULT '2',
                                       `jd` INTEGER DEFAULT '0',
+                                      `ql_remark` varchar,
                                       `created_time` varchar DEFAULT (datetime('now', 'localtime')),
                                       `expiry_time` varchar,
                                       `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );
+alter TABLE  `jdck` add `ql_remark` varchar;
 create table if not exists `jdFruit` (
                            `id` INTEGER PRIMARY KEY AUTOINCREMENT,
                            `help_code` varchar,

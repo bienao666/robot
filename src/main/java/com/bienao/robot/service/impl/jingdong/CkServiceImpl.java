@@ -17,6 +17,7 @@ import com.bienao.robot.mapper.jingdong.JdPetMapper;
 import com.bienao.robot.mapper.jingdong.JdPlantMapper;
 import com.bienao.robot.service.jingdong.CkService;
 import com.bienao.robot.utils.jingdong.GetUserAgentUtil;
+import com.bienao.robot.utils.jingdong.JDUtil;
 import com.bienao.robot.utils.ql.QlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -444,4 +445,21 @@ public class CkServiceImpl implements CkService {
         }
         return Result.success();
     }
+
+    /**
+     * 过期ck
+     */
+    @Override
+    public Result expireCk(List<String> cks) {
+        for (String ck : cks) {
+            JDUtil.expire(ck);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return Result.success();
+    }
+
 }

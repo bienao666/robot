@@ -48,6 +48,11 @@ public class QlEntity {
     //青龙状态
     private String status;
 
+    /**
+     * 0 普通容器 1聚合容器
+     */
+    private Integer type;
+
     //新增时间
     private String createdTime;
 

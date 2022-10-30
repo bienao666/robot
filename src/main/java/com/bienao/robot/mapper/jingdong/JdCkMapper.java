@@ -93,4 +93,11 @@ public interface JdCkMapper {
      * @return
      */
     List<JdCkEntity> queryHasHelpPlantCk();
+
+    /**
+     * 过期ck
+     * @param ids
+     * @return
+     */
+    List<JdCkEntity> queryByIdsCk(List<Integer> ids);
 }

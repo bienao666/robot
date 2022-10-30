@@ -49,4 +49,9 @@ public interface CkService {
     Result disableJdCk(List<JSONObject> cks);
 
     Result deleteJdCk(List<JSONObject> cks);
+
+    /**
+     * 过期ck
+     */
+    Result expireCk(List<String> ids);
 }

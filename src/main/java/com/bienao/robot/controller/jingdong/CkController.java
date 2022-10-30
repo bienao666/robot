@@ -163,4 +163,16 @@ public class CkController {
         }
         return ckService.deleteJdCks(ids);
     }
+
+    /**
+     * 过期ck
+     */
+    @LoginToken
+    @PostMapping("/expireCk")
+    public Result expireCk(@RequestBody List<String> cks) {
+        if (cks == null || cks.size() == 0) {
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "cks不能为空");
+        }
+        return ckService.expireCk(cks);
+    }
 }

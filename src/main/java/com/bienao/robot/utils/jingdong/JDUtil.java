@@ -72,4 +72,18 @@ public class JDUtil {
             return true;
         }
     }
+
+    /**
+     * 过期ck
+     * @param ck
+     */
+    public static void expire(String ck){
+        HttpRequest.get("https://plogin.m.jd.com/cgi-bin/ml/mlogout?appid=300&returnurl=https%3A%2F%2Fm.jd.com%2F")
+                .header("authority", "plogin.m.jd.com")
+                .header("User-Agent", "GetUserAgentUtil.getUserAgent()")
+                .header("cookie", ck)
+                .execute()
+                .body();
+
+    }
 }

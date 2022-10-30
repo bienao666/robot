@@ -873,6 +873,7 @@ public class JdServiceImpl implements JdService {
                         jdck = new JdCkEntity();
                         jdck.setStatus(0);
                         jdck.setCk(ck);
+                        jdck.setQlRemark(ql.getRemark());
                         jdck.setLevel(2);
                         if (StringUtils.isNotEmpty(remarks)) {
                             jdck.setRemark(remarks);
@@ -882,9 +883,10 @@ public class JdServiceImpl implements JdService {
                         count++;
                     } else {
                         //更新
-                        if (!ck.equals(jdck.getCk())) {
+                        if (!ck.equals(jdck.getCk()) || (StringUtils.isNotEmpty(ql.getRemark()) && !ql.getRemark().equals(jdck.getQlRemark()))) {
                             jdck.setStatus(0);
                             jdck.setCk(ck);
+                            jdck.setQlRemark(ql.getRemark());
                             if (StringUtils.isNotEmpty(remarks)) {
                                 jdck.setRemark(remarks);
                             }

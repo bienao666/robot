@@ -129,4 +129,9 @@ public interface QlService {
      * ck检测
      */
     void checkCk();
+
+    /**
+     * 恢复青龙ck
+     */
+    Result recoveryCk(String oldQl, String newQl);
 }

@@ -47,7 +47,7 @@
     </select>
 
     <insert id="addCk" parameterType="jdCkEntity">
-        insert into jdck(ck,pt_pin,remark,level,expiry_time) values (#{ck},#{ptPin},#{remark},#{level},#{expiryTime});
+        insert into jdck(ck,pt_pin,remark,level,ql_remark,expiry_time) values (#{ck},#{ptPin},#{remark},#{level},#{qlRemark},#{expiryTime});
     </insert>
 
     <update id="updateCk" parameterType="jdCkEntity">
@@ -67,6 +67,9 @@
             </if>
             <if test="level != null">
                 level = #{level},
+            </if>
+            <if test="qlRemark != null and qlRemark != ''">
+                ql_remark = #{qlRemark},
             </if>
             <if test="jd != null">
                 jd = #{jd},
@@ -137,6 +140,13 @@
 
     <select id="queryHasHelpPlantCk" resultType="jdCkEntity">
         select * from jdck where 1 = 1 and id in (select ckid from jdPlant where help_status =1) order by level
+    </select>
+
+    <select id="queryByIdsCk" parameterType="list" resultType="jdCkEntity">
+        select * from jdck where 1=1 and id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
     </select>
 
 </mapper>

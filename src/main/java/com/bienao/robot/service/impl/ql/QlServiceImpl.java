@@ -1064,6 +1064,19 @@ public class QlServiceImpl implements QlService {
         }
     }
 
+    /**
+     * 恢复青龙ck
+     */
+    @Override
+    public Result recoveryCk(String oldQl, String newQl) {
+        //根据老青龙备注查询ck
+
+        //根据新青龙备注查询青龙
+
+        //开始恢复ck
+        return Result.success();
+    }
+
     private void countQlCkCounts(HashMap<Integer, Integer> qlToCkCount, Integer qlID, Integer value) {
         Integer count = qlToCkCount.get(qlID);
         if (count == null) {
