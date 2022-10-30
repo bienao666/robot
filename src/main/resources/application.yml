@@ -39,9 +39,9 @@ async:
       # 配置核心线程数
       core_pool_size: 4
       # 配置最大线程数
-      max_pool_size: 10
+      max_pool_size: 8
       # 配置队列大小
-      queue_capacity: 10000
+      queue_capacity: 100
       # 配置线程池中的线程的名称前缀
       name:
         prefix: async-service-

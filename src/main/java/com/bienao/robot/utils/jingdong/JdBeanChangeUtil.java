@@ -127,11 +127,26 @@ public class JdBeanChangeUtil {
         cookie = jdCk.getCk();
         overdue = "【挂机天数】" + DateUtil.between(DateUtil.parseDate(jdCk.getCreatedTime()), DateUtil.date(), DateUnit.DAY) + "天";
         userName = URLDecoder.decode(jdCk.getPtPin(), CharsetUtil.defaultCharset());
+
         try {
             TotalBean();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        if (!isLogin){
+            return "账号过期，请重新登陆";
+        }
+
+        try {
+            bean();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (!isLogin){
+            return "账号过期，请重新登陆";
+        }
+
         try {
             TotalBean2();
         } catch (Exception e) {
@@ -176,11 +191,6 @@ public class JdBeanChangeUtil {
         }
         //
 //        JxmcGetRequest();
-        try {
-            bean();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         try {
             redPacket();
@@ -460,6 +470,7 @@ public class JdBeanChangeUtil {
                     }
                 } else if ("3".equals(jingBeanBalanceDetail.getString("code"))) {
                     log.info("ck已过期，或者填写不规范");
+                    isLogin = false;
                     //跳出
                     t = 1;
                 } else {

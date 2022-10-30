@@ -119,7 +119,7 @@ public class WxServiceImpl implements WxService {
 
     private static Pattern ckPattern = Pattern.compile("pt_key=(.+?);pt_pin=(.+?);");
 
-    @Async("asyncServiceExecutor")
+    @Async("messageAsyncServiceExecutor")
     @Override
     public void handleMessage(JSONObject message) {
         JSONObject content = message.getJSONObject("content");
