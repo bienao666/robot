@@ -24,6 +24,7 @@ import com.bienao.robot.utils.weixin.WeChatUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -355,6 +356,22 @@ public class QlServiceImpl implements QlService {
             }
         }
         return Result.success(results);
+    }
+
+    /**
+     * 延迟取消车头
+     *
+     * @return
+     */
+    @Override
+    @Async("asyncServiceExecutor")
+    public void waitCancelHead(){
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        cancelHead();
     }
 
     /**

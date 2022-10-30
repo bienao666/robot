@@ -250,8 +250,8 @@ public class WireServiceImpl implements WireService {
         }
 
         if (wireEntity.getSetHead()==1){
-            //取消大车头
-            qlService.cancelHead();
+            //延迟取消大车头
+            qlService.waitCancelHead();
         }
 
         //更新线报表

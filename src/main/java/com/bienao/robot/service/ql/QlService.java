@@ -70,6 +70,13 @@ public interface QlService {
     Result cancelHead();
 
     /**
+     * 延迟取消车头
+     *
+     * @return
+     */
+    void waitCancelHead();
+
+    /**
      * 停止脚本
      * @param command
      * @return
