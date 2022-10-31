@@ -39,6 +39,9 @@
         <if test="remark !=null and remark !=''">
             and remark like ('%'||#{remark}||'%')
         </if>
+        <if test="qlRemark != null and qlRemark != ''">
+            AND ql_remark = #{qlRemark}
+        </if>
         order by level
     </select>
 

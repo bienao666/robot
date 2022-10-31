@@ -8,8 +8,17 @@
         insert into ql(url,clientID,clientSecret,head,remark) values (#{url},#{clientID},#{clientSecret},#{head},#{remark})
     </insert>
 
-    <select id="queryQl" resultType="qlEntity">
-        select * from ql where id=#{id}
+    <select id="queryQl" parameterType="qlEntity" resultType="qlEntity">
+        select * from ql where 1=1
+        <if test="id != null">
+            AND id = #{id}
+        </if>
+        <if test="url != null and url != ''">
+            AND url = #{url}
+        </if>
+        <if test="remark != null and remark != ''">
+            AND remark = #{remark}
+        </if>
     </select>
 
     <select id="queryQlByUrl" parameterType="string" resultType="qlEntity">

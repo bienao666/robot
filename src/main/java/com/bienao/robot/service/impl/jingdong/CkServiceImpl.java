@@ -385,7 +385,9 @@ public class CkServiceImpl implements CkService {
         }
         for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {
             Integer qlId = entry.getKey();
-            QlEntity qlEntity = qlMapper.queryQl(qlId);
+            QlEntity query = new QlEntity();
+            query.setId(qlId);
+            QlEntity qlEntity = qlMapper.queryQl(query);
             if (qlEntity != null) {
                 List<Integer> list = entry.getValue();
                 qlUtil.enableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), list);
@@ -411,7 +413,9 @@ public class CkServiceImpl implements CkService {
         }
         for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {
             Integer qlId = entry.getKey();
-            QlEntity qlEntity = qlMapper.queryQl(qlId);
+            QlEntity query = new QlEntity();
+            query.setId(qlId);
+            QlEntity qlEntity = qlMapper.queryQl(query);
             if (qlEntity != null) {
                 List<Integer> list = entry.getValue();
                 qlUtil.disableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), list);
@@ -437,7 +441,9 @@ public class CkServiceImpl implements CkService {
         }
         for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {
             Integer qlId = entry.getKey();
-            QlEntity qlEntity = qlMapper.queryQl(qlId);
+            QlEntity query = new QlEntity();
+            query.setId(qlId);
+            QlEntity qlEntity = qlMapper.queryQl(query);
             if (qlEntity != null) {
                 List<Integer> list = entry.getValue();
                 qlUtil.deleteEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), list);
