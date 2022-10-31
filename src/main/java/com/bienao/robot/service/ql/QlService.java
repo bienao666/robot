@@ -134,4 +134,10 @@ public interface QlService {
      * 恢复青龙ck
      */
     Result recoveryCk(String oldQl, String newQl);
+
+    /**
+     * 获取待恢复青龙
+     * @return
+     */
+    Result getRecoveryQl();
 }

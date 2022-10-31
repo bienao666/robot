@@ -1090,6 +1090,7 @@ public class QlServiceImpl implements QlService {
         }
         //根据新青龙备注查询青龙
         QlEntity qlQuery = new QlEntity();
+        qlQuery.setRemark(newQl);
         QlEntity qlEntity = qlMapper.queryQl(qlQuery);
         if (qlEntity==null){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"新青龙备注未查到数据");
@@ -1125,12 +1126,7 @@ public class QlServiceImpl implements QlService {
                             jdCkEntity.setQlRemark(newQl);
                             jdCkMapper.updateCk(jdCkEntity);
                         }
-                    }else {
-                        //存在
-                        //todo
-
                     }
-
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1142,6 +1138,16 @@ public class QlServiceImpl implements QlService {
         res.put("successCount",successCount);
         res.put("failedCount",needCount - successCount);
         return Result.success(res);
+    }
+
+    /**
+     * 获取待恢复青龙
+     * @return
+     */
+    @Override
+    public Result getRecoveryQl() {
+        List<String> list = jdCkMapper.getRecoveryQl();
+        return Result.success(list);
     }
 
     private void countQlCkCounts(HashMap<Integer, Integer> qlToCkCount, Integer qlID, Integer value) {

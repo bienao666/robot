@@ -100,4 +100,10 @@ public interface JdCkMapper {
      * @return
      */
     List<JdCkEntity> queryByIdsCk(List<Integer> ids);
+
+    /**
+     * 获取待恢复青龙
+     * @return
+     */
+    List<String> getRecoveryQl();
 }

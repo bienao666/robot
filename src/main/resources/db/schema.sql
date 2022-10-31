@@ -42,7 +42,7 @@ create table if not exists `ql` (
                                        tokenType varchar,
                                        token varchar,
                                        head varchar,
-                                       remark varchar,
+                                       remark varchar UNIQUE,
                                        `type` INTEGER DEFAULT 0,
                                        created_time varchar DEFAULT (datetime('now', 'localtime')),
                                        updated_time varchar DEFAULT (datetime('now', 'localtime'))

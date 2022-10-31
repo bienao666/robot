@@ -335,10 +335,20 @@ public class QlController {
     }
 
     /**
+     * 获取待恢复青龙
+     */
+    @PassToken
+    @GetMapping("/getRecoveryQl")
+    public Result getRecoveryQl(){
+        Result result = qlService.getRecoveryQl();
+        return result;
+    }
+
+    /**
      * 恢复青龙ck
      */
     @LoginToken
-    @GetMapping("/recoveryCk")
+    @PostMapping("/recoveryCk")
     public Result recoveryCk(@RequestBody JSONObject jsonObject) {
         //老青龙备注
         String oldQl = jsonObject.getString("oldQl");

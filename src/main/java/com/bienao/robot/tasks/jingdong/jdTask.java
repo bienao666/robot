@@ -162,9 +162,9 @@ public class jdTask {
 
     /**
      * 青龙同步助力池
-     * 每隔一小时同步一次
+     * 每隔十分钟同步一次
      */
-    @Scheduled(cron = "0 0 */1 * * ?")
+    @Scheduled(cron = "0 */10 * * * ?")
     public void qlToZlc(){
         String qltozlc = systemParamUtil.querySystemParam("QLTOZLC");
         if ("是".equals(qltozlc)){
