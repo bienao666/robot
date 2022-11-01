@@ -494,7 +494,7 @@ public class WireServiceImpl implements WireService {
 
         keys.add("yhyactivityId");
         keys.add("yhyauthorCode");
-        addWire("邀请赢大礼/邀好友赢大礼","jd_yqhy.py",keys);
+        addWire("邀请赢大礼","jd_prodev.py",keys);
 
         keys.add("jd_wxShopFollowActivity_activityUrl");
         addWire("关注店铺有礼","jd_wxShopFollowActivity.js",keys);
@@ -606,6 +606,9 @@ public class WireServiceImpl implements WireService {
 
         keys.add("jd_lottery_activityUrl");
         addWire("收藏大师-幸运抽奖","jd_txzj_lottery.js",keys);
+
+        keys.add("jd_wdzfd_activityId");
+        addWire("微定制瓜分福袋","jd_wdzfd.js",keys);
 
         /*keys.add("M_WX_SHOP_GIFT_URL");
         addWire("","",keys);
