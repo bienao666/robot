@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -328,6 +329,7 @@ public class CkServiceImpl implements CkService {
                 e.printStackTrace();
             }
         }
+//        jdCkEntities = jdCkEntities.stream().sorted(Comparator.comparing(JdCkEntity::getJd).reversed()).collect(Collectors.toList());
         int start = PageUtil.getStart(pageNo, pageSize) - pageSize;
         int end = PageUtil.getEnd(pageNo, pageSize) - pageSize;
         JSONObject result = new JSONObject();
