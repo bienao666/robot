@@ -2,20 +2,20 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.bienao.robot.mapper.jingdong.JdPetMapper">
+<mapper namespace="com.bienao.robot.mapper.jingdong.JdZqdyjMapper">
 
-    <update id="resetPetStatus">
-        update jdPet set help_status = 0,to_help_status = 1;
+    <update id="resetStatus">
+        update jdZqdyj set help_status = 0,to_help_status = 1;
     </update>
 
-    <update id="updateJdPet" parameterType="JdPetEntity">
-        update jdPet
+    <update id="update" parameterType="jdZqdyjEntity">
+        update jdZqdyj
         <set>
             <if test="helpCode != null and helpCode != ''">
                 help_code = #{helpCode},
             </if>
-            <if test="isPetHei != null">
-                is_pet_hei = #{isPetHei},
+            <if test="isHei != null">
+                is_hei = #{isHei},
             </if>
             <if test="helpStatus != null">
                 help_status = #{helpStatus},
@@ -23,19 +23,22 @@
             <if test="toHelpStatus != null">
                 to_help_status = #{toHelpStatus},
             </if>
+            <if test="updatedTime !=null">
+                updated_time=#{updatedTime},
+            </if>
         </set>
         where id=#{id};
     </update>
 
     <select id="getHelpTimes" resultType="java.lang.Integer">
-        select count(*) from jdPet where help_status = 1
+        select count(*) from jdZqdyj where help_status = 1
     </select>
 
-    <insert id="addJdPet" parameterType="JdPetEntity">
-        insert into jdPet(help_code,ckid,is_pet_hei) values (#{helpCode},#{ckId},#{isPetHei});
+    <insert id="add" parameterType="jdZqdyjEntity">
+        insert into jdZqdyj(help_code,ckid,is_hei) values (#{helpCode},#{ckId},#{isHei});
     </insert>
 
     <delete id="clear">
-        delete from jdPet where ckid not in (select id from jdck);
+        delete from jdZqdyj where ckid not in (select id from jdck);
     </delete>
 </mapper>

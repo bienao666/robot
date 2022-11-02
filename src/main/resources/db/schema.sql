@@ -125,6 +125,16 @@ create table if not exists `jdPlant` (
                            `created_time` varchar DEFAULT (datetime('now', 'localtime')),
                            `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );
+create table if not exists `jdZqdyj` (
+                           `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+                           `help_code` varchar,
+                           `ckid` INTEGER,
+                           `is_hei` INTEGER DEFAULT '0',
+                           `help_status` INTEGER DEFAULT '0',
+                           `to_help_status` INTEGER DEFAULT '1',
+                           `created_time` varchar DEFAULT (datetime('now', 'localtime')),
+                            `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
+);
 create table if not exists `ylgy` (
                                          `id` INTEGER PRIMARY KEY AUTOINCREMENT,
                                          `uid` varchar,
