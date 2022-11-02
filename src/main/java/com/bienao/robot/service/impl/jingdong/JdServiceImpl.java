@@ -855,49 +855,65 @@ public class JdServiceImpl implements JdService {
             int count = 0;
             List<QlEnv> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
             for (QlEnv env : envs) {
-                String name = env.getName();
-                String ck = env.getValue();
-                String remarks = env.getRemarks();
-                if ("JD_COOKIE".equals(name)) {
-                    String ptPin = "";
-                    Matcher matcher = jdPinPattern.matcher(ck);
-                    if (matcher.find()) {
-                        ptPin = matcher.group(1);
+                try {
+                    String name = env.getName();
+                    String ck = env.getValue();
+                    String remarks = env.getRemarks();
+                    if ("JD_COOKIE".equals(name)) {
+                        addJdck(ck,remarks,count,ql.getRemark());
                     }
-                    //判断pt_pin是否存在
-                    JdCkEntity jdCkEntityQuery = new JdCkEntity();
-                    jdCkEntityQuery.setPtPin(ptPin);
-                    JdCkEntity jdck = jdCkMapper.queryCk(jdCkEntityQuery);
-                    if (jdck == null) {
-                        //添加
-                        jdck = new JdCkEntity();
-                        jdck.setStatus(0);
-                        jdck.setCk(ck);
-                        jdck.setQlRemark(ql.getRemark());
-                        jdck.setLevel(2);
-                        if (StringUtils.isNotEmpty(remarks)) {
-                            jdck.setRemark(remarks);
-                        }
-                        jdck.setPtPin(ptPin);
-                        jdCkMapper.addCk(jdck);
-                        count++;
-                    } else {
-                        //更新
-                        if (!ck.equals(jdck.getCk()) || (StringUtils.isNotEmpty(ql.getRemark()) && !ql.getRemark().equals(jdck.getQlRemark()))) {
-                            jdck.setStatus(0);
-                            jdck.setCk(ck);
-                            jdck.setQlRemark(ql.getRemark());
-                            if (StringUtils.isNotEmpty(remarks)) {
-                                jdck.setRemark(remarks);
-                            }
-                            jdck.setUpdatedTime(DateUtil.formatDateTime(new Date()));
-                            jdCkMapper.updateCk(jdck);
-                            count++;
-                        }
-                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             log.info("青龙服务器：{}同步助力池结束，共同步{}个ck", ql.getRemark(), count);
+        }
+    }
+
+    /**
+     *
+     * @param ck ck
+     * @param remarks ck备注
+     * @param count 数量
+     * @param qlRemark 青龙备注
+     */
+    @Override
+    public void addJdck(String ck, String remarks, int count, String qlRemark){
+        String ptPin = "";
+        Matcher matcher = jdPinPattern.matcher(ck);
+        if (matcher.find()) {
+            ptPin = matcher.group(1);
+        }
+        //判断pt_pin是否存在
+        JdCkEntity jdCkEntityQuery = new JdCkEntity();
+        jdCkEntityQuery.setPtPin(ptPin);
+        JdCkEntity jdck = jdCkMapper.queryCk(jdCkEntityQuery);
+        if (jdck == null) {
+            //添加
+            jdck = new JdCkEntity();
+            jdck.setStatus(0);
+            jdck.setCk(ck);
+            jdck.setQlRemark(qlRemark);
+            jdck.setLevel(2);
+            if (StringUtils.isNotEmpty(remarks)) {
+                jdck.setRemark(remarks);
+            }
+            jdck.setPtPin(ptPin);
+            jdCkMapper.addCk(jdck);
+            count++;
+        } else {
+            //更新
+            if (!ck.equals(jdck.getCk()) || (StringUtils.isNotEmpty(qlRemark) && !qlRemark.equals(jdck.getQlRemark()))) {
+                jdck.setStatus(0);
+                jdck.setCk(ck);
+                jdck.setQlRemark(qlRemark);
+                if (StringUtils.isNotEmpty(remarks)) {
+                    jdck.setRemark(remarks);
+                }
+                jdck.setUpdatedTime(DateUtil.formatDateTime(new Date()));
+                jdCkMapper.updateCk(jdck);
+                count++;
+            }
         }
     }
 

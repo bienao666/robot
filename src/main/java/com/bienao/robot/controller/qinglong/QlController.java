@@ -321,8 +321,9 @@ public class QlController {
      */
     @LoginToken
     @GetMapping("/autoAdjust")
-    public void autoAdjust() {
+    public Result autoAdjust() {
         qlService.autoAdjust();
+        return Result.success();
     }
 
     /**

@@ -23,4 +23,6 @@ public class QlEnv {
     private Integer qlId;
     //所属青龙位置
     private Integer qlIndex;
+    //s所属青龙备注
+    private String qlRemark;
 }
