@@ -50,6 +50,8 @@ public interface JdService {
 
     void qlToZlc();
 
+    void addJdck(String ck,String remarks,int count,String qlRemark);
+
     List getHelpList(String type);
 
     void clear();
