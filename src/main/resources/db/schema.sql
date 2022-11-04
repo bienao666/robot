@@ -133,7 +133,7 @@ create table if not exists `jdZqdyj` (
                            `help_status` INTEGER DEFAULT '0',
                            `to_help_status` INTEGER DEFAULT '1',
                            `created_time` varchar DEFAULT (datetime('now', 'localtime')),
-                            `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
+                           `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );
 create table if not exists `ylgy` (
                                          `id` INTEGER PRIMARY KEY AUTOINCREMENT,

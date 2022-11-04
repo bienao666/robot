@@ -1,6 +1,8 @@
 package com.bienao.robot.controller.jingdong;
 
+import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.annotation.LoginToken;
+import com.bienao.robot.annotation.PassToken;
 import com.bienao.robot.entity.Result;
 import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.service.jingdong.ZqdyjService;
@@ -10,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 京东ck
+ * 赚钱大赢家
  *
  * @author tiandawei
  */
@@ -24,11 +26,12 @@ public class ZqdyjController {
     private ZqdyjService zqdyjService;
 
     /**
-     * 获取京东账号列表
+     * 赚钱大赢家助力
      */
-    @LoginToken
+    @PassToken
     @PostMapping("/help")
-    public Result help(@RequestBody String param){
+    public Result help(@RequestBody JSONObject jsonObject){
+        String param = jsonObject.getString("param");
         if (StringUtils.isEmpty(param)){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "ck或者助力码不能为空");
         }

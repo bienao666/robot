@@ -859,8 +859,9 @@ public class JdServiceImpl implements JdService {
                     String name = env.getName();
                     String ck = env.getValue();
                     String remarks = env.getRemarks();
+                    Integer status = env.getStatus();
                     if ("JD_COOKIE".equals(name)) {
-                        addJdck(ck,remarks,count,ql.getRemark());
+                        addJdck(ck,remarks,status,count,ql.getRemark());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -878,7 +879,7 @@ public class JdServiceImpl implements JdService {
      * @param qlRemark 青龙备注
      */
     @Override
-    public void addJdck(String ck, String remarks, int count, String qlRemark){
+    public void addJdck(String ck, String remarks,Integer status, int count, String qlRemark){
         String ptPin = "";
         Matcher matcher = jdPinPattern.matcher(ck);
         if (matcher.find()) {
@@ -903,10 +904,11 @@ public class JdServiceImpl implements JdService {
             count++;
         } else {
             //更新
-            if (!ck.equals(jdck.getCk()) || (StringUtils.isNotEmpty(qlRemark) && !qlRemark.equals(jdck.getQlRemark()))) {
+            if (!ck.equals(jdck.getCk()) || (StringUtils.isNotEmpty(qlRemark) && !qlRemark.equals(jdck.getQlRemark())) || !status.equals(jdck.getStatus())) {
                 jdck.setStatus(0);
                 jdck.setCk(ck);
                 jdck.setQlRemark(qlRemark);
+                jdck.setStatus(status);
                 if (StringUtils.isNotEmpty(remarks)) {
                     jdck.setRemark(remarks);
                 }

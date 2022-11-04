@@ -30,15 +30,43 @@
         where id=#{id};
     </update>
 
+    <update id="updateByCkId" parameterType="jdZqdyjEntity">
+        update jdZqdyj
+        <set>
+            <if test="helpCode != null and helpCode != ''">
+                help_code = #{helpCode},
+            </if>
+            <if test="isHei != null">
+                is_hei = #{isHei},
+            </if>
+            <if test="helpStatus != null">
+                help_status = #{helpStatus},
+            </if>
+            <if test="toHelpStatus != null">
+                to_help_status = #{toHelpStatus},
+            </if>
+            <if test="updatedTime !=null">
+                updated_time=#{updatedTime},
+            </if>
+        </set>
+        where ckid=#{ckid};
+    </update>
+
     <select id="getHelpTimes" resultType="java.lang.Integer">
         select count(*) from jdZqdyj where help_status = 1
     </select>
 
     <insert id="add" parameterType="jdZqdyjEntity">
-        insert into jdZqdyj(help_code,ckid,is_hei) values (#{helpCode},#{ckId},#{isHei});
+        insert into jdZqdyj(help_code,ckid,is_hei,to_help_status) values (#{helpCode},#{ckId},#{isHei},#{toHelpStatus});
     </insert>
 
     <delete id="clear">
         delete from jdZqdyj where ckid not in (select id from jdck);
     </delete>
+
+    <select id="getZqdyjCk" resultType="com.alibaba.fastjson.JSONObject">
+        select z.id id,c.id ckid,c.ck ck,z.is_hei isHei,z.to_help_status toHelpStatus from jdck c
+        left join jdZqdyj z on z.ckid=c.id
+        where c.status=0
+    </select>
 </mapper>

@@ -5,7 +5,7 @@ import com.bienao.robot.entity.Result;
 public interface ZqdyjService {
 
     /**
-     * 助力
+     * 赚钱大赢家助力
      * @param param
      * @return
      */

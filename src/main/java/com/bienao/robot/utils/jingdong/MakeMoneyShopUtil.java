@@ -6,6 +6,9 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 /**
  * 特价版大赢家
  */
@@ -50,7 +53,7 @@ public class MakeMoneyShopUtil {
         result.put("code",code);
         if (0 == code){
             //是否火爆
-            result.put("hot",1);
+            result.put("hot",0);
             //助力码
             String sId = data.getJSONObject("data").getString("shareId");
             result.put("sId",sId);
@@ -59,7 +62,7 @@ public class MakeMoneyShopUtil {
             result.put("canUseCoinAmount",canUseCoinAmount);
         }else {
             //是否火爆
-            result.put("hot",0);
+            result.put("hot",1);
         }
         return result;
     }
@@ -69,7 +72,7 @@ public class MakeMoneyShopUtil {
      * @param ck ck
      * @return
      */
-    public static JSONObject getTask(String ck){
+    public static List<JSONObject> getTask(String ck){
         String fn = "newtasksys/newtasksys_front/GetUserTaskStatusList";
         String body = "__t="+DateUtil.date().getTime()+"&source=makemoneyshop&bizCode=makemoneyshop";
         JSONObject data = get(fn, body, ck);
@@ -79,37 +82,34 @@ public class MakeMoneyShopUtil {
         }
         JSONObject result = new JSONObject();
         Integer ret = data.getInteger("ret");
-        result.put("code",ret);
         if (0 == ret){
-            //打扫任务状态
-            Integer awardStatus = data.getJSONObject("data").getJSONArray("userTaskStatusList").getJSONObject(0).getInteger("awardStatus");
-            result.put("awardStatus",awardStatus);
+            String userTaskStatusListStr = data.getJSONObject("data").getString("userTaskStatusList");
+            List<JSONObject> userTaskStatusList = JSONObject.parseArray(userTaskStatusListStr, JSONObject.class);
+            return userTaskStatusList;
         }
-        return result;
+        return null;
     }
 
     /**
-     * 打扫
+     * 奖励
      * @param ck ck
      * @return
      */
-    public static JSONObject award(String ck){
+    public static String award(String ck,Integer taskId){
         String fn = "newtasksys/newtasksys_front/Award";
-        String body = "__t="+DateUtil.date().getTime()+"&source=makemoneyshop&taskId=3532&bizCode=makemoneyshop";
+        String body = "__t="+DateUtil.date().getTime()+"&source=makemoneyshop&taskId="+taskId+"&bizCode=makemoneyshop";
         JSONObject data = get(fn, body, ck);
-        log.info("赚钱大赢家打扫：{}",data.toJSONString());
+        log.info("赚钱大赢家奖励：{}",data.toJSONString());
         if (data == null){
-            return null;
+            return "";
         }
-        JSONObject result = new JSONObject();
         Integer ret = data.getInteger("ret");
-        result.put("code",ret);
         if (0 == ret){
-            //打扫任务获取的积分
             Integer prizeInfo = data.getJSONObject("data").getInteger("prizeInfo");
-            result.put("prizeInfo",prizeInfo);
+            Double money = new BigDecimal(prizeInfo).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP).doubleValue();
+            return "获得营业金："+money+"元";
         }
-        return result;
+        return "result";
     }
 
 
@@ -145,6 +145,7 @@ public class MakeMoneyShopUtil {
         }else {
             //其他情况
             result.put("nohelp",3);
+            result.put("msg",data.getString("msg"));
             log.info(data.getString("msg"));
         }
         return result;

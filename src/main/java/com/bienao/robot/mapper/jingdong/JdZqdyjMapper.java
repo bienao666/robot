@@ -1,7 +1,11 @@
 package com.bienao.robot.mapper.jingdong;
 
+import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.jingdong.JdPetEntity;
+import com.bienao.robot.entity.jingdong.JdZqdyjEntity;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 @Mapper
 public interface JdZqdyjMapper {
@@ -14,10 +18,12 @@ public interface JdZqdyjMapper {
 
     /**
      * 修改
-     * @param jdPetEntity
+     * @param jdZqdyjEntity
      * @return
      */
-    int update(JdPetEntity jdPetEntity);
+    int update(JdZqdyjEntity jdZqdyjEntity);
+
+    int updateByCkId(JdZqdyjEntity jdZqdyjEntity);
 
     /**
      * 获取已助力满人数
@@ -27,10 +33,12 @@ public interface JdZqdyjMapper {
 
     /**
      * 添加
-     * @param jdPetEntity
+     * @param jdZqdyjEntity
      * @return
      */
-    int add(JdPetEntity jdPetEntity);
+    int add(JdZqdyjEntity jdZqdyjEntity);
 
     void clear();
+
+    List<JSONObject> getZqdyjCk();
 }

@@ -926,12 +926,12 @@ public class QlServiceImpl implements QlService {
                                         //qlEnv所在青龙加上
                                         operateQlToQlEnvs(qlToQlEnvs, qlEnv.getQlId(), qlEnv, 0);
                                         //更新robot本地
-                                        jdService.addJdck(qlEnv.getValue(),qlEnv.getRemarks(),0,qlEnv.getQlRemark());
+                                        jdService.addJdck(qlEnv.getValue(),qlEnv.getRemarks(),qlEnv.getStatus(),0,qlEnv.getQlRemark());
                                     } else {
                                         //删除qlEnv
                                         deleteQlCk(qlEntity, qlEnv);
                                         //更新robot本地
-                                        jdService.addJdck(qlEnv1.getValue(),qlEnv1.getRemarks(),0,qlEnv1.getQlRemark());
+                                        jdService.addJdck(qlEnv1.getValue(),qlEnv1.getRemarks(),qlEnv1.getStatus(),0,qlEnv1.getQlRemark());
                                     }
 
                                 } else {
@@ -944,7 +944,7 @@ public class QlServiceImpl implements QlService {
                                             //删除qlEnv
                                             deleteQlCk(qlEntity, qlEnv);
                                             //更新robot本地
-                                            jdService.addJdck(qlEnv1.getValue(),qlEnv1.getRemarks(),0,qlEnv1.getQlRemark());
+                                            jdService.addJdck(qlEnv1.getValue(),qlEnv1.getRemarks(),qlEnv1.getStatus(),0,qlEnv1.getQlRemark());
                                         } else {
                                             //删除qlEnv1
                                             QlEntity query = new QlEntity();
@@ -961,7 +961,7 @@ public class QlServiceImpl implements QlService {
                                             //qlEnv所在青龙加上
                                             operateQlToQlEnvs(qlToQlEnvs, qlEnv.getQlId(), qlEnv, 0);
                                             //更新robot本地
-                                            jdService.addJdck(qlEnv.getValue(),qlEnv.getRemarks(),0,qlEnv.getQlRemark());
+                                            jdService.addJdck(qlEnv.getValue(),qlEnv.getRemarks(),qlEnv.getStatus(),0,qlEnv.getQlRemark());
                                         }
                                     } else {
                                         if (isValid || isValid1) {
@@ -970,7 +970,7 @@ public class QlServiceImpl implements QlService {
                                                 //删除qlEnv
                                                 deleteQlCk(qlEntity, qlEnv);
                                                 //更新robot本地
-                                                jdService.addJdck(qlEnv1.getValue(),qlEnv1.getRemarks(),0,qlEnv1.getQlRemark());
+                                                jdService.addJdck(qlEnv1.getValue(),qlEnv1.getRemarks(),qlEnv1.getStatus(),0,qlEnv1.getQlRemark());
                                             }
                                             if (!isValid1) {
                                                 //删除qlEnv1
@@ -988,13 +988,13 @@ public class QlServiceImpl implements QlService {
                                                 //qlEnv所在青龙加上
                                                 operateQlToQlEnvs(qlToQlEnvs, qlEnv.getQlId(), qlEnv, 0);
                                                 //更新robot本地
-                                                jdService.addJdck(qlEnv.getValue(),qlEnv.getRemarks(),0,qlEnv.getQlRemark());
+                                                jdService.addJdck(qlEnv.getValue(),qlEnv.getRemarks(),qlEnv.getStatus(),0,qlEnv.getQlRemark());
                                             }
                                         } else {
                                             //两个都无效，删除qlEnv
                                             deleteQlCk(qlEntity, qlEnv);
                                             //更新robot本地
-                                            jdService.addJdck(qlEnv1.getValue(),qlEnv1.getRemarks(),0,qlEnv1.getQlRemark());
+                                            jdService.addJdck(qlEnv1.getValue(),qlEnv1.getRemarks(),qlEnv1.getStatus(),0,qlEnv1.getQlRemark());
                                         }
                                     }
                                 }
@@ -1051,7 +1051,7 @@ public class QlServiceImpl implements QlService {
                                         qlEnvs.remove(qlEnv);
                                         count.setValue(count.getValue() - 1);
                                         //更新robot本地
-                                        jdService.addJdck(qlEnv.getValue(),qlEnv.getRemarks(),0,qlEntity1.getRemark());
+                                        jdService.addJdck(qlEnv.getValue(),qlEnv.getRemarks(),qlEnv.getStatus(),0,qlEntity1.getRemark());
                                     }
                                 }
                             } catch (Exception e) {

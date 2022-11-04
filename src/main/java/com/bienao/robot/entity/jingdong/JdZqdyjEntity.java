@@ -1,8 +1,11 @@
 package com.bienao.robot.entity.jingdong;
 
+import lombok.Data;
+
 /**
  * 赚钱大赢家
  */
+@Data
 public class JdZqdyjEntity {
     //序号
     private Integer id;
