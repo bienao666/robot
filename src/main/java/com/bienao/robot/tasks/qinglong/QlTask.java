@@ -81,7 +81,7 @@ public class QlTask {
     /**
      * ck检测
      */
-    @Scheduled(cron = "0 30 10,22 * * ?")
+    @Scheduled(cron = "0 30 0,8,12,16,20 * * ?")
     public void checkck(){
         qlService.checkCk();
     }
