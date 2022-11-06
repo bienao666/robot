@@ -14,7 +14,7 @@ public interface JdZqdyjMapper {
      * 重置ck的助力数据
      * @return
      */
-    int resetStatus();
+    int reset();
 
     /**
      * 修改

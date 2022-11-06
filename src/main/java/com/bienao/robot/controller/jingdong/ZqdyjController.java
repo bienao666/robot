@@ -28,14 +28,32 @@ public class ZqdyjController {
     /**
      * 赚钱大赢家助力
      */
-    @PassToken
+    @LoginToken
     @PostMapping("/help")
     public Result help(@RequestBody JSONObject jsonObject){
-        String param = jsonObject.getString("param");
-        if (StringUtils.isEmpty(param)){
+        String account = jsonObject.getString("account");
+        if (StringUtils.isEmpty(account)){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "ck或者助力码不能为空");
         }
+        return zqdyjService.help(account);
+    }
 
-        return zqdyjService.help(param);
+    /**
+     * 赚钱大赢家数据详情
+     */
+    @PassToken
+    @GetMapping("/getZqdyjData")
+    public Result getZqdyjData(){
+        return zqdyjService.getZqdyjData();
+    }
+
+    @PassToken
+    @PostMapping("/test")
+    public Result test(@RequestBody JSONObject jsonObject){
+        String account = jsonObject.getString("account");
+        if (StringUtils.isEmpty(account)){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "ck或者助力码不能为空");
+        }
+        return zqdyjService.test(account);
     }
 }

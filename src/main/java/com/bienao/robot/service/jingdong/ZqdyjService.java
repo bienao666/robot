@@ -10,4 +10,10 @@ public interface ZqdyjService {
      * @return
      */
     Result help(String param);
+
+    void reset();
+
+    Result test(String account);
+
+    Result getZqdyjData();
 }

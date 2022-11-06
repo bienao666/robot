@@ -7,33 +7,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * 特价版大赢家
  */
 @Slf4j
 public class MakeMoneyShopUtil {
-
-    public static void main(String[] args) {
-        String ck = "pt_key=AAJjYG30ADAxiz95zW1VRawAPJOKekhBpQAAqfnEJoVWpzsmBVZxMgueUCz7iqrysMg-JrmUmQI;pt_pin=jd_6df829e3c988b;";
-        String fn = "makemoneyshop/home";
-        String body = "activeId=63526d8f5fe613a6adb48f03&_stk=activeId&_ste=1";
-        String url = "https://wq.jd.com/" + fn + "?g_ty=h5&g_tk=&appCode=msc588d6d5&" + body + "&h5st=&sceneval=2&callback=__jsonp1667344808184";
-        String str = HttpRequest.get(url)
-                .header("Origin", "https://wq.jd.com")
-                .header("Referer", "https://wqs.jd.com/sns/202210/20/make-money-shop/index.html?activeId=63526d8f5fe613a6adb48f03")
-                .header("User-Agent", GetUserAgentUtil.getUserAgent())
-                .header("Cookie", ck)
-                .execute().body();
-        System.out.println(str);
-        int start = str.indexOf("(");
-        int end = str.lastIndexOf(")");
-        String substring = str.substring(start + 1, end);
-        System.out.println(substring);
-        JSONObject jsonObject = JSONObject.parseObject(substring);
-        System.out.println(jsonObject.toJSONString());
-    }
 
     /**
      * 获取信息
@@ -52,7 +34,8 @@ public class MakeMoneyShopUtil {
         Integer code = data.getInteger("code");
         result.put("code",code);
         if (0 == code){
-            //是否火爆
+            result.put("code",0);
+            //不火爆
             result.put("hot",0);
             //助力码
             String sId = data.getJSONObject("data").getString("shareId");
@@ -60,8 +43,11 @@ public class MakeMoneyShopUtil {
             //当前营业金
             Double canUseCoinAmount = data.getJSONObject("data").getDouble("canUseCoinAmount");
             result.put("canUseCoinAmount",canUseCoinAmount);
+        }else if (13 == code){
+            result.put("code",13);
         }else {
-            //是否火爆
+            result.put("code",1);
+            //火爆
             result.put("hot",1);
         }
         return result;
@@ -95,21 +81,51 @@ public class MakeMoneyShopUtil {
      * @param ck ck
      * @return
      */
-    public static String award(String ck,Integer taskId){
+    public static JSONObject award(String ck,Integer taskId){
         String fn = "newtasksys/newtasksys_front/Award";
         String body = "__t="+DateUtil.date().getTime()+"&source=makemoneyshop&taskId="+taskId+"&bizCode=makemoneyshop";
         JSONObject data = get(fn, body, ck);
         log.info("赚钱大赢家奖励：{}",data.toJSONString());
         if (data == null){
-            return "";
+            return data;
         }
         Integer ret = data.getInteger("ret");
         if (0 == ret){
             Integer prizeInfo = data.getJSONObject("data").getInteger("prizeInfo");
             Double money = new BigDecimal(prizeInfo).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP).doubleValue();
-            return "获得营业金："+money+"元";
+            JSONObject res = new JSONObject();
+            res.put("code",0);
+            res.put("money",money);
+            return res;
         }
-        return "result";
+        return null;
+    }
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        int n = in.nextInt();
+        in = new Scanner(System.in);
+        int q = in.nextInt();
+        //0 黑 1白
+        ArrayList<Integer> list = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            list.add(0);
+        }
+        for (int i = 0; i < q; i++) {
+            in = new Scanner(System.in);
+            int L = in.nextInt();
+            in = new Scanner(System.in);
+            int R = in.nextInt();
+            for (int j = 0; j < list.size(); j++) {
+                if (j >= L && j <=R){
+                    list.set(j,list.get(j)==0?1:0);
+                }
+            }
+        }
+
+        long count = list.stream().filter(i -> i == 0).count();
+        System.out.println(count);
+
+
     }
 
 
@@ -142,6 +158,16 @@ public class MakeMoneyShopUtil {
         }else if (1008 == code){
             //今日无助力次数了！
             result.put("nohelp",0);
+        }else if (147 == code){
+            //活动火爆
+            result.put("nohelp",4);
+        }else if (1009 == code){
+            //助力任务已完成
+            result.put("nohelp",5);
+        }else if (1002 == code){
+            //shareid错误
+            result.put("code",1002);
+            result.put("msg",data.getString("msg"));
         }else {
             //其他情况
             result.put("nohelp",3);
@@ -162,6 +188,7 @@ public class MakeMoneyShopUtil {
         if (StringUtils.isEmpty(str)){
             return null;
         }
+        str = str.replace("try{","").replace(";} catch (e) {}","");
         int start = str.indexOf("(");
         int end = str.lastIndexOf(")");
         String substring = str.substring(start + 1, end);

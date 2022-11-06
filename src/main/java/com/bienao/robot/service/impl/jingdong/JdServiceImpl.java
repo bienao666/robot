@@ -64,6 +64,9 @@ public class JdServiceImpl implements JdService {
     @Autowired
     private QlUtil qlUtil;
 
+    @Autowired
+    private JdZqdyjMapper jdZqdyjMapper;
+
     private Pattern jdPinPattern = Pattern.compile("pt_pin=(.+?);");
 
     /**
@@ -957,6 +960,7 @@ public class JdServiceImpl implements JdService {
         jdFruitMapper.clear();
         jdPetMapper.clear();
         jdPlantMapper.clear();
+        jdZqdyjMapper.clear();
     }
 
     /**

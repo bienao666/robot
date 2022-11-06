@@ -8,6 +8,7 @@ import com.bienao.robot.entity.jingdong.JdCkEntity;
 import com.bienao.robot.service.jingdong.CkService;
 import com.bienao.robot.service.jingdong.JdDhService;
 import com.bienao.robot.service.jingdong.JdService;
+import com.bienao.robot.service.jingdong.ZqdyjService;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +54,9 @@ public class jdTask {
 
     @Value("${task-function.countJd}")
     private boolean countJd;
+
+    @Autowired
+    private ZqdyjService zqdyjService;
 
     private Cache<String, String> redis = WXConstant.redis;
 
@@ -207,5 +211,13 @@ public class jdTask {
     @Scheduled(cron = "0 0 23 * * ?")
     public void clear(){
         jdService.clear();
+    }
+
+    /**
+     * 重置赚钱大赢家
+     */
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void zqdyjReset(){
+        zqdyjService.reset();
     }
 }
