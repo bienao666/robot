@@ -41,7 +41,7 @@ public class ZqdyjController {
     /**
      * 赚钱大赢家数据详情
      */
-    @PassToken
+    @LoginToken
     @GetMapping("/getZqdyjData")
     public Result getZqdyjData(){
         return zqdyjService.getZqdyjData();
@@ -50,7 +50,7 @@ public class ZqdyjController {
     /**
      * 重置火爆数据
      */
-    @PassToken
+    @LoginToken
     @GetMapping("/resetHot")
     public Result resetHot(){
         return zqdyjService.resetHot();
