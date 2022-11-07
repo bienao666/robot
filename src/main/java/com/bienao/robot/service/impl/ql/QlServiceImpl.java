@@ -836,6 +836,7 @@ public class QlServiceImpl implements QlService {
      * 韭菜友好设置
      */
     @Override
+    @Async("asyncServiceExecutor")
     public void leekFriendly() {
         List<QlEntity> qlEntities = qlMapper.queryQls(null);
         for (QlEntity ql : qlEntities) {

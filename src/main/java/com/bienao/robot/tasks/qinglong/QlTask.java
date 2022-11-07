@@ -62,7 +62,7 @@ public class QlTask {
     /**
      * 韭菜友好设置
      */
-    @Scheduled(cron = "0 0 4 * * ?")
+    @Scheduled(cron = "0 0 8,12,16,20 * * ?")
     public void leekFriendly(){
         String leekFriendly = systemParamUtil.querySystemParam("LEEKFRIENDLY");
         if ("是".equals(leekFriendly)){
