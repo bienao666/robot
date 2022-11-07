@@ -16,4 +16,6 @@ public interface ZqdyjService {
     Result test(String account);
 
     Result getZqdyjData();
+
+    Result resetHot();
 }

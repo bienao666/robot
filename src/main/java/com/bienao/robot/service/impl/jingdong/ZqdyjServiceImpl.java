@@ -276,6 +276,12 @@ public class ZqdyjServiceImpl implements ZqdyjService {
         return Result.success(res);
     }
 
+    @Override
+    public Result resetHot() {
+        int count = jdZqdyjMapper.resetHot();
+        return Result.success();
+    }
+
     /**
      * 修改赚钱大赢家账号
      * @param jdZqdyjEntity

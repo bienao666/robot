@@ -69,4 +69,8 @@
         left join jdZqdyj z on z.ckid=c.id
         where c.status=0
     </select>
+
+    <update id="resetHot">
+        update jdZqdyj set is_hei=0 where is_hei=1
+    </update>
 </mapper>

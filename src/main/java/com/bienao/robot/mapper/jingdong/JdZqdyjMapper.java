@@ -41,4 +41,6 @@ public interface JdZqdyjMapper {
     void clear();
 
     List<JSONObject> getZqdyjCk();
+
+    int resetHot();
 }

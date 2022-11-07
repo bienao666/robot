@@ -47,6 +47,15 @@ public class ZqdyjController {
         return zqdyjService.getZqdyjData();
     }
 
+    /**
+     * 重置火爆数据
+     */
+    @PassToken
+    @GetMapping("/resetHot")
+    public Result resetHot(){
+        return zqdyjService.resetHot();
+    }
+
     @PassToken
     @PostMapping("/test")
     public Result test(@RequestBody JSONObject jsonObject){
