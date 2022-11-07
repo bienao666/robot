@@ -196,26 +196,18 @@ public class CkServiceImpl implements CkService {
     }
 
     /**
-     * 检查ck是否过期
+     * 检查助力是否过期
      */
     @Override
-    public void checkCk() {
-        log.info("定时检查ck开始。。。");
+    public void checkZlc() {
+        log.info("定时检查助力是否过期开始。。。");
         JdCkEntity jdCkEntityQuery = new JdCkEntity();
         List<JdCkEntity> jdCkEntities = jdCkMapper.queryCks(jdCkEntityQuery);
         log.info("共查询{}个ck", jdCkEntities.size());
         for (JdCkEntity jdCkEntity : jdCkEntities) {
-            JSONObject jsonObject = queryDetail(jdCkEntity.getCk());
-            if (jsonObject == null) {
-                //清理过期ck
-                jdCkEntity.setStatus(1);
-                jdCkMapper.updateCk(jdCkEntity);
-            } else {
-                if (jdCkEntity.getStatus()==1){
-                    jdCkEntity.setStatus(0);
-                    jdCkMapper.updateCk(jdCkEntity);
-                }
-                if (StringUtils.isEmpty(jdCkEntity.getRemark())) {
+            if (StringUtils.isEmpty(jdCkEntity.getRemark())) {
+                JSONObject jsonObject = queryDetail(jdCkEntity.getCk());
+                if (jsonObject!=null){
                     JSONObject baseInfo = jsonObject.getJSONObject("baseInfo");
                     if (baseInfo != null) {
                         jdCkEntity.setRemark(baseInfo.getString("nickname"));
@@ -223,15 +215,15 @@ public class CkServiceImpl implements CkService {
                         jdCkMapper.updateCk(jdCkEntity);
                     }
                 }
-                //查看助力超级vip是否过期
-                if (jdCkEntity.getLevel() == 1 && StringUtils.isNotEmpty(jdCkEntity.getExpiryTime())) {
-                    DateTime expiryTime = DateUtil.parse(jdCkEntity.getExpiryTime());
-                    if (expiryTime.getTime() < DateUtil.date().getTime()) {
-                        jdCkEntity.setLevel(2);
-                        jdCkEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
-                        jdCkEntity.setExpiryTime(null);
-                        jdCkMapper.updateCk(jdCkEntity);
-                    }
+            }
+            //查看助力超级vip是否过期
+            if (jdCkEntity.getLevel() == 1 && StringUtils.isNotEmpty(jdCkEntity.getExpiryTime())) {
+                DateTime expiryTime = DateUtil.parse(jdCkEntity.getExpiryTime());
+                if (expiryTime.getTime() < DateUtil.date().getTime()) {
+                    jdCkEntity.setLevel(2);
+                    jdCkEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
+                    jdCkEntity.setExpiryTime(null);
+                    jdCkMapper.updateCk(jdCkEntity);
                 }
             }
             try {
@@ -241,7 +233,7 @@ public class CkServiceImpl implements CkService {
                 e.printStackTrace();
             }
         }
-        log.info("定时清理过期ck结束。。。");
+        log.info("定时检查助力是否过期结束。。。");
     }
 
     @Override

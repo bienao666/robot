@@ -1065,6 +1065,7 @@ public class QlServiceImpl implements QlService {
     }
 
     @Override
+    @Async("asyncServiceExecutor")
     public void checkCk() {
         List<QlEntity> qls = qlMapper.queryQls(null);
         for (QlEntity ql : qls) {

@@ -58,13 +58,13 @@ public class CkController {
     }
 
     /**
-     * 检测ck是否过期
+     * 检测助力池是否过期
      *
      * @return
      */
-    @GetMapping("/checkCk")
-    public void checkCk() {
-        ckService.checkCk();
+    @GetMapping("/checkZlc")
+    public void checkZlc() {
+        ckService.checkZlc();
     }
 
     /**

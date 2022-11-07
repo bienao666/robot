@@ -46,8 +46,8 @@ public class jdTask {
     @Value("${task-function.resetCkStatus}")
     private boolean resetCkStatus;
 
-    @Value("${task-function.checkCk}")
-    private boolean checkCk;
+    @Value("${task-function.checkZlc}")
+    private boolean checkZlc;
 
     @Value("${task-function.updateShareCode}")
     private boolean updateShareCode;
@@ -123,14 +123,14 @@ public class jdTask {
     }
 
     /**
-     * 检查ck是否过期
+     * 检查助力池是否过期
      */
-    @Scheduled(cron = "0 0 14 * * ?")
-    public void checkCk(){
-        if (checkCk){
-            ckService.checkCk();
+    @Scheduled(cron = "0 0 13 * * ?")
+    public void checkZlc(){
+        if (checkZlc){
+            ckService.checkZlc();
         }else {
-            log.info("检查ck是否过期定时任务执行失败，请先去配置checkCk为true");
+            log.info("检查助力池是否过期定时任务执行失败，请先去配置checkZlc为true");
         }
     }
 

@@ -28,7 +28,7 @@ VERSION: 1.0.17
 task-function:
   shareHelp: true
   resetCkStatus: true
-  checkCk: true
+  checkZlc: true
   updateShareCode: true
   countJd: true
 

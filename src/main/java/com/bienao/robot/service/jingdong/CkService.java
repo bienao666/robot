@@ -32,7 +32,7 @@ public interface CkService {
     /**
      * 检查ck是否过期
      */
-    void checkCk();
+    void checkZlc();
 
     Result getJdCks(String ck,String ptPin,Integer level,Integer status,String remark,Integer pageNo,Integer pageSize);
 
