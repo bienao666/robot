@@ -645,7 +645,7 @@ public class JdServiceImpl implements JdService {
         log.info("统计京豆收益结束！！！");
         log.info("更新京豆数据！！！");
         int jdCount = jdCkMapper.sumJdCount();
-        String dateTime = DateUtil.formatDateTime(date);
+        String dateTime = DateUtil.format(DateUtil.date(),"yyyy-MM-dd");
         int i = 0;
         if (jdJdMapper.queryJdByDate(dateTime) == null){
             i = jdJdMapper.addJdDate(dateTime, jdCount);
