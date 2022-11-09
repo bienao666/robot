@@ -1083,8 +1083,14 @@ public class QlServiceImpl implements QlService {
                         }
                     } else {
                         //无效
-                        if (env.getStatus() == 0) {
-                            disableList.add(env.getId());
+                        String autoDeleteExpireCk = systemParamUtil.querySystemParam("AUTODELETEEXPIRECK");
+                        if ("是".equals(autoDeleteExpireCk)){
+                            //删除青龙过期ck
+                            deleteQlCk(ql,env);
+                        }else {
+                            if (env.getStatus() == 0) {
+                                disableList.add(env.getId());
+                            }
                         }
                     }
                     //休息5s防止黑ip
@@ -1182,6 +1188,7 @@ public class QlServiceImpl implements QlService {
      * 京东红包领取通知
      */
     @Override
+    @Async("asyncServiceExecutor")
     public void notifyRedPacket() {
         List<QlEntity> qls = qlMapper.queryQls(null);
         for (QlEntity ql : qls) {
