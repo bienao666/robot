@@ -1,5 +1,6 @@
 package com.bienao.robot.service.impl.jingdong;
 
+import cn.hutool.cache.Cache;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.net.URLDecoder;
@@ -17,6 +18,7 @@ import com.bienao.robot.entity.jingdong.JdPetEntity;
 import com.bienao.robot.entity.jingdong.JdPlantEntity;
 import com.bienao.robot.mapper.QlMapper;
 import com.bienao.robot.mapper.jingdong.*;
+import com.bienao.robot.redis.Redis;
 import com.bienao.robot.service.jingdong.JdService;
 import com.bienao.robot.utils.jingdong.GetUserAgentUtil;
 import com.bienao.robot.utils.ql.QlUtil;
@@ -67,6 +69,8 @@ public class JdServiceImpl implements JdService {
     @Autowired
     private JdZqdyjMapper jdZqdyjMapper;
 
+    private Cache<String, String> redis = Redis.redis;
+
     private Pattern jdPinPattern = Pattern.compile("pt_pin=(.+?);");
 
     /**
@@ -75,6 +79,17 @@ public class JdServiceImpl implements JdService {
     @Async("asyncServiceExecutor")
     @Override
     public void fruitShareHelp(List<JdCkEntity> cks, int zlcwaittime) {
+        //判断是否有锁
+        String fruitShareHelpIng = redis.get("fruitShareHelp");
+        if (StringUtils.isEmpty(fruitShareHelpIng)) {
+            //加锁
+            redis.put("fruitShareHelp", "true", (zlcwaittime + 10) * 1000);
+        } else {
+            //有锁
+            log.info("东东农场互助进行中。。。");
+            return;
+        }
+
         //需要被助力的ck集合
         List<JdCkEntity> jdCks = new ArrayList<>();
         //查询所有的svipck 未助力满
@@ -159,6 +174,10 @@ public class JdServiceImpl implements JdService {
                 if (toHelpJdFruitEntity.getToHelpStatus() == 1) {
                     //助力
                     helpFruit(toHelpJdCk, jdCk);
+
+                    //续锁
+                    redis.put("fruitShareHelp", "true", (zlcwaittime + 10) * 1000);
+
                     try {
                         log.info("东东农场助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
                         Thread.sleep(zlcwaittime * 1000);
@@ -293,6 +312,17 @@ public class JdServiceImpl implements JdService {
     @Async("asyncServiceExecutor")
     @Override
     public void petShareHelp(List<JdCkEntity> cks, int zlcwaittime) {
+        //判断是否有锁
+        String fruitShareHelpIng = redis.get("petShareHelp");
+        if (StringUtils.isEmpty(fruitShareHelpIng)) {
+            //加锁
+            redis.put("petShareHelp", "true", (zlcwaittime + 10) * 1000);
+        } else {
+            //有锁
+            log.info("东东萌宠互助进行中。。。");
+            return;
+        }
+
         //需要被助力的ck集合
         List<JdCkEntity> jdCks = new ArrayList<>();
         //查询所有的svipck 未助力满
@@ -378,6 +408,10 @@ public class JdServiceImpl implements JdService {
                 if (toHelpJdPetEntity.getToHelpStatus() == 1) {
                     //助力
                     helpPet(toHelpJdCk, jdCk);
+
+                    //续锁
+                    redis.put("petShareHelp", "true", (zlcwaittime + 10) * 1000);
+
                     try {
                         log.info("东东萌宠助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
                         Thread.sleep(zlcwaittime * 1000);
@@ -399,6 +433,17 @@ public class JdServiceImpl implements JdService {
     @Async("asyncServiceExecutor")
     @Override
     public void plantShareHelp(List<JdCkEntity> cks, int zlcwaittime) {
+        //判断是否有锁
+        String fruitShareHelpIng = redis.get("plantShareHelp");
+        if (StringUtils.isEmpty(fruitShareHelpIng)) {
+            //加锁
+            redis.put("plantShareHelp", "true", (zlcwaittime + 10) * 1000);
+        } else {
+            //有锁
+            log.info("种豆得豆互助进行中。。。");
+            return;
+        }
+
         //需要被助力的ck集合
         List<JdCkEntity> jdCks = new ArrayList<>();
         //查询所有的svipck 未助力满
@@ -484,6 +529,10 @@ public class JdServiceImpl implements JdService {
                 if (toHelpJdPlantEntity.getToHelpStatus() == 1) {
                     //助力
                     helpPlant(toHelpJdCk, jdCk);
+
+                    //续锁
+                    redis.put("plantShareHelp", "true", (zlcwaittime + 10) * 1000);
+
                     try {
                         log.info("种豆得豆助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
                         Thread.sleep(zlcwaittime * 1000);
@@ -685,6 +734,17 @@ public class JdServiceImpl implements JdService {
     @Override
     @Async("asyncServiceExecutor")
     public void updateFruitShareCode(List<JdCkEntity> cks) {
+        //判断是否有锁
+        String fruitShareHelpIng = redis.get("updateFruitShareCode");
+        if (StringUtils.isEmpty(fruitShareHelpIng)) {
+            //加锁
+            redis.put("updateFruitShareCode", "true", 30 * 1000);
+        } else {
+            //有锁
+            log.info("维护东东农场互助码进行中。。。");
+            return;
+        }
+
         for (JdCkEntity ck : cks) {
             if (ck.getStatus() == 1) {
                 //ck失效
@@ -700,9 +760,25 @@ public class JdServiceImpl implements JdService {
                 try {
                     //查询农场信息
                     JSONObject farmInfo = getFarmInfo(ck.getCk());
+
+                    //续锁
+                    redis.put("updateFruitShareCode", "true", 30 * 1000);
+
+                    try {
+                        log.info("休息20s防止黑ip...");
+                        Thread.sleep(20000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
                     if (farmInfo != null) {
                         if (StringUtils.isNotEmpty(farmInfo.getString("code")) && "403".equals(farmInfo.getString("code"))) {
                             log.info("ip已黑，休息20s!!!");
+                            try {
+                                Thread.sleep(20000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         } else {
                             JSONObject farmUserPro = farmInfo.getJSONObject("farmUserPro");
                             if (farmUserPro == null) {
@@ -740,6 +816,17 @@ public class JdServiceImpl implements JdService {
     @Override
     @Async("asyncServiceExecutor")
     public void updatePetShareCode(List<JdCkEntity> cks) {
+        //判断是否有锁
+        String fruitShareHelpIng = redis.get("updatePetShareCode");
+        if (StringUtils.isEmpty(fruitShareHelpIng)) {
+            //加锁
+            redis.put("updatePetShareCode", "true", 30 * 1000);
+        } else {
+            //有锁
+            log.info("维护东东萌宠互助码进行中。。。");
+            return;
+        }
+
         for (JdCkEntity ck : cks) {
             if (ck.getStatus() == 1) {
                 //ck失效
@@ -755,9 +842,25 @@ public class JdServiceImpl implements JdService {
                 try {
                     //查询萌宠信息
                     JSONObject petInfo = getPetInfo(ck.getCk(), "initPetTown");
+
+                    //续锁
+                    redis.put("updatePetShareCode", "true", 30 * 1000);
+
+                    try {
+                        log.info("休息20s防止黑ip...");
+                        Thread.sleep(20000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
                     if (petInfo != null) {
                         if (StringUtils.isNotEmpty(petInfo.getString("code")) && "403".equals(petInfo.getString("code"))) {
                             log.info("ip已黑，休息20s!!!");
+                            try {
+                                Thread.sleep(20000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         } else {
                             if ("0".equals(petInfo.getString("code")) && "0".equals(petInfo.getString("resultCode")) && "success".equals(petInfo.getString("message"))) {
                                 JSONObject petUserPro = petInfo.getJSONObject("result");
@@ -801,6 +904,17 @@ public class JdServiceImpl implements JdService {
     @Override
     @Async("asyncServiceExecutor")
     public void updatePlantShareCode(List<JdCkEntity> cks) {
+        //判断是否有锁
+        String fruitShareHelpIng = redis.get("updatePlantShareCode");
+        if (StringUtils.isEmpty(fruitShareHelpIng)) {
+            //加锁
+            redis.put("updatePlantShareCode", "true", 30 * 1000);
+        } else {
+            //有锁
+            log.info("维护种豆得豆互助码进行中。。。");
+            return;
+        }
+
         for (JdCkEntity ck : cks) {
             if (ck.getStatus() == 1) {
                 //ck失效
@@ -816,9 +930,25 @@ public class JdServiceImpl implements JdService {
                 try {
                     //查询种豆得豆信息
                     JSONObject plantInfo = getPlantInfo(ck.getCk(), "plantBeanIndex");
+
+                    //续锁
+                    redis.put("updatePlantShareCode", "true", 30 * 1000);
+
+                    try {
+                        log.info("休息20s防止黑ip...");
+                        Thread.sleep(20000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
                     if (plantInfo != null) {
                         if (StringUtils.isNotEmpty(plantInfo.getString("code")) && "403".equals(plantInfo.getString("code"))) {
                             log.info("ip已黑，休息20s!!!");
+                            try {
+                                Thread.sleep(20000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         } else {
                             if ("PB101".equals(plantInfo.getString("errorCode")) || "3".equals(plantInfo.getString("code"))) {
                                 log.info("{}ck的种豆得豆互助码更新失败，活动没开或者活动已黑", ck.getCk());
@@ -1269,12 +1399,6 @@ public class JdServiceImpl implements JdService {
                 .timeout(10000)
                 .execute().body();
         log.info("查询农场信息结果：{}", result);
-        try {
-            log.info("休息20s防止黑ip...");
-            Thread.sleep(20000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         if (StringUtils.isEmpty(result)) {
             log.info("东东农场: 查询农场信息请求失败 ‼️‼️");
             return null;
@@ -1303,12 +1427,6 @@ public class JdServiceImpl implements JdService {
                 .timeout(10000)
                 .execute().body();
         log.info("查询萌宠信息结果：{}", result);
-        try {
-            log.info("休息20s防止黑ip...");
-            Thread.sleep(20000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         if (StringUtils.isEmpty(result)) {
             log.info("东东萌宠: 查询萌宠信息请求失败 ‼️‼️");
             return null;

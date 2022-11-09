@@ -90,7 +90,7 @@ alter TABLE  `jdck` add `ql_remark` varchar;
 create table if not exists `jdFruit` (
                            `id` INTEGER PRIMARY KEY AUTOINCREMENT,
                            `help_code` varchar,
-                           `ckid` INTEGER,
+                           `ckid` INTEGER UNIQUE,
                            `is_fruit_hei` INTEGER DEFAULT '0',
                            `help_status` INTEGER DEFAULT '0',
                            `to_help_status` INTEGER DEFAULT '1',
@@ -108,14 +108,14 @@ create table if not exists `jdjd` (
 create table if not exists `jdPet` (
                          `id` INTEGER PRIMARY KEY AUTOINCREMENT,
                          `help_code` varchar,
-                         `ckid` INTEGER,
+                         `ckid` INTEGER UNIQUE,
                          `is_pet_hei` INTEGER DEFAULT '0',
                          `help_status` INTEGER DEFAULT '0',
                          `to_help_status` INTEGER DEFAULT '1',
                          `created_time` varchar DEFAULT (datetime('now', 'localtime')),
                          `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );
-create table if not exists `jdPlant` (
+create table if not exists `jdPlant UNIQUE` (
                            `id` INTEGER PRIMARY KEY AUTOINCREMENT,
                            `help_code` varchar,
                            `ckid` INTEGER,
@@ -128,7 +128,7 @@ create table if not exists `jdPlant` (
 create table if not exists `jdZqdyj` (
                            `id` INTEGER PRIMARY KEY AUTOINCREMENT,
                            `help_code` varchar,
-                           `ckid` INTEGER,
+                           `ckid` INTEGER UNIQUE,
                            `is_hei` INTEGER DEFAULT '0',
                            `help_status` INTEGER DEFAULT '0',
                            `to_help_status` INTEGER DEFAULT '1',
