@@ -72,7 +72,7 @@ public class jdTask {
             int zlcwaittime = 0;
             String zlcwaittimeStr = systemParamUtil.querySystemParam("ZLCWAITTIME");
             if (StringUtils.isEmpty(zlcwaittimeStr)){
-                zlcwaittime = 10;
+                zlcwaittime = 30;
             }else {
                 zlcwaittime = Integer.parseInt(zlcwaittimeStr);
             }

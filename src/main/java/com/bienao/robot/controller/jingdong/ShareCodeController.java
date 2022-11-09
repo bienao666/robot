@@ -39,9 +39,18 @@ public class ShareCodeController {
     @GetMapping("/fruitShareHelp")
     public Result fruitShareHelp(){
         try {
+            //接口调用等待时间
+            int zlcwaittime = 0;
+            String zlcwaittimeStr = systemParamUtil.querySystemParam("ZLCWAITTIME");
+            if (StringUtils.isEmpty(zlcwaittimeStr)){
+                zlcwaittime = 30;
+            }else {
+                zlcwaittime = Integer.parseInt(zlcwaittimeStr);
+            }
+
             //查询所有ck
             List<JdCkEntity> cks = jdCkMapper.queryCksAndActivity();
-            jdService.fruitShareHelp(cks,10);
+            jdService.fruitShareHelp(cks,zlcwaittime);
             return Result.success("东东农场互助开始");
         } catch (Exception e) {
             e.printStackTrace();
@@ -55,9 +64,18 @@ public class ShareCodeController {
     @GetMapping("/petShareHelp")
     public Result petShareHelp(){
         try {
+            //接口调用等待时间
+            int zlcwaittime = 0;
+            String zlcwaittimeStr = systemParamUtil.querySystemParam("ZLCWAITTIME");
+            if (StringUtils.isEmpty(zlcwaittimeStr)){
+                zlcwaittime = 30;
+            }else {
+                zlcwaittime = Integer.parseInt(zlcwaittimeStr);
+            }
+
             //查询所有ck
             List<JdCkEntity> cks = jdCkMapper.queryCksAndActivity();
-            jdService.petShareHelp(cks,10);
+            jdService.petShareHelp(cks,zlcwaittime);
             return Result.success("东东萌宠互助开始");
         } catch (Exception e) {
             e.printStackTrace();
@@ -71,9 +89,18 @@ public class ShareCodeController {
     @GetMapping("/plantShareHelp")
     public Result plantShareHelp(){
         try {
+            //接口调用等待时间
+            int zlcwaittime = 0;
+            String zlcwaittimeStr = systemParamUtil.querySystemParam("ZLCWAITTIME");
+            if (StringUtils.isEmpty(zlcwaittimeStr)){
+                zlcwaittime = 30;
+            }else {
+                zlcwaittime = Integer.parseInt(zlcwaittimeStr);
+            }
+
             //查询所有ck
             List<JdCkEntity> cks = jdCkMapper.queryCksAndActivity();
-            jdService.plantShareHelp(cks,10);
+            jdService.plantShareHelp(cks,zlcwaittime);
             return Result.success("东东萌宠互助开始");
         } catch (Exception e) {
             e.printStackTrace();
