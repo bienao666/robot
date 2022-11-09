@@ -24,7 +24,7 @@
                 to_help_status = #{toHelpStatus},
             </if>
         </set>
-        where id=#{id};
+        where ckid=#{ckId};
     </update>
 
     <select id="getHelpTimes" resultType="java.lang.Integer">

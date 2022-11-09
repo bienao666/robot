@@ -84,7 +84,7 @@ public class JdServiceImpl implements JdService {
         String fruitShareHelpIng = redis.get("fruitShareHelp");
         if (StringUtils.isEmpty(fruitShareHelpIng)) {
             //加锁
-            redis.put("fruitShareHelp", "true", (zlcwaittime + 10) * 1000);
+            redis.put("fruitShareHelp", "true", (zlcwaittime + 10) * 1000L);
         } else {
             //有锁
             log.info("东东农场互助进行中。。。");
@@ -118,7 +118,7 @@ public class JdServiceImpl implements JdService {
                 ck.setJdFruitEntity(jdFruitEntity);
                 jdFruitMapper.addJdFruit(jdFruitEntity);
             }
-            if (jdFruitEntity != null && (jdFruitEntity.getIsFruitHei() == 0)) {
+            if (jdFruitEntity.getIsFruitHei() == 0) {
                 //东东农场不黑
                 if ((ck.getLevel() == 0) && (jdFruitEntity.getHelpStatus() == 0)) {
                     //自己 && 未助力满 && 互助码不为空
@@ -209,11 +209,11 @@ public class JdServiceImpl implements JdService {
                         helpFruit(toHelpJdCk, jdCk);
 
                         //续锁
-                        redis.put("fruitShareHelp", "true", (zlcwaittime + 10) * 1000);
+                        redis.put("fruitShareHelp", "true", (zlcwaittime + 10) * 1000L);
 
                         try {
                             log.info("东东农场助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
-                            Thread.sleep(zlcwaittime * 1000);
+                            Thread.sleep(zlcwaittime * 1000L);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -352,7 +352,7 @@ public class JdServiceImpl implements JdService {
         String fruitShareHelpIng = redis.get("petShareHelp");
         if (StringUtils.isEmpty(fruitShareHelpIng)) {
             //加锁
-            redis.put("petShareHelp", "true", (zlcwaittime + 10) * 1000);
+            redis.put("petShareHelp", "true", (zlcwaittime + 10) * 1000L);
         } else {
             //有锁
             log.info("东东萌宠互助进行中。。。");
@@ -376,18 +376,28 @@ public class JdServiceImpl implements JdService {
                 continue;
             }
             JdPetEntity jdPetEntity = ck.getJdPetEntity();
-            if (jdPetEntity != null && (jdPetEntity.getIsPetHei() == 0)) {
+            if (jdPetEntity == null){
+                jdPetEntity = new JdPetEntity();
+                jdPetEntity.setCkId(ck.getId());
+                jdPetEntity.setIsPetHei(0);
+                jdPetEntity.setHelpStatus(0);
+                jdPetEntity.setToHelpStatus(1);
+                jdPetEntity.setTimes(0);
+                ck.setJdPetEntity(jdPetEntity);
+                jdPetMapper.addJdPet(jdPetEntity);
+            }
+            if (jdPetEntity.getIsPetHei() == 0) {
                 //东东萌宠不黑
-                if ((ck.getLevel() == 0) && (jdPetEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdPetEntity.getHelpCode()))) {
-                    //自己 && 未助力满 && 互助码不为空
+                if ((ck.getLevel() == 0) && (jdPetEntity.getHelpStatus() == 0)) {
+                    //自己 && 未助力满
                     svipCks.add(ck);
                 }
-                if ((ck.getLevel() == 1) && (jdPetEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdPetEntity.getHelpCode()))) {
-                    //vip && 未助力满 && 互助码不为空
+                if ((ck.getLevel() == 1) && (jdPetEntity.getHelpStatus() == 0)) {
+                    //vip && 未助力满
                     vipCks.add(ck);
                 }
-                if ((ck.getLevel() == 2) && (jdPetEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdPetEntity.getHelpCode()))) {
-                    //普通用户 && 未助力满 && 互助码不为空
+                if ((ck.getLevel() == 2) && (jdPetEntity.getHelpStatus() == 0)) {
+                    //普通用户 && 未助力满
                     ptCks.add(ck);
                 }
                 if (jdPetEntity.getToHelpStatus() == 1) {
@@ -479,11 +489,11 @@ public class JdServiceImpl implements JdService {
                         helpPet(toHelpJdCk, jdCk);
 
                         //续锁
-                        redis.put("petShareHelp", "true", (zlcwaittime + 10) * 1000);
+                        redis.put("petShareHelp", "true", (zlcwaittime + 10) * 1000L);
 
                         try {
                             log.info("东东萌宠助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
-                            Thread.sleep(zlcwaittime * 1000);
+                            Thread.sleep(zlcwaittime * 1000L);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -509,7 +519,7 @@ public class JdServiceImpl implements JdService {
         String fruitShareHelpIng = redis.get("plantShareHelp");
         if (StringUtils.isEmpty(fruitShareHelpIng)) {
             //加锁
-            redis.put("plantShareHelp", "true", (zlcwaittime + 10) * 1000);
+            redis.put("plantShareHelp", "true", (zlcwaittime + 10) * 1000L);
         } else {
             //有锁
             log.info("种豆得豆互助进行中。。。");
@@ -533,17 +543,27 @@ public class JdServiceImpl implements JdService {
                 continue;
             }
             JdPlantEntity jdPlantEntity = ck.getJdPlantEntity();
-            if (jdPlantEntity != null && (jdPlantEntity.getIsPlantHei() == 0)) {
+            if (jdPlantEntity == null){
+                jdPlantEntity = new JdPlantEntity();
+                jdPlantEntity.setCkId(ck.getId());
+                jdPlantEntity.setIsPlantHei(0);
+                jdPlantEntity.setHelpStatus(0);
+                jdPlantEntity.setToHelpStatus(1);
+                jdPlantEntity.setTimes(0);
+                ck.setJdPlantEntity(jdPlantEntity);
+                jdPlantMapper.addJdPlant(jdPlantEntity);
+            }
+            if (jdPlantEntity.getIsPlantHei() == 0) {
                 //种豆得豆不黑
-                if ((ck.getLevel() == 0) && (jdPlantEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdPlantEntity.getHelpCode()))) {
+                if ((ck.getLevel() == 0) && (jdPlantEntity.getHelpStatus() == 0)) {
                     //自己 && 未助力满 && 互助码不为空
                     svipCks.add(ck);
                 }
-                if ((ck.getLevel() == 1) && (jdPlantEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdPlantEntity.getHelpCode()))) {
+                if ((ck.getLevel() == 1) && (jdPlantEntity.getHelpStatus() == 0)) {
                     //vip && 未助力满 && 互助码不为空
                     vipCks.add(ck);
                 }
-                if ((ck.getLevel() == 2) && (jdPlantEntity.getHelpStatus() == 0) && (StringUtils.isNotEmpty(jdPlantEntity.getHelpCode()))) {
+                if ((ck.getLevel() == 2) && (jdPlantEntity.getHelpStatus() == 0)) {
                     //普通用户 && 未助力满 && 互助码不为空
                     ptCks.add(ck);
                 }
@@ -625,7 +645,7 @@ public class JdServiceImpl implements JdService {
                         helpPlant(toHelpJdCk, jdCk);
 
                         //续锁
-                        redis.put("plantShareHelp", "true", (zlcwaittime + 10) * 1000);
+                        redis.put("plantShareHelp", "true", (zlcwaittime + 10) * 1000L);
 
                         try {
                             log.info("种豆得豆助力休息" + zlcwaittime * 1000 + "s防止黑ip...");

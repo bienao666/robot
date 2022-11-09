@@ -95,7 +95,7 @@ public class jdTask {
     /**
      * 助力池互助
      */
-    @Scheduled(cron = "20 0 3,6,8,10,12,14,16,18,20,22 * * ?")
+    @Scheduled(cron = "0 */30 1-23 * * ?")
     public void shareHelpNoReset(){
         if (shareHelp){
             //接口调用等待时间
