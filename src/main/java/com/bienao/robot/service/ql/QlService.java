@@ -140,4 +140,9 @@ public interface QlService {
      * @return
      */
     Result getRecoveryQl();
+
+    /**
+     * 京东红包领取通知
+     */
+    void notifyRedPacket();
 }

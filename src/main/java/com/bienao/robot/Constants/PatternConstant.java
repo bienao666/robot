@@ -9,5 +9,7 @@ public class PatternConstant {
     public static Pattern ckPattern = Pattern.compile("pt_key=(.+?);pt_pin=(.+?);");
     //京东ckpin
     public static Pattern jdPinPattern = Pattern.compile("pt_pin=(.+?);");
+    //京东标准备注
+    public static Pattern jdRemarkPattern = Pattern.compile("(.+?)@@(.+?)@@(.+)");
 
 }

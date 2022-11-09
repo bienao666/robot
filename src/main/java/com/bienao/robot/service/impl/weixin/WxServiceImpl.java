@@ -922,16 +922,16 @@ public class WxServiceImpl implements WxService {
         }
 
         //羊了个羊
-        if ("brushylgy".equals(operate)) {
+        /*if ("brushylgy".equals(operate)) {
             if ("y".equals(msg)) {
                 weChatUtil.sendTextMsg("请在10s内输入需要刷的次数：(输入q退出当前操作)", content);
                 redis.put(from_wxid + "ylgyUid", redis.get(from_wxid + "ylgyUid"), 15 * 1000);
                 redis.put(from_wxid + "ylgyToken", redis.get(from_wxid + "ylgyToken"), 15 * 1000);
                 redis.put(from_wxid + "operate", "brushylgytimes", 11 * 1000);
             }
-        }
+        }*/
 
-        if ("brushylgytimes".equals(operate)) {
+        /*if ("brushylgytimes".equals(operate)) {
             if (NumberUtil.isInteger(msg)) {
                 Integer times = Integer.parseInt(msg);
                 if (times <= 0 || times > 1000000) {
@@ -954,7 +954,7 @@ public class WxServiceImpl implements WxService {
                 redis.put(from_wxid + "ylgyToken", redis.get(from_wxid + "ylgyToken"), 15 * 1000);
                 redis.put(from_wxid + "operate", "brushylgytimes", 11 * 1000);
             }
-        }
+        }*/
     }
 
     private void addJdCk(String ck,JSONObject content){

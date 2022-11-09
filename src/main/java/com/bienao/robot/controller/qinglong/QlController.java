@@ -309,7 +309,7 @@ public class QlController {
      *
      * @return
      */
-    @PassToken
+    @LoginToken
     @GetMapping("/leekFriendly")
     public Result leekFriendly() {
         qlService.leekFriendly();
@@ -338,7 +338,7 @@ public class QlController {
     /**
      * 获取待恢复青龙
      */
-    @PassToken
+    @LoginToken
     @GetMapping("/getRecoveryQl")
     public Result getRecoveryQl(){
         Result result = qlService.getRecoveryQl();
@@ -363,6 +363,15 @@ public class QlController {
         }
         Result result = qlService.recoveryCk(oldQl,newQl);
         return result;
+    }
+
+    /**
+     * 京东红包领取通知
+     */
+    @LoginToken
+    @GetMapping("/notifyRedPacket")
+    public void notifyRedPacket(){
+        qlService.notifyRedPacket();
     }
 
 }

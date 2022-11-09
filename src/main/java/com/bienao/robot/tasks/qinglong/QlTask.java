@@ -96,4 +96,15 @@ public class QlTask {
             qlService.autoAdjust();
         }
     }
+
+    /**
+     * 京东红包领取通知
+     */
+    @Scheduled(cron = "0 0 10 * * ?")
+    public void notifyRedPacket(){
+        String notifyRedPacket = systemParamUtil.querySystemParam("NOTIFYREDPACKET");
+        if ("是".equals(notifyRedPacket)){
+            qlService.notifyRedPacket();
+        }
+    }
 }

@@ -35,3 +35,4 @@ INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ISWXSAFE', '启动
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ISLISTENWIRE', '启动线报监听(是/否)','是',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ISCOMPAREGOODSPRICE', '启动比价(是/否)','否',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('QLCKAUTOADJUST', '青龙ck优化(是/否)','否',1);
+INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('NOTIFYREDPACKET', '京东红包领取通知(是/否)','否',1);

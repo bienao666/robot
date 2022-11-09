@@ -296,8 +296,8 @@ public class JdBeanChangeUtil {
 //            allReceiveMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】${$.jxFactoryReceive} (京喜工厂)\n`;
 //            TempBaipiao += `【京喜工厂】${$.jxFactoryReceive} 可以兑换了!\n`;
 //        }
-        JSONObject response = PetRequest("energyCollect");
-        JSONObject initPetTownRes = PetRequest("initPetTown");
+        JSONObject response = PetRequest("energyCollect",cookie);
+        JSONObject initPetTownRes = PetRequest("initPetTown",cookie);
         if (initPetTownRes.getInteger("code") == 0 && initPetTownRes.getInteger("resultCode") == 0 && "success".equals(initPetTownRes.getString("message"))) {
             JSONObject petInfo = initPetTownRes.getJSONObject("result");
             if (petInfo.getInteger("userStatus") == 0) {
@@ -330,11 +330,11 @@ public class JdBeanChangeUtil {
         return ReturnMessage;
     }
 
-    public JSONObject PetRequest(String function_id){
+    public static JSONObject PetRequest(String function_id,String cookie){
         JSONObject body = new JSONObject();
         body.put("version",2);
         body.put("channel","app");
-        String resStr = HttpRequest.post(JDAPIHOST + "?functionId=" + function_id)
+        String resStr = HttpRequest.post("https://api.m.jd.com/client.action?functionId=" + function_id)
                 .header("Cookie", cookie)
                 .header("User-Agent", GetUserAgentUtil.getUserAgent())
                 .header("Host", "api.m.jd.com")
@@ -548,44 +548,50 @@ public class JdBeanChangeUtil {
 
     public void getjdfruit() {
         try {
-            JSONObject body = new JSONObject();
-            body.put("version", 4);
-            String result = HttpRequest.post(JDAPIHOST + "?functionId=initForFarm")
-                    .header("accept", "*/*")
-                    .header("Accept-Encoding", "gzip, deflate, br")
-                    .header("accept-language", "zh-CN,zh;q=0.9")
-                    .header("cache-control", "no-cache")
-                    .header("Cookie", cookie)
-                    .header("origin", "https://home.m.jd.com")
-                    .header("pragma", "no-cache")
-                    .header("Referer", "https://home.m.jd.com/myJd/newhome.action")
-                    .header("sec-fetch-dest", "empty")
-                    .header("sec-fetch-mode", "cors")
-                    .header("sec-fetch-site", "same-site")
-                    .header("User-Agent", GetUserAgentUtil.getUserAgent())
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .body("body=" + URLEncodeUtil.encode(body.toJSONString()) + "&appid=wh5&clientVersion=9.1.0")
-                    .timeout(3000)
-                    .execute().body();
-            if (StringUtils.isNotEmpty(result)) {
-                JSONObject farmInfo = JSONObject.parseObject(result);
-                JSONObject farmUserPro = farmInfo.getJSONObject("farmUserPro");
-                if (farmUserPro != null) {
-                    JdFarmProdName = farmUserPro.getString("name");
-                    JdtreeEnergy = farmUserPro.getInteger("treeEnergy");
-                    JdtreeTotalEnergy = farmUserPro.getInteger("treeTotalEnergy");
-                    treeState = farmInfo.getInteger("treeState");
-                    int waterEveryDayT = JDwaterEveryDayT;
-                    //一共还需浇多少次水
-                    int waterTotalT = (farmUserPro.getInteger("treeTotalEnergy") - farmUserPro.getInteger("treeEnergy") - farmUserPro.getInteger("totalEnergy")) / 10;
-                    int waterD = new BigDecimal(waterTotalT).divide(new BigDecimal(waterEveryDayT), 0, BigDecimal.ROUND_HALF_UP).intValue();
-                    JdwaterTotalT = waterTotalT;
-                    JdwaterD = waterD;
-                }
+            JSONObject farmInfo = getjdfruit(cookie);
+            JSONObject farmUserPro = farmInfo.getJSONObject("farmUserPro");
+            if (farmUserPro != null) {
+                JdFarmProdName = farmUserPro.getString("name");
+                JdtreeEnergy = farmUserPro.getInteger("treeEnergy");
+                JdtreeTotalEnergy = farmUserPro.getInteger("treeTotalEnergy");
+                treeState = farmInfo.getInteger("treeState");
+                int waterEveryDayT = JDwaterEveryDayT;
+                //一共还需浇多少次水
+                int waterTotalT = (farmUserPro.getInteger("treeTotalEnergy") - farmUserPro.getInteger("treeEnergy") - farmUserPro.getInteger("totalEnergy")) / 10;
+                int waterD = new BigDecimal(waterTotalT).divide(new BigDecimal(waterEveryDayT), 0, BigDecimal.ROUND_HALF_UP).intValue();
+                JdwaterTotalT = waterTotalT;
+                JdwaterD = waterD;
             }
+
         } catch (HttpException e) {
             log.error("getjdfruit方法异常：" + e.getMessage());
         }
+    }
+
+    public static JSONObject getjdfruit(String ck){
+        JSONObject body = new JSONObject();
+        body.put("version", 4);
+        String result = HttpRequest.post("https://api.m.jd.com/client.action?functionId=initForFarm")
+                .header("accept", "*/*")
+                .header("Accept-Encoding", "gzip, deflate, br")
+                .header("accept-language", "zh-CN,zh;q=0.9")
+                .header("cache-control", "no-cache")
+                .header("Cookie", ck)
+                .header("origin", "https://home.m.jd.com")
+                .header("pragma", "no-cache")
+                .header("Referer", "https://home.m.jd.com/myJd/newhome.action")
+                .header("sec-fetch-dest", "empty")
+                .header("sec-fetch-mode", "cors")
+                .header("sec-fetch-site", "same-site")
+                .header("User-Agent", GetUserAgentUtil.getUserAgent())
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .body("body=" + URLEncodeUtil.encode(body.toJSONString()) + "&appid=wh5&clientVersion=9.1.0")
+                .timeout(3000)
+                .execute().body();
+        if (StringUtils.isNotEmpty(result)) {
+            return JSONObject.parseObject(result);
+        }
+        return null;
     }
 
     public void TotalBean() {

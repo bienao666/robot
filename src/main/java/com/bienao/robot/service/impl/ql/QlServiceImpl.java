@@ -19,6 +19,7 @@ import com.bienao.robot.service.jingdong.JdService;
 import com.bienao.robot.service.ql.QlService;
 import com.bienao.robot.utils.WxpusherUtil;
 import com.bienao.robot.utils.jingdong.JDUtil;
+import com.bienao.robot.utils.jingdong.JdBeanChangeUtil;
 import com.bienao.robot.utils.ql.QlUtil;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import com.bienao.robot.utils.weixin.WeChatUtil;
@@ -1175,6 +1176,77 @@ public class QlServiceImpl implements QlService {
     public Result getRecoveryQl() {
         List<String> list = jdCkMapper.getRecoveryQl();
         return Result.success(list);
+    }
+
+    /**
+     * 京东红包领取通知
+     */
+    @Override
+    public void notifyRedPacket() {
+        List<QlEntity> qls = qlMapper.queryQls(null);
+        for (QlEntity ql : qls) {
+            List<QlEnv> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
+            for (QlEnv env : envs) {
+                if ("JD_COOKIE".equals(env.getName())) {
+                    String remarks = env.getRemarks();
+                    Matcher matcher = PatternConstant.jdRemarkPattern.matcher(remarks);
+                    if (!matcher.find()){
+                        //备注格式不正确
+                        continue;
+                    }
+                    String wxpusherUid = matcher.group(3);
+                    if (StringUtils.isEmpty(wxpusherUid)){
+                        continue;
+                    }
+                    String content = "";
+                    String summary = "京东红包通知";
+                    try {
+                        //农场红包
+                        JSONObject farmInfo = JdBeanChangeUtil.getjdfruit(env.getValue());
+                        JSONObject farmUserPro = farmInfo.getJSONObject("farmUserPro");
+                        if (farmUserPro != null) {
+                            Integer treeEnergy = farmUserPro.getInteger("treeEnergy");
+                            Integer treeState = farmInfo.getInteger("treeState");
+                            if (treeEnergy != 0 && (treeState == 2 || treeState == 3)){
+                                //农场红包可以领取了
+                                content += "东东农场红包可以领啦\n无门槛红包呦\n友情提醒：可以领完红包先种植，红包八天内有效喔\n京东->我的->东东农场\n";
+                            }
+                            if (treeEnergy == 0 && treeState == 0){
+                                //没选商品
+                                content += "东东农场还没选商品呢，亏啦亏啦\n京东->我的->东东农场\n";
+                            }
+                        }
+
+                        //萌宠红包
+                        JSONObject initPetTownRes = JdBeanChangeUtil.PetRequest("initPetTown", env.getValue());
+                        if (initPetTownRes.getInteger("code") == 0 && initPetTownRes.getInteger("resultCode") == 0 && "success".equals(initPetTownRes.getString("message"))) {
+                            JSONObject petInfo = initPetTownRes.getJSONObject("result");
+                             if (petInfo.getInteger("petStatus") == 5) {
+                                //萌宠红包可以领取了
+                                 content += "东东萌宠红包可以领啦\n20元无门槛红包呦\n友情提醒：可以先领完红包重新选个商品，红包三天内有效喔\n京东->我的->东东萌宠\n";
+                            } else if (petInfo.getInteger("petStatus") == 6 || petInfo.getJSONObject("goodsInfo")==null) {
+                                //没选商品
+                                 content += "东东萌宠还没选商品呢，亏啦亏啦\n京东->我的->东东萌宠\n";
+                             }
+                        }
+
+                        //推送
+                        if (StringUtils.isNotEmpty(content)){
+                            wxpusherUtil.sendJdRedPacketNotify("robot通知：\n"+content,summary,wxpusherUid);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    //休息5s防止黑ip
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     private void countQlCkCounts(HashMap<Integer, Integer> qlToCkCount, Integer qlID, Integer value) {
