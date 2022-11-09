@@ -5,7 +5,7 @@
 <mapper namespace="com.bienao.robot.mapper.jingdong.JdPlantMapper">
 
     <update id="resetPlantStatus">
-        update jdPlant set help_status = 0,to_help_status = 1;
+        update jdPlant set help_status = 0,to_help_status = 1,is_Plant_hei = 0;
     </update>
 
     <update id="updateJdPlant" parameterType="JdPlantEntity">

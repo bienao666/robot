@@ -5,6 +5,7 @@ import cn.hutool.core.net.URLEncoder;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.QlEnv;
+import com.bienao.robot.service.ql.QlService;
 import com.bienao.robot.service.weixin.WxService;
 import com.bienao.robot.utils.ql.QlUtil;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
@@ -32,6 +33,9 @@ class RobotApplicationTests {
     @Autowired
     private QlUtil qlUtil;
 
+    @Autowired
+    private QlService qlService;
+
     @Test
     public void test1() {
         JSONObject jsonObject = new JSONObject();
@@ -45,7 +49,7 @@ class RobotApplicationTests {
     /**
      * 青龙数据转发
      */
-    @Test
+    /*@Test
     public void zhuanfa(){
         //原青龙
         String url1 = "";
@@ -65,7 +69,7 @@ class RobotApplicationTests {
         for (QlEnv env : envs) {
             qlUtil.addEnvs(url2, tokenType2, token2, env.getName(),env.getValue(),env.getRemarks());
         }
-    }
+    }*/
 
     /**
      * 京粉数据查询
@@ -96,6 +100,18 @@ class RobotApplicationTests {
                 .execute().body();
         System.out.println(resStr);
     }*/
+
+
+    public static void main(String[] args) {
+        String s = "19【赚钱大赢家】海量低价好物，新人享1分购噢！ https:/JO17oOLGjgmZcM复自这段话￥FAgee153c3%来【レσ\uD83C\uDD96特价】";
+        JSONObject body = new JSONObject();
+        body.put("code",s);
+        String resStr = HttpRequest.post("https://api.m.jd.com/client.action?functionId=jComExchange")
+                .header("User-Agent", "Mozilla/5.0 (Linux; U; Android 11; zh-cn; KB2000 Build/RP1A.201005.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.36 HeyTapBrowser/40.7.19.3 uuid/cddaa248eaf1933ddbe92e9bf4d72cb3")
+                .body(body.toJSONString())
+                .execute().body();
+        System.out.println(resStr);
+    }
 
 
 }

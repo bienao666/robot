@@ -296,8 +296,8 @@ public class JdBeanChangeUtil {
 //            allReceiveMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】${$.jxFactoryReceive} (京喜工厂)\n`;
 //            TempBaipiao += `【京喜工厂】${$.jxFactoryReceive} 可以兑换了!\n`;
 //        }
-        JSONObject response = PetRequest("energyCollect",cookie);
-        JSONObject initPetTownRes = PetRequest("initPetTown",cookie);
+        JSONObject response = petRequest("energyCollect",cookie);
+        JSONObject initPetTownRes = petRequest("initPetTown",cookie);
         if (initPetTownRes.getInteger("code") == 0 && initPetTownRes.getInteger("resultCode") == 0 && "success".equals(initPetTownRes.getString("message"))) {
             JSONObject petInfo = initPetTownRes.getJSONObject("result");
             if (petInfo.getInteger("userStatus") == 0) {
@@ -330,7 +330,7 @@ public class JdBeanChangeUtil {
         return ReturnMessage;
     }
 
-    public static JSONObject PetRequest(String function_id,String cookie){
+    public static JSONObject petRequest(String function_id,String cookie){
         JSONObject body = new JSONObject();
         body.put("version",2);
         body.put("channel","app");

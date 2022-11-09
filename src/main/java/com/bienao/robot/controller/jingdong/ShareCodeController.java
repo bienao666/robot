@@ -1,6 +1,7 @@
 package com.bienao.robot.controller.jingdong;
 
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.annotation.LoginToken;
 import com.bienao.robot.annotation.PassToken;
 import com.bienao.robot.entity.jingdong.JdCkEntity;
 import com.bienao.robot.mapper.jingdong.JdCkMapper;
@@ -167,6 +168,16 @@ public class ShareCodeController {
     public Result getJdInfo(){
         JSONObject helpInfo = jdService.getJdInfo();
         return Result.success(helpInfo);
+    }
+
+    /**
+     * 获取助力池信息
+     */
+    @LoginToken
+    @GetMapping("/getZlcInfo")
+    public Result getZlcInfo(){
+        JSONObject zlcInfo = jdService.getZlcInfo();
+        return Result.success(zlcInfo);
     }
 
     /**

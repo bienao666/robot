@@ -56,4 +56,5 @@ public interface JdService {
 
     void clear();
 
+    JSONObject getZlcInfo();
 }

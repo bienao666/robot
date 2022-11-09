@@ -1251,7 +1251,7 @@ public class QlServiceImpl implements QlService {
                         }
 
                         //萌宠红包
-                        JSONObject initPetTownRes = JdBeanChangeUtil.PetRequest("initPetTown", env.getValue());
+                        JSONObject initPetTownRes = JdBeanChangeUtil.petRequest("initPetTown", env.getValue());
                         if (initPetTownRes.getInteger("code") == 0 && initPetTownRes.getInteger("resultCode") == 0 && "success".equals(initPetTownRes.getString("message"))) {
                             JSONObject petInfo = initPetTownRes.getJSONObject("result");
                              if (petInfo.getInteger("petStatus") == 5) {
