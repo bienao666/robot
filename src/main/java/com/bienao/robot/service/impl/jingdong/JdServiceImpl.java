@@ -1217,7 +1217,41 @@ public class JdServiceImpl implements JdService {
         //种豆有助力数
         int plantHaveHelp = 0;
 
-        return null;
+        JSONObject data = new JSONObject();
+        JSONObject fruit = new JSONObject();
+        fruit.put("fruitHot",fruitHot);
+        fruit.put("fruitHasHelp",fruitHasHelp);
+        fruit.put("fruitHaveHelp",fruitHaveHelp);
+        String fruitShareHelp = redis.get("fruitShareHelp");
+        if (StringUtils.isEmpty(fruitShareHelp)) {
+            fruit.put("run",false);
+        }else {
+            fruit.put("run",true);
+        }
+        data.put("fruit",fruit);
+        JSONObject pet = new JSONObject();
+        pet.put("petHot",petHot);
+        pet.put("petHasHelp",petHasHelp);
+        pet.put("petHaveHelp",petHaveHelp);
+        String petShareHelp = redis.get("petShareHelp");
+        if (StringUtils.isEmpty(petShareHelp)) {
+            pet.put("run",false);
+        }else {
+            pet.put("run",true);
+        }
+        data.put("pet",pet);
+        JSONObject plant = new JSONObject();
+        plant.put("plantHot",plantHot);
+        plant.put("plantHasHelp",plantHasHelp);
+        plant.put("plantHaveHelp",plantHaveHelp);
+        String plantShareHelp = redis.get("plantShareHelp");
+        if (StringUtils.isEmpty(plantShareHelp)) {
+            plant.put("run",false);
+        }else {
+            plant.put("run",true);
+        }
+        data.put("plant",plant);
+        return data;
     }
 
     /**

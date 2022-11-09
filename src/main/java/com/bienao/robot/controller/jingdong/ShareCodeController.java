@@ -37,6 +37,7 @@ public class ShareCodeController {
     /**
      * 东东农场互助
      */
+    @LoginToken
     @GetMapping("/fruitShareHelp")
     public Result fruitShareHelp(){
         try {
@@ -62,6 +63,7 @@ public class ShareCodeController {
     /**
      * 东东萌宠互助
      */
+    @LoginToken
     @GetMapping("/petShareHelp")
     public Result petShareHelp(){
         try {
@@ -87,6 +89,7 @@ public class ShareCodeController {
     /**
      * 种豆得豆互助
      */
+    @LoginToken
     @GetMapping("/plantShareHelp")
     public Result plantShareHelp(){
         try {
