@@ -237,10 +237,9 @@ public class CkServiceImpl implements CkService {
     }
 
     @Override
-    public Result getJdCks(String ck, String ptPin, Integer level, Integer status,String remark, Integer pageNo, Integer pageSize) {
+    public Result getJdCks(String ck, Integer level, Integer status,String remark, Integer pageNo, Integer pageSize) {
         JdCkEntity jdCkEntity = new JdCkEntity();
         jdCkEntity.setCk(ck);
-        jdCkEntity.setPtPin(ptPin);
         jdCkEntity.setLevel(level);
         jdCkEntity.setStatus(status);
         jdCkEntity.setRemark(remark);

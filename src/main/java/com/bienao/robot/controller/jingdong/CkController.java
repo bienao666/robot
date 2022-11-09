@@ -81,13 +81,12 @@ public class CkController {
     @LoginToken
     @GetMapping("/getJdCks")
     public Result getJdCks(@RequestParam(value = "ck", required = false) String ck,
-                           @RequestParam(value = "ptPin", required = false) String ptPin,
                            @RequestParam(value = "level", required = false) Integer level,
                            @RequestParam(value = "status", required = false) Integer status,
                            @RequestParam(value = "remark", required = false) String remark,
                            @RequestParam(value = "pageNo") Integer pageNo,
                            @RequestParam(value = "pageSize") Integer pageSize) {
-        return ckService.getJdCks(ck, ptPin, level, status,remark, pageNo, pageSize);
+        return ckService.getJdCks(ck, level, status,remark, pageNo, pageSize);
     }
 
     /**
