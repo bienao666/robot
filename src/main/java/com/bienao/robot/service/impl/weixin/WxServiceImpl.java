@@ -478,7 +478,7 @@ public class WxServiceImpl implements WxService {
      */
     private void handleNiuYiNiu(JSONObject content) {
         String url = "http://api.qemao.com/api/douyin/";
-        url += HttpRequest.get(url).execute().header("location").replace("./","");
+        url += HttpRequest.get(url).timeout(3000).execute().header("location").replace("./","");
         weChatUtil.sendVideoMsg(url,content);
     }
 

@@ -54,8 +54,8 @@
     </delete>
 
     <select id="getJdFruits" resultType="jdFruitEntity">
-        select jf.* from jdFruit jf
-        left join jdck jc on jf.ckid = jc.id
+        select jf.* from jdck jc
+        left join jdFruit jf on jf.ckid = jc.id
         where jc.status = 0
     </select>
 </mapper>

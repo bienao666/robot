@@ -9,11 +9,17 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.Result;
 import com.bienao.robot.enums.ErrorCodeConstant;
+import com.google.common.base.Splitter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 public class XiaoMiUtil {
@@ -86,6 +92,29 @@ public class XiaoMiUtil {
         log.info("app_token获取成功...");
         return app_token;
     }
+
+    /*public String getAccessCode(String account, String password) {
+        try {
+            JSONObject data = new JSONObject();
+            data.put("client_id", "HuaMi");
+            data.put("password", password);
+            data.put("redirect_uri", "https://s3-us-west-2.amazonaws.com/hm-registration/successsignin.html");
+            data.put("token", "access");
+            HttpRequest.post("https://api-user.huami.com/registrations/+86" + account + "/tokens")
+                    .header("User-Agent", "MiFit/4.6.0 (iPhone; iOS 14.0.1; Scale/2.00)")
+                    .header("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
+            HttpResponse execute = httpClient.execute(httpPost);
+            int statusCode = execute.getStatusLine().getStatusCode();
+            Header location = execute.getFirstHeader("Location");
+            String params = location.getValue().substring(location.getValue().indexOf("?") + 1);
+            Map<String, String> split = Splitter.on("&").withKeyValueSeparator("=").split(params);
+            String s = (String)split.get("access");
+            return s;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }*/
 
     /**
      * 替换请求参数中的数据

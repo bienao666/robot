@@ -1,7 +1,10 @@
 package com.bienao.robot.mapper.jingdong;
 
+import com.bienao.robot.entity.jingdong.JdPetEntity;
 import com.bienao.robot.entity.jingdong.JdPlantEntity;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 @Mapper
 public interface JdPlantMapper {
@@ -33,4 +36,6 @@ public interface JdPlantMapper {
     int addJdPlant(JdPlantEntity jdPlantEntity);
 
     void clear();
+
+    List<JdPlantEntity> getJdPlants();
 }

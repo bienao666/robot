@@ -38,4 +38,10 @@
     <delete id="clear">
         delete from jdPlant where ckid not in (select id from jdck);
     </delete>
+
+    <select id="getJdPlants" resultType="JdPlantEntity">
+        select jP.* from jdck jc
+        left join jdPlant jP on jP.ckid = jc.id
+        where jc.status = 0
+    </select>
 </mapper>

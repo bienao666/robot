@@ -341,6 +341,7 @@ public class JdBeanChangeUtil {
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .body("body=" + EscapeUtil.escape(body.toJSONString()) + "&appid=wh5&loginWQBiz=pet-town&clientVersion=9.0.4")
                 .timeout(3000).execute().body();
+        log.info("查询东东萌宠数据："+resStr);
         if (StringUtils.isNotEmpty(resStr)){
             return JSONObject.parseObject(resStr);
         }else {
@@ -588,6 +589,7 @@ public class JdBeanChangeUtil {
                 .body("body=" + URLEncodeUtil.encode(body.toJSONString()) + "&appid=wh5&clientVersion=9.1.0")
                 .timeout(3000)
                 .execute().body();
+        log.info("查询东东农场数据："+result);
         if (StringUtils.isNotEmpty(result)) {
             return JSONObject.parseObject(result);
         }
