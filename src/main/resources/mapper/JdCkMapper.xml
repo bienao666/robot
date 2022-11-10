@@ -25,7 +25,7 @@
             AND id = #{id}
         </if>
         <if test="ck != null and ck != ''">
-            AND ck = like ('%'||#{ck}||'%')
+            AND ck like ('%'||#{ck}||'%')
         </if>
         <if test="ptPin != null and ptPin != ''">
             AND pt_pin = #{ptPin}
