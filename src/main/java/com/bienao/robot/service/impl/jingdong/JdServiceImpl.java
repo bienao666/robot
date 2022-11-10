@@ -1469,7 +1469,7 @@ public class JdServiceImpl implements JdService {
             } else if ("411".equals(resultObject.getString("resultCode"))) {
 //                jdPetEntity.setIsPetHei(1);
 //                toHelpJdPetEntity.setIsPetHei(1);
-                jdPetMapper.updateJdPet(toHelpJdPetEntity);
+//                jdPetMapper.updateJdPet(toHelpJdPetEntity);
                 log.info("此账号风控，跳出....");
             } else {
                 log.info("东东萌宠助力失败:{}", resultObject.toJSONString());
