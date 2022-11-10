@@ -1223,27 +1223,27 @@ public class JdServiceImpl implements JdService {
     public JSONObject getZlcInfo() {
         List<JdFruitEntity> JdFruits = jdFruitMapper.getJdFruits();
         //农场火爆数
-        long fruitHot = JdFruits.stream().filter(f -> f.getIsFruitHei() == 1).count();
+        long fruitHot = JdFruits.stream().filter(f -> f != null && f.getIsFruitHei() == 1).count();
         //农场已助力个数
-        long fruitHasHelp = JdFruits.stream().filter(f -> f.getHelpStatus() == 1).count();
+        long fruitHasHelp = JdFruits.stream().filter(f -> f != null && f.getHelpStatus() == 1).count();
         //农场有助力数
-        long fruitHaveHelp = JdFruits.stream().filter(f -> f.getToHelpStatus() == 1 && f.getIsFruitHei() == 0).count();
+        long fruitHaveHelp = JdFruits.stream().filter(f -> f == null || (f.getToHelpStatus() == 1 && f.getIsFruitHei() == 0)).count();
 
         List<JdPetEntity> jdPets = jdPetMapper.getJdPets();
         //萌宠火爆数
-        long petHot = jdPets.stream().filter(p -> p.getIsPetHei() == 1).count();
+        long petHot = jdPets.stream().filter(p -> p != null && p.getIsPetHei() == 1).count();
         //萌宠已助力个数
-        long petHasHelp = jdPets.stream().filter(p -> p.getHelpStatus() == 1).count();
+        long petHasHelp = jdPets.stream().filter(p -> p != null && p.getHelpStatus() == 1).count();
         //萌宠有助力数
-        long petHaveHelp = jdPets.stream().filter(p -> p.getToHelpStatus() == 1 && p.getIsPetHei() == 0).count();
+        long petHaveHelp = jdPets.stream().filter(p -> p == null || (p.getToHelpStatus() == 1 && p.getIsPetHei() == 0)).count();
 
         List<JdPlantEntity> jdPlants = jdPlantMapper.getJdPlants();
         //种豆火爆数
-        long plantHot = jdPlants.stream().filter(p -> p.getIsPlantHei() == 1).count();
+        long plantHot = jdPlants.stream().filter(p -> p != null && p.getIsPlantHei() == 1).count();
         //种豆已助力个数
-        long plantHasHelp = jdPlants.stream().filter(p -> p.getHelpStatus() == 1).count();
+        long plantHasHelp = jdPlants.stream().filter(p -> p != null && p.getHelpStatus() == 1).count();
         //种豆有助力数
-        long plantHaveHelp = jdPlants.stream().filter(p -> p.getToHelpStatus() == 1 && p.getIsPlantHei() == 0).count();
+        long plantHaveHelp = jdPlants.stream().filter(p -> p == null || (p.getToHelpStatus() == 1 && p.getIsPlantHei() == 0)).count();
 
         JSONObject data = new JSONObject();
         JSONObject fruit = new JSONObject();
