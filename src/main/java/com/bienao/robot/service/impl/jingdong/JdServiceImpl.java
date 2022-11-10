@@ -81,7 +81,7 @@ public class JdServiceImpl implements JdService {
     @Override
     public void fruitShareHelp(List<JdCkEntity> cks, int zlcwaittime) {
         //判断是否有锁
-        String fruitShareHelpIng = redis.get("fruitShareHelp");
+        String fruitShareHelpIng = redis.get("fruitShareHelp",false);
         if (StringUtils.isEmpty(fruitShareHelpIng)) {
             //加锁
             redis.put("fruitShareHelp", "true", (zlcwaittime + 10) * 1000L);
@@ -185,7 +185,11 @@ public class JdServiceImpl implements JdService {
             for (JdCkEntity toHelpJdCk : toHelpJdCks) {
                 try {
                     JdFruitEntity toHelpJdFruitEntity = toHelpJdCk.getJdFruitEntity();
-
+                    if (jdFruitEntity.getHelpStatus() == 1) {
+                        //当前账号已满助力，跳过当前循环
+                        log.info("{}东东农场已助力满!!!", jdCk.getRemark());
+                        break;
+                    }
                     if (jdFruitEntity.getHelpCode().equals(toHelpJdFruitEntity.getHelpCode())) {
                         //不能为自己助力
                         continue;
@@ -347,7 +351,7 @@ public class JdServiceImpl implements JdService {
     @Override
     public void petShareHelp(List<JdCkEntity> cks, int zlcwaittime) {
         //判断是否有锁
-        String fruitShareHelpIng = redis.get("petShareHelp");
+        String fruitShareHelpIng = redis.get("petShareHelp",false);
         if (StringUtils.isEmpty(fruitShareHelpIng)) {
             //加锁
             redis.put("petShareHelp", "true", (zlcwaittime + 10) * 1000L);
@@ -462,6 +466,11 @@ public class JdServiceImpl implements JdService {
             for (JdCkEntity toHelpJdCk : toHelpJdCks) {
                 try {
                     JdPetEntity toHelpJdPetEntity = toHelpJdCk.getJdPetEntity();
+                    if (jdPetEntity.getHelpStatus() == 1) {
+                        //当前账号已满助力，跳过当前循环
+                        log.info("{}东东萌宠已助力满!!!", jdCk.getRemark());
+                        break;
+                    }
                     if (jdPetEntity.getHelpCode().equals(toHelpJdPetEntity.getHelpCode())) {
                         //不能为自己助力
                         continue;
@@ -510,7 +519,7 @@ public class JdServiceImpl implements JdService {
     @Override
     public void plantShareHelp(List<JdCkEntity> cks, int zlcwaittime) {
         //判断是否有锁
-        String fruitShareHelpIng = redis.get("plantShareHelp");
+        String fruitShareHelpIng = redis.get("plantShareHelp",false);
         if (StringUtils.isEmpty(fruitShareHelpIng)) {
             //加锁
             redis.put("plantShareHelp", "true", (zlcwaittime + 10) * 1000L);
@@ -615,6 +624,11 @@ public class JdServiceImpl implements JdService {
             for (JdCkEntity toHelpJdCk : toHelpJdCks) {
                 try {
                     JdPlantEntity toHelpJdPlantEntity = toHelpJdCk.getJdPlantEntity();
+                    if (jdPlantEntity.getHelpStatus() == 1) {
+                        //当前账号已满助力，跳过当前循环
+                        log.info("{}种豆得豆已助力满!!!", jdCk.getRemark());
+                        break;
+                    }
                     if (jdPlantEntity.getHelpCode().equals(toHelpJdPlantEntity.getHelpCode())) {
                         //不能为自己助力
                         continue;
@@ -843,7 +857,7 @@ public class JdServiceImpl implements JdService {
     @Async("asyncServiceExecutor")
     public void updateFruitShareCode(List<JdCkEntity> cks) {
         //判断是否有锁
-        String fruitShareHelpIng = redis.get("updateFruitShareCode");
+        String fruitShareHelpIng = redis.get("updateFruitShareCode",false);
         if (StringUtils.isEmpty(fruitShareHelpIng)) {
             //加锁
             redis.put("updateFruitShareCode", "true", 30 * 1000);
@@ -925,7 +939,7 @@ public class JdServiceImpl implements JdService {
     @Async("asyncServiceExecutor")
     public void updatePetShareCode(List<JdCkEntity> cks) {
         //判断是否有锁
-        String fruitShareHelpIng = redis.get("updatePetShareCode");
+        String fruitShareHelpIng = redis.get("updatePetShareCode",false);
         if (StringUtils.isEmpty(fruitShareHelpIng)) {
             //加锁
             redis.put("updatePetShareCode", "true", 30 * 1000);
@@ -1013,7 +1027,7 @@ public class JdServiceImpl implements JdService {
     @Async("asyncServiceExecutor")
     public void updatePlantShareCode(List<JdCkEntity> cks) {
         //判断是否有锁
-        String fruitShareHelpIng = redis.get("updatePlantShareCode");
+        String fruitShareHelpIng = redis.get("updatePlantShareCode",false);
         if (StringUtils.isEmpty(fruitShareHelpIng)) {
             //加锁
             redis.put("updatePlantShareCode", "true", 30 * 1000);
@@ -1236,7 +1250,7 @@ public class JdServiceImpl implements JdService {
         fruit.put("fruitHot",fruitHot);
         fruit.put("fruitHasHelp",fruitHasHelp);
         fruit.put("fruitHaveHelp",fruitHaveHelp);
-        String fruitShareHelp = redis.get("fruitShareHelp");
+        String fruitShareHelp = redis.get("fruitShareHelp",false);
         if (StringUtils.isEmpty(fruitShareHelp)) {
             fruit.put("run",false);
         }else {
@@ -1247,7 +1261,7 @@ public class JdServiceImpl implements JdService {
         pet.put("petHot",petHot);
         pet.put("petHasHelp",petHasHelp);
         pet.put("petHaveHelp",petHaveHelp);
-        String petShareHelp = redis.get("petShareHelp");
+        String petShareHelp = redis.get("petShareHelp",false);
         if (StringUtils.isEmpty(petShareHelp)) {
             pet.put("run",false);
         }else {
@@ -1258,7 +1272,7 @@ public class JdServiceImpl implements JdService {
         plant.put("plantHot",plantHot);
         plant.put("plantHasHelp",plantHasHelp);
         plant.put("plantHaveHelp",plantHaveHelp);
-        String plantShareHelp = redis.get("plantShareHelp");
+        String plantShareHelp = redis.get("plantShareHelp",false);
         if (StringUtils.isEmpty(plantShareHelp)) {
             plant.put("run",false);
         }else {
@@ -1278,7 +1292,7 @@ public class JdServiceImpl implements JdService {
     public void helpFruit(JdCkEntity toHelpJdCk, JdCkEntity jdCk) {
         JdFruitEntity jdFruitEntity = jdCk.getJdFruitEntity();
         JdFruitEntity toHelpJdFruitEntity = toHelpJdCk.getJdFruitEntity();
-        log.info("{}开始助力东东农场->{}", toHelpJdFruitEntity.getHelpCode(), jdFruitEntity.getHelpCode());
+        log.info("{}开始助力东东农场->{}", toHelpJdCk.getPtPin(), jdCk.getPtPin());
         JSONObject body = new JSONObject();
         body.put("imageUrl", "");
         body.put("nickName", "");
@@ -1304,19 +1318,20 @@ public class JdServiceImpl implements JdService {
             log.info("东东农场: API查询请求失败 ‼️‼️");
         } else {
             JSONObject resultObject = JSONObject.parseObject(result);
+            String msg = "【东东农场助力好友结果】:"+toHelpJdCk.getPtPin()+"->"+jdCk.getPtPin();
             if ("0".equals(resultObject.getString("code"))) {
                 JSONObject helpResult = resultObject.getJSONObject("helpResult");
                 if ("0".equals(helpResult.getString("code"))) {
                     //助力成功
-                    log.info("【东东农场助力好友结果】: 已成功助力");
+                    log.info(msg + " 已成功助力");
                 } else if ("8".equals(helpResult.getString("code"))) {
-                    log.info("【东东农场助力好友结果】: 助力失败，您今天助力次数已耗尽");
+                    log.info(msg + " 助力失败，您今天助力次数已耗尽");
                     toHelpJdFruitEntity.setToHelpStatus(0);
                     jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
                 } else if ("9".equals(helpResult.getString("code"))) {
-                    log.info("【东东农场助力好友结果】: 之前助力过了");
+                    log.info(msg + " 之前助力过了");
                 } else if ("10".equals(helpResult.getString("code"))) {
-                    log.info("【东东农场助力好友结果】: 好友已满助力");
+                    log.info(msg + " 好友已满助力");
                     jdFruitEntity.setHelpStatus(1);
                     jdFruitMapper.updateJdFruit(jdFruitEntity);
                 } else {
@@ -1426,7 +1441,7 @@ public class JdServiceImpl implements JdService {
     public void helpPet(JdCkEntity toHelpJdCk, JdCkEntity jdCk) {
         JdPetEntity jdPetEntity = jdCk.getJdPetEntity();
         JdPetEntity toHelpJdPetEntity = toHelpJdCk.getJdPetEntity();
-        log.info("{}开始助力东东萌宠->{}", toHelpJdPetEntity.getHelpCode(), jdPetEntity.getHelpCode());
+        log.info("{}开始助力东东萌宠->{}", toHelpJdCk.getPtPin(), jdCk.getPtPin());
         JSONObject body = new JSONObject();
         body.put("shareCode", jdPetEntity.getHelpCode());
         body.put("version", 2);
@@ -1444,17 +1459,18 @@ public class JdServiceImpl implements JdService {
             log.info("东东萌宠: API查询请求失败 ‼️‼️");
         } else {
             JSONObject resultObject = JSONObject.parseObject(result);
+            String msg = "【东东萌宠助力好友结果】:"+toHelpJdCk.getPtPin()+"->"+jdCk.getPtPin();
             if ("0".equals(resultObject.getString("code")) && "0".equals(resultObject.getString("resultCode"))) {
                 JSONObject helpResult = resultObject.getJSONObject("result");
                 if ("0".equals(helpResult.getString("helpStatus"))) {
                     //助力成功
-                    log.info("【东东萌宠助力好友结果】: 已成功助力");
+                    log.info(msg + " 已成功助力");
                 } else if ("1".equals(helpResult.getString("helpStatus"))) {
-                    log.info("【东东萌宠助力好友结果】: 助力失败，您今天助力次数已耗尽");
+                    log.info(msg + " 助力失败，您今天助力次数已耗尽");
                     toHelpJdPetEntity.setToHelpStatus(0);
                     jdPetMapper.updateJdPet(toHelpJdPetEntity);
                 } else if ("2".equals(helpResult.getString("helpStatus"))) {
-                    log.info("【东东萌宠助力好友结果】: 好友已满助力");
+                    log.info(msg + " 好友已满助力");
                     jdPetEntity.setHelpStatus(1);
                     jdPetMapper.updateJdPet(jdPetEntity);
                 } else {
@@ -1495,7 +1511,7 @@ public class JdServiceImpl implements JdService {
     public void helpPlant(JdCkEntity toHelpJdCk, JdCkEntity jdCk) {
         JdPlantEntity jdPlantEntity = jdCk.getJdPlantEntity();
         JdPlantEntity toHelpJdPlantEntity = toHelpJdCk.getJdPlantEntity();
-        log.info("{}开始助力种豆得豆->{}", toHelpJdPlantEntity.getHelpCode(), jdPlantEntity.getHelpCode());
+        log.info("{}开始助力种豆得豆->{}", toHelpJdCk.getPtPin(), jdCk.getPtPin());
         JSONObject body = new JSONObject();
         body.put("plantUuid", jdPlantEntity.getHelpCode());
         body.put("wxHeadImgUrl", "");
@@ -1516,17 +1532,18 @@ public class JdServiceImpl implements JdService {
             log.info("种豆得豆: API查询请求失败 ‼️‼️");
         } else {
             JSONObject resultObject = JSONObject.parseObject(result);
+            String msg = "【种豆得豆助力好友结果】:"+toHelpJdCk.getPtPin()+"->"+jdCk.getPtPin();
             if ("0".equals(resultObject.getString("code")) && StringUtils.isNotEmpty(resultObject.getString("data"))) {
                 JSONObject helpResult = resultObject.getJSONObject("data");
                 if ("1".equals(helpResult.getJSONObject("helpShareRes").getString("state"))) {
                     //助力成功
-                    log.info("【种豆得豆助力好友结果】: 已成功助力");
+                    log.info(msg + " 已成功助力");
                 } else if ("2".equals(helpResult.getJSONObject("helpShareRes").getString("state"))) {
-                    log.info("【种豆得豆助力好友结果】: 助力失败，您今天助力次数已耗尽");
+                    log.info(msg + "助力失败，您今天助力次数已耗尽");
                     toHelpJdPlantEntity.setToHelpStatus(0);
                     jdPlantMapper.updateJdPlant(toHelpJdPlantEntity);
                 } else if ("3".equals(helpResult.getJSONObject("helpShareRes").getString("state"))) {
-                    log.info("【种豆得豆助力好友结果】: 好友已满助力");
+                    log.info(msg + "好友已满助力");
                     jdPlantEntity.setHelpStatus(1);
                     jdPlantMapper.updateJdPlant(jdPlantEntity);
                 } else {

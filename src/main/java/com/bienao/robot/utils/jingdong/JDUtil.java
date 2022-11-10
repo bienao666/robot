@@ -86,4 +86,21 @@ public class JDUtil {
                 .body();
 
     }
+
+    /**
+     * 解析口令
+     * @return
+     */
+    public static JSONObject parseCommand(String command){
+        JSONObject body = new JSONObject();
+        body.put("data",command);
+        String resStr = HttpRequest.get("http://49.4.114.73/transformation")
+                .body(body.toJSONString())
+                .execute().body();
+        log.info("解析京东口令：{}",resStr);
+        if (StringUtils.isNotEmpty(resStr)){
+            return JSONObject.parseObject(resStr);
+        }
+        return null;
+    }
 }

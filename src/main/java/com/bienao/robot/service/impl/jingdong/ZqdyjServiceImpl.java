@@ -1,6 +1,7 @@
 package com.bienao.robot.service.impl.jingdong;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.PatternConstant;
 import com.bienao.robot.Socket.ZqdyjWebSocket;
@@ -9,6 +10,7 @@ import com.bienao.robot.entity.jingdong.JdZqdyjEntity;
 import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.mapper.jingdong.JdZqdyjMapper;
 import com.bienao.robot.service.jingdong.ZqdyjService;
+import com.bienao.robot.utils.jingdong.JDUtil;
 import com.bienao.robot.utils.jingdong.MakeMoneyShopUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -60,7 +62,21 @@ public class ZqdyjServiceImpl implements ZqdyjService {
                 sId = info.getString("sId");
             }
         }else {
-            sId = param;
+            JSONObject res = JDUtil.parseCommand(param);
+            if (0 != res.getInteger("code") || res.getJSONObject("data") == null){
+                return Result.error(ErrorCodeConstant.SERVICE_ERROR, "解析口令异常");
+            }
+            String jumpUrl = res.getJSONObject("data").getString("jumpUrl");
+            if (StringUtils.isEmpty(jumpUrl)){
+                return Result.error(ErrorCodeConstant.SERVICE_ERROR, "解析口令异常");
+            }
+            String[] split = jumpUrl.split("&");
+            for (String s : split) {
+                if (s.contains("shareId")){
+                    sId = s.replace("shareId=","");
+                    break;
+                }
+            }
         }
 
         //获取所有 有效的 还有助力的 非火爆的ck

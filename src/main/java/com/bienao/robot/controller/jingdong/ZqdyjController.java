@@ -33,7 +33,7 @@ public class ZqdyjController {
     public Result help(@RequestBody JSONObject jsonObject){
         String account = jsonObject.getString("account");
         if (StringUtils.isEmpty(account)){
-            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "ck或者助力码不能为空");
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "ck|口令不能为空");
         }
         return zqdyjService.help(account);
     }

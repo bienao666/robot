@@ -298,7 +298,7 @@ public class WireServiceImpl implements WireService {
                 }
             }
         }
-        String redis = Redis.wireRedis.get(s.toString());
+        String redis = Redis.wireRedis.get(s.toString(),false);
         if (StringUtils.isNotEmpty(redis)){
             return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"该线报活动已存在，添加失败");
         }

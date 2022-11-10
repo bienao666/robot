@@ -249,7 +249,7 @@ public class WxServiceImpl implements WxService {
         }
 
         //查看当前操作
-        String operate = redis.get(from_wxid + "operate");
+        String operate = redis.get(from_wxid + "operate",false);
         if (StringUtils.isNotEmpty(operate)) {
             log.info("处理当前操作：{}", operate);
             handleOperate(content, operate, msg, from_wxid);
@@ -465,7 +465,7 @@ public class WxServiceImpl implements WxService {
 
         if (NumberUtil.isInteger(msg)) {
             Integer num = Integer.valueOf(msg);
-            String publicKey = redis.get("publicKey");
+            String publicKey = redis.get("publicKey",false);
             if (num <= 50 && StringUtils.isNotEmpty(publicKey)) {
                 handleLast(content, num, publicKey);
             }
@@ -684,13 +684,13 @@ public class WxServiceImpl implements WxService {
         }
         String from_wxid = content.getString("from_wxid");
         //限制一天只能查3次
-        String timesStr = redis.get(from_wxid + operate);
+        String timesStr = redis.get(from_wxid + operate,false);
         if (StringUtils.isEmpty(timesStr)) {
             redis.put(from_wxid + operate, DateUtil.formatDateTime(DateUtil.date()));
             return true;
         } else {
             //上次查询时间
-            DateTime lastTime = DateUtil.parse(redis.get(from_wxid + operate));
+            DateTime lastTime = DateUtil.parse(redis.get(from_wxid + operate,false));
             DateTime limitTime = DateUtil.offsetSecond(lastTime, 30);
             if (limitTime.getTime() > DateUtil.date().getTime()) {
 //                weChatUtil.sendTextMsg("抱歉，请在" + DateUtil.formatDateTime(limitTime) + "后再试", content);
@@ -710,7 +710,7 @@ public class WxServiceImpl implements WxService {
     public void handleQueryJdAssets(JSONObject content) {
         String from_wxid = content.getString("from_wxid");
         //限制一天只能查3次
-        String timesStr = redis.get(from_wxid + "QueryTimes");
+        String timesStr = redis.get(from_wxid + "QueryTimes",false);
         if (StringUtils.isNotEmpty(timesStr)) {
             Integer times = Integer.parseInt(timesStr);
             if (times > 3) {
@@ -719,7 +719,7 @@ public class WxServiceImpl implements WxService {
             }
             //限制查询间隔3个小时
             //上次查询时间
-            DateTime lastTime = DateUtil.parse(redis.get(from_wxid + "QueryTime"));
+            DateTime lastTime = DateUtil.parse(redis.get(from_wxid + "QueryTime",false));
             DateTime limitTime = DateUtil.offsetHour(lastTime, 3);
             if (limitTime.getTime() > DateUtil.date().getTime()) {
                 weChatUtil.sendTextMsg("抱歉，请在" + DateUtil.formatDateTime(limitTime) + "后查询（robot保护京东账号策略：查询间隔3小时）", content);
@@ -910,7 +910,7 @@ public class WxServiceImpl implements WxService {
         //京东登陆
         if ("readIdentifyingCode".equals(operate)) {
             log.info("京东登陆-readIdentifyingCode");
-            String phone = redis.get(from_wxid + "phone");
+            String phone = redis.get(from_wxid + "phone",false);
             String ck = verifyCode(phone, msg);
             if (StringUtils.isEmpty(ck)) {
                 redis.remove(from_wxid + "operate");
@@ -1290,7 +1290,7 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleFunctionList(JSONObject content) {
-        weChatUtil.sendTextMsg(redis.get("functionList"), content);
+        weChatUtil.sendTextMsg(redis.get("functionList",false), content);
     }
 
     /**
@@ -1702,7 +1702,7 @@ public class WxServiceImpl implements WxService {
     }
 
     public void handleLastWeiBo(JSONObject content, Integer num) {
-        String bandListStr = redis.get("WbBandLists");
+        String bandListStr = redis.get("WbBandLists",false);
         List<JSONObject> bandLists = JSONArray.parseArray(bandListStr, JSONObject.class);
         int index = 1;
         for (JSONObject band : bandLists) {
