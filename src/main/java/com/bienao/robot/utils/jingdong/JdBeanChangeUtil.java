@@ -342,6 +342,11 @@ public class JdBeanChangeUtil {
                 .body("body=" + EscapeUtil.escape(body.toJSONString()) + "&appid=wh5&loginWQBiz=pet-town&clientVersion=9.0.4")
                 .timeout(3000).execute().body();
         log.info("查询东东萌宠数据："+resStr);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if (StringUtils.isNotEmpty(resStr)){
             return JSONObject.parseObject(resStr);
         }else {
@@ -590,6 +595,11 @@ public class JdBeanChangeUtil {
                 .timeout(3000)
                 .execute().body();
         log.info("查询东东农场数据："+result);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if (StringUtils.isNotEmpty(result)) {
             return JSONObject.parseObject(result);
         }
