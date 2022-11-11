@@ -59,4 +59,22 @@ public class JdCkEntity {
 
     //ck在青龙的位置
     private int qlindex;
+
+    //农场状态 0正常 1火爆
+    private Integer fruitStataus;
+
+    //农场是否助力满
+    private Integer fruitHelp;
+
+    //萌宠状态 0正常 1火爆
+    private Integer petStataus;
+
+    //萌宠是否助力满
+    private Integer petHelp;
+
+    //种豆状态 0正常 1火爆
+    private Integer plantStataus;
+
+    //种豆是否助力满
+    private Integer plantHelp;
 }

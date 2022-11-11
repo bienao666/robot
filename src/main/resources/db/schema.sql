@@ -115,10 +115,10 @@ create table if not exists `jdPet` (
                          `created_time` varchar DEFAULT (datetime('now', 'localtime')),
                          `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );
-create table if not exists `jdPlant UNIQUE` (
+create table if not exists `jdPlant` (
                            `id` INTEGER PRIMARY KEY AUTOINCREMENT,
                            `help_code` varchar,
-                           `ckid` INTEGER,
+                           `ckid` INTEGER UNIQUE,
                            `is_Plant_hei` INTEGER DEFAULT '0',
                            `help_status` INTEGER DEFAULT '0',
                            `to_help_status` INTEGER DEFAULT '1',

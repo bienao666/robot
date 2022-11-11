@@ -20,27 +20,35 @@
     </select>
 
     <select id="queryCks" parameterType="jdCkEntity" resultType="jdCkEntity">
-        select * from jdck where 1=1
+        select jc.*,
+               jf.help_status fruitHelp,jf.is_fruit_hei fruitStataus,
+               jp.help_status petHelp,jp.is_pet_hei petStataus,
+               jpl.help_status plantHelp,jpl.is_plant_hei plantStataus
+        from jdck jc
+        left join jdFruit jf on jc.id = jf.ckid
+        left join jdPet jp on jc.id = jp.ckid
+        left join jdPlant jpl on jc.id = jpl.ckid
+        where 1=1
         <if test="id != null">
-            AND id = #{id}
+            AND jc.id = #{id}
         </if>
         <if test="ck != null and ck != ''">
-            AND ck like ('%'||#{ck}||'%')
+            AND jc.ck like ('%'||#{ck}||'%')
         </if>
         <if test="ptPin != null and ptPin != ''">
-            AND pt_pin = #{ptPin}
+            AND jc.pt_pin = #{ptPin}
         </if>
         <if test="level != null">
-            AND level = #{level}
+            AND jc.level = #{level}
         </if>
         <if test="status != null">
-            AND status = #{status}
+            AND jc.status = #{status}
         </if>
         <if test="remark !=null and remark !=''">
-            and remark like ('%'||#{remark}||'%')
+            and jc.remark like ('%'||#{remark}||'%')
         </if>
         <if test="qlRemark != null and qlRemark != ''">
-            AND ql_remark = #{qlRemark}
+            AND jc.ql_remark = #{qlRemark}
         </if>
         order by level
     </select>
