@@ -645,7 +645,7 @@ public class JdServiceImpl implements JdService {
                         continue;
                     }else {
                         JSONObject plantInfo = getPlantInfo(toHelpJdCk.getCk(), "plantBeanIndex");
-                        if ("3".equals(plantInfo.getString("resultCode"))){
+                        if ("PB101".equals(plantInfo.getString("errorCode")) || "3".equals(plantInfo.getString("resultCode"))){
                             //种豆得豆火爆
                             toHelpJdPlantEntity.setIsPlantHei(1);
                             jdPlantMapper.updateJdPlant(toHelpJdPlantEntity);
