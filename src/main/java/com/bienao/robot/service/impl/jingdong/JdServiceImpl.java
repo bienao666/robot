@@ -174,6 +174,9 @@ public class JdServiceImpl implements JdService {
                     jdFruitMapper.updateJdFruit(jdFruitEntity);
                     continue;
                 }else {
+                    if (403 == farmInfo.getInteger("code")){
+                        break;
+                    }
                     JSONObject farmUserPro = farmInfo.getJSONObject("farmUserPro");
                     //互助码
                     String fruitShareCode = farmUserPro.getString("shareCode");
@@ -204,6 +207,10 @@ public class JdServiceImpl implements JdService {
                             toHelpJdFruitEntity.setIsFruitHei(1);
                             jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
                             continue;
+                        }else {
+                            if (403 == farmInfo.getInteger("code")){
+                                break;
+                            }
                         }
                     }
                     if (toHelpJdFruitEntity.getToHelpStatus() == 1) {
@@ -439,7 +446,7 @@ public class JdServiceImpl implements JdService {
                 continue;
             }else {
                 JSONObject petInfo = JdBeanChangeUtil.petRequest("initPetTown",jdCk.getCk());
-                if ("1019".equals(petInfo.getString("resultCode")) || "410".equals(petInfo.getString("resultCode"))){
+                if ("1018".equals(petInfo.getString("resultCode")) || "1019".equals(petInfo.getString("resultCode")) || "410".equals(petInfo.getString("resultCode"))){
                     //东东东东萌宠
                     jdPetEntity.setIsPetHei(1);
                     jdPetMapper.updateJdPet(jdPetEntity);
@@ -480,7 +487,7 @@ public class JdServiceImpl implements JdService {
                         continue;
                     }else {
                         JSONObject initPet = JdBeanChangeUtil.petRequest("initPetTown",toHelpJdCk.getCk());
-                        if ("1019".equals(initPet.getString("resultCode")) || "410".equals(initPet.getString("resultCode"))){
+                        if ("1018".equals(initPet.getString("resultCode")) || "1019".equals(initPet.getString("resultCode")) || "410".equals(initPet.getString("resultCode"))){
                             //东东萌宠火爆
                             toHelpJdPetEntity.setIsPetHei(1);
                             jdPetMapper.updateJdPet(toHelpJdPetEntity);
@@ -638,7 +645,7 @@ public class JdServiceImpl implements JdService {
                         continue;
                     }else {
                         JSONObject plantInfo = getPlantInfo(toHelpJdCk.getCk(), "plantBeanIndex");
-                        if ("3".equals(plantInfo.getString("resultCode"))){
+                        if ("PB101".equals(plantInfo.getString("errorCode")) || "3".equals(plantInfo.getString("resultCode"))){
                             //种豆得豆火爆
                             toHelpJdPlantEntity.setIsPlantHei(1);
                             jdPlantMapper.updateJdPlant(toHelpJdPlantEntity);
@@ -1652,8 +1659,8 @@ public class JdServiceImpl implements JdService {
                 .execute().body();
         log.info("查询种豆得豆信息结果：{}", result);
         try {
-            log.info("休息20s防止黑ip...");
-            Thread.sleep(20000);
+            log.info("休息1s防止黑ip...");
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
