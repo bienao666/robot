@@ -157,6 +157,8 @@ public class JdServiceImpl implements JdService {
             log.info("查询到东东农场助力上限：{}个", limit);
         }
 
+        boolean isBreak = false;
+
         for (JdCkEntity jdCk : jdCks) {
 
             if (limit != null) {
@@ -203,6 +205,10 @@ public class JdServiceImpl implements JdService {
             }
             log.info("东东农场开始助力{}!!!", jdCk.getRemark());
 
+            if (isBreak){
+                break;
+            }
+
             for (JdCkEntity toHelpJdCk : toHelpJdCks) {
                 try {
                     JdFruitEntity toHelpJdFruitEntity = toHelpJdCk.getJdFruitEntity();
@@ -227,6 +233,7 @@ public class JdServiceImpl implements JdService {
                             continue;
                         }else if(403 == farmInfo.getInteger("code")){
                             log.info("ip已黑。。。");
+                            isBreak = true;
                             break;
                         }else if(farmInfo.getJSONObject("farmUserPro") == null){
                             //东东农场火爆
