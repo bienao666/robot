@@ -1240,6 +1240,9 @@ public class QlServiceImpl implements QlService {
                     try {
                         //农场红包
                         JSONObject farmInfo = JdBeanChangeUtil.getjdfruit(env.getValue());
+                        if (403 == farmInfo.getInteger("code")){
+                            break;
+                        }
                         JSONObject farmUserPro = farmInfo.getJSONObject("farmUserPro");
                         if (farmUserPro != null) {
                             Integer treeEnergy = farmUserPro.getInteger("treeEnergy");

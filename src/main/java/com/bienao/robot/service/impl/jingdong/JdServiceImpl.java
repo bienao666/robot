@@ -177,15 +177,24 @@ public class JdServiceImpl implements JdService {
                 continue;
             }else {
                 JSONObject farmInfo = JdBeanChangeUtil.getjdfruit(jdCk.getCk());
-                if (farmInfo == null || farmInfo.getJSONObject("farmUserPro") == null){
+                /*{
+                    "code": "403",
+                        "message": "运行环境异常，请您从正规渠道参与活动，稍后再试~"
+                }*/
+                if (farmInfo == null){
+                    //东东农场火爆
+                    jdFruitEntity.setIsFruitHei(1);
+                    jdFruitMapper.updateJdFruit(jdFruitEntity);
+                    continue;
+                }else if(403 == farmInfo.getInteger("code")){
+                    log.info("ip已黑。。。");
+                    break;
+                }else if(farmInfo.getJSONObject("farmUserPro") == null){
                     //东东农场火爆
                     jdFruitEntity.setIsFruitHei(1);
                     jdFruitMapper.updateJdFruit(jdFruitEntity);
                     continue;
                 }else {
-                    if (403 == farmInfo.getInteger("code")){
-                        break;
-                    }
                     JSONObject farmUserPro = farmInfo.getJSONObject("farmUserPro");
                     //互助码
                     String fruitShareCode = farmUserPro.getString("shareCode");
@@ -211,15 +220,19 @@ public class JdServiceImpl implements JdService {
                         continue;
                     }else {
                         JSONObject farmInfo = JdBeanChangeUtil.getjdfruit(toHelpJdCk.getCk());
-                        if (farmInfo == null || farmInfo.getJSONObject("farmUserPro") == null){
+                        if (farmInfo == null){
                             //东东农场火爆
-                            toHelpJdFruitEntity.setIsFruitHei(1);
-                            jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
+                            jdFruitEntity.setIsFruitHei(1);
+                            jdFruitMapper.updateJdFruit(jdFruitEntity);
                             continue;
-                        }else {
-                            if (403 == farmInfo.getInteger("code")){
-                                break;
-                            }
+                        }else if(403 == farmInfo.getInteger("code")){
+                            log.info("ip已黑。。。");
+                            break;
+                        }else if(farmInfo.getJSONObject("farmUserPro") == null){
+                            //东东农场火爆
+                            jdFruitEntity.setIsFruitHei(1);
+                            jdFruitMapper.updateJdFruit(jdFruitEntity);
+                            continue;
                         }
                     }
                     if (toHelpJdFruitEntity.getToHelpStatus() == 1) {
