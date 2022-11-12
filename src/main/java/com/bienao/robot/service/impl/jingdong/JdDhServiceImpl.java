@@ -46,7 +46,7 @@ public class JdDhServiceImpl implements JdDhService {
                     JSONObject data = res.getJSONObject("data");
                     if ("success".equals(data.getString("bizMsg"))){
                         log.info("兑换成功:{}豆",data.getJSONObject("result").getInteger("jingBeanNum"));
-                    }else if ("到达今日兑换次数上限，不能再兑换哦~".equals(data.getString("bizMsg"))){
+                    }else if (-6060 == data.getInteger("bizCode") || "该奖品已达今日可兑换次数上限，不能再兑换哦~".equals(data.getString("bizMsg"))){
                         log.info("今日兑换次数上限");
                     }else if("活动太火爆啦".equals(data.getString("bizMsg"))){
                         log.info("活动太火爆啦");
