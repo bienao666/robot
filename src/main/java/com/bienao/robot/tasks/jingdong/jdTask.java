@@ -137,7 +137,7 @@ public class jdTask {
     /**
      * 维护助力码
      */
-    @Scheduled(cron = "0 0 12,22 * * ?")
+    /*@Scheduled(cron = "0 0 12,22 * * ?")
     public void updateShareCode(){
         if (updateShareCode){
             List<JdCkEntity> cks = jdService.queryCksAndActivity();
@@ -150,7 +150,7 @@ public class jdTask {
         }else {
             log.info("维护助力码定时任务执行失败，请先去配置updateShareCode为true");
         }
-    }
+    }*/
 
     /**
      * 统计京豆收益

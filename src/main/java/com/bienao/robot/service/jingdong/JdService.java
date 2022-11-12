@@ -15,7 +15,7 @@ public interface JdService {
     /**
      * 东东农场天天抽奖互助
      */
-    void fruitLotteryShareHelp(List<JdCkEntity> cks,int zlcwaittime);
+//    void fruitLotteryShareHelp(List<JdCkEntity> cks,int zlcwaittime);
 
     /**
      * 东东萌宠互助

@@ -667,9 +667,9 @@ public class JdBeanChangeUtil {
                     return;
                 }
                 String petName = userInfo.getString("petName");
-                if (StringUtils.isNotEmpty(petName)) {
-                    nickName = petName;
-                }
+//                if (StringUtils.isNotEmpty(petName)) {
+//                    nickName = petName;
+//                }
                 if (beanCount == 0) {
                     beanCount = userInfo.getInteger("jingBean");
                     isPlusVip = 3;

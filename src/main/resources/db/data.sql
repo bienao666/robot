@@ -37,3 +37,4 @@ INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('ISCOMPAREGOODSPRIC
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('QLCKAUTOADJUST', '青龙ck优化(是/否)','否',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('NOTIFYREDPACKET', '京东红包领取通知(是/否)','否',1);
 INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('AUTODELETEEXPIRECK', '删除过期ck(是/否)','否',1);
+INSERT INTO systemParam (code,codeName,value,isShow) VALUES ('QLFIXEDCKCOUNT', '青龙固定ck数量(默认5)','5',1);

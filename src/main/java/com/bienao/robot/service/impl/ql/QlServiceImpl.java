@@ -839,12 +839,16 @@ public class QlServiceImpl implements QlService {
     @Override
     @Async("asyncServiceExecutor")
     public void leekFriendly() {
+        //保留前五个ck不动
+        int limit = 5;
+        String leekFriendly = systemParamUtil.querySystemParam("LEEKFRIENDLY");
+        if (StringUtils.isNotEmpty(leekFriendly)){
+            limit = Integer.parseInt(leekFriendly);
+        }
         List<QlEntity> qlEntities = qlMapper.queryQls(null);
         for (QlEntity ql : qlEntities) {
             log.info("青龙服务器：{}开始韭菜友好排序。。。", ql.getRemark());
             List<QlEnv> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
-            //保留前五个ck不动
-            int limit = 5;
             int count = 0;
             //第五个ck的索引
             int index = 0;
