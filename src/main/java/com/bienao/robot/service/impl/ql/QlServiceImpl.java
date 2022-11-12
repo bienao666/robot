@@ -896,6 +896,12 @@ public class QlServiceImpl implements QlService {
             QlEntity qlEntity = qlEntities.get(i);
             try {
                 List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
+
+                if (envs.size() == 0){
+                    qlToCkCount.put(qlEntity.getId(), 0);
+                    continue;
+                }
+
                 //获取当前有效ck数量
                 for (int j = 0; j < envs.size(); j++) {
                     QlEnv qlEnv = envs.get(j);
