@@ -16,6 +16,7 @@ import com.bienao.robot.mapper.jingdong.JdFruitMapper;
 import com.bienao.robot.mapper.jingdong.JdPetMapper;
 import com.bienao.robot.mapper.jingdong.JdPlantMapper;
 import com.bienao.robot.service.jingdong.CkService;
+import com.bienao.robot.service.jingdong.JdDhService;
 import com.bienao.robot.utils.jingdong.GetUserAgentUtil;
 import com.bienao.robot.utils.jingdong.JDUtil;
 import com.bienao.robot.utils.ql.QlUtil;
@@ -44,6 +45,9 @@ public class CkServiceImpl implements CkService {
 
     @Autowired
     private JdPlantMapper jdPlantMapper;
+
+    @Autowired
+    private JdDhService jdDhService;
 
     @Autowired
     private QlUtil qlUtil;
@@ -333,11 +337,11 @@ public class CkServiceImpl implements CkService {
     }
 
     @Override
-    public List<JdCkEntity> getJdCkListWithoutPage(){
-        List<JdCkEntity> jdCkEntities = new ArrayList<>();
+    public void jkExchange(){
         //查询所有青龙
         List<QlEntity> qlEntities = qlMapper.queryQls(null);
         for (QlEntity qlEntity : qlEntities) {
+            List<JdCkEntity> jdCkEntities = new ArrayList<>();
             try {
                 List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
                 for (int i = 0; i < envs.size(); i++) {
@@ -357,8 +361,9 @@ public class CkServiceImpl implements CkService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            //健康社区兑换京豆
+            jdDhService.jkExchange(jdCkEntities);
         }
-        return jdCkEntities;
     }
 
     @Override

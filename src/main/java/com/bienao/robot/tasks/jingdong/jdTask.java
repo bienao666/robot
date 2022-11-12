@@ -37,9 +37,6 @@ public class jdTask {
     @Autowired
     private SystemParamUtil systemParamUtil;
 
-    @Autowired
-    private JdDhService jdDhService;
-
     @Value("${task-function.shareHelp}")
     private boolean shareHelp;
 
@@ -200,9 +197,7 @@ public class jdTask {
      */
     @Scheduled(cron = "0 0 0 * * ?")
     public void jdTimeTask(){
-        List<JdCkEntity> jdCkList = ckService.getJdCkListWithoutPage();
-        //健康社区兑换京豆
-        jdDhService.jkExchange(jdCkList);
+        ckService.jkExchange();
     }
 
     /**
