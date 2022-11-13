@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -853,7 +854,7 @@ public class QlServiceImpl implements QlService {
             //第五个ck的索引
             int index = 0;
             //存放五个以后的ck
-            TreeMap<Integer, QlEnv> treeMap = new TreeMap<>();
+            List<QlEnv> treeqEnvs = new ArrayList<>();
             for (int i = 0; i < envs.size(); i++) {
                 QlEnv env = envs.get(i);
                 if (!"JD_COOKIE".equals(env.getName())) {
@@ -864,20 +865,22 @@ public class QlServiceImpl implements QlService {
                     index = i;
                     continue;
                 }
+                env.setQlIndex(i);
                 //查询前一天的京豆收益
                 JdCkEntity jdCkEntityQuery = new JdCkEntity();
                 jdCkEntityQuery.setCk(env.getValue());
                 JdCkEntity jdCkEntity = jdCkMapper.queryCk(jdCkEntityQuery);
                 if (jdCkEntity != null) {
                     Integer jd = jdCkEntity.getJd();
+                    env.setJd(jd);
                     if (jd > 10) {
-                        treeMap.put(jd, env);
+                        treeqEnvs.add(env);
                     }
                 }
             }
-            for (Map.Entry<Integer, QlEnv> entry : treeMap.entrySet()) {
-                QlEnv qlEnv = entry.getValue();
-                qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), qlEnv.getId(), 1000, ++index);
+            treeqEnvs = treeqEnvs.stream().sorted(Comparator.comparing(QlEnv::getJd)).collect(Collectors.toList());
+            for (QlEnv qlEnv : treeqEnvs) {
+                qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), qlEnv.getId(), qlEnv.getQlIndex(), ++index);
             }
         }
     }

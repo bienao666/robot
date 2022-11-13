@@ -25,4 +25,6 @@ public class QlEnv {
     private Integer qlIndex;
     //s所属青龙备注
     private String qlRemark;
+    //前一天的京豆收益
+    private Integer jd;
 }
