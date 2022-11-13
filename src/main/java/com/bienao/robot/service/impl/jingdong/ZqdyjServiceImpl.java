@@ -46,10 +46,11 @@ public class ZqdyjServiceImpl implements ZqdyjService {
         //助力码
         String sId ="";
 
-        //判断是ck还是助力码
+        //判断是ck还是口令
         Matcher matcher = PatternConstant.ckPattern.matcher(param);
         String needHelpPtPin = "";
         if (matcher.find()){
+            //ck
             needHelpck = param;
             needHelpPtPin = matcher.group(2);
             JSONObject info = MakeMoneyShopUtil.getInfo(param);
@@ -62,6 +63,7 @@ public class ZqdyjServiceImpl implements ZqdyjService {
                 sId = info.getString("sId");
             }
         }else {
+            //口令
             JSONObject res = JDUtil.parseCommand(param);
             if (0 != res.getInteger("code") || res.getJSONObject("data") == null){
                 return Result.error(ErrorCodeConstant.SERVICE_ERROR, "解析口令异常");
@@ -95,7 +97,7 @@ public class ZqdyjServiceImpl implements ZqdyjService {
         zqdyjWebSocket.sendMessageAll("开始助力...");
         for (JSONObject jsonObject : zqdyjCk) {
 
-            if (helpCount>MaxTime){
+            if (helpCount>=MaxTime){
                 break;
             }
 
@@ -141,10 +143,8 @@ public class ZqdyjServiceImpl implements ZqdyjService {
                 if (help.getInteger("code") == 0){
                     helpCount++;
                     zqdyjWebSocket.sendMessageAll("!!!>>>>>>>>第"+helpCount+"次助力成功<<<<<<<<!!!");
-//                    log.info("助力成功");
                 }else if (help.getInteger("code") == 1002){
                     zqdyjWebSocket.sendMessageAll(">>>>>>>>"+help.getString("msg")+"<<<<<<<<");
-//                    return Result.success();
                     return Result.error(ErrorCodeConstant.PARAMETER_ERROR, help.getString("msg"));
                 }else {
                     if (help.getInteger("nohelp")==0){
@@ -157,13 +157,10 @@ public class ZqdyjServiceImpl implements ZqdyjService {
                         updateZqdyjCk(jdZqdyjEntity);
                     }else if (help.getInteger("nohelp")==1){
                         zqdyjWebSocket.sendMessageAll(">>>>>>>>已助力过TA<<<<<<<<");
-//                        log.info("已助力过TA");
                     }else if (help.getInteger("nohelp")==2){
                         zqdyjWebSocket.sendMessageAll(">>>>>>>>不能为自己助力<<<<<<<<");
-//                        log.info("不能为自己助力");
                     }else if (help.getInteger("nohelp")==4){
                         zqdyjWebSocket.sendMessageAll(">>>>>>>>"+ptPin+"账号火爆<<<<<<<<");
-//                        log.info("火爆");
                         JdZqdyjEntity jdZqdyjEntity = new JdZqdyjEntity();
                         jdZqdyjEntity.setCkId(ckid);
                         jdZqdyjEntity.setIsHei(1);
@@ -199,6 +196,12 @@ public class ZqdyjServiceImpl implements ZqdyjService {
                                 Double money = res.getDouble("money");
                                 log.info("获得营业金："+money+"元");
                                 zqdyjWebSocket.sendMessageAll("获得营业金："+money+"元");
+                                if (3533 == task.getInteger("taskId")){
+                                    totalMoney += task.getInteger("completedTimes") * task.getInteger("reward") / 100.00;
+                                }
+                                if (3532 == task.getInteger("taskId")){
+                                    totalMoney += task.getInteger("completedTimes") * task.getInteger("reward") / 100.00;
+                                }
                             }
                             try {
                                 Thread.sleep(1000);
@@ -206,12 +209,6 @@ public class ZqdyjServiceImpl implements ZqdyjService {
                                 e.printStackTrace();
                             }
                         }
-                    }
-                    if (3533 == task.getInteger("taskId")){
-                        totalMoney += task.getInteger("completedTimes") * task.getInteger("reward") / 100.00;
-                    }
-                    if (3532 == task.getInteger("taskId")){
-                        totalMoney += task.getInteger("completedTimes") * task.getInteger("reward") / 100.00;
                     }
                 }
                 log.info("今日获得营业金总额："+totalMoney+"元");
