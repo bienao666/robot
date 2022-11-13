@@ -841,9 +841,9 @@ public class QlServiceImpl implements QlService {
     public void leekFriendly() {
         //保留前五个ck不动
         int limit = 5;
-        String leekFriendly = systemParamUtil.querySystemParam("LEEKFRIENDLY");
-        if (StringUtils.isNotEmpty(leekFriendly)){
-            limit = Integer.parseInt(leekFriendly);
+        String qlFixedCkCount = systemParamUtil.querySystemParam("QLFIXEDCKCOUNT");
+        if (StringUtils.isNotEmpty(qlFixedCkCount)){
+            limit = Integer.parseInt(qlFixedCkCount);
         }
         List<QlEntity> qlEntities = qlMapper.queryQls(null);
         for (QlEntity ql : qlEntities) {
