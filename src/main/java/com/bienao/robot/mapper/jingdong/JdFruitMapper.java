@@ -14,6 +14,8 @@ public interface JdFruitMapper {
      */
     int resetFruitStatus();
 
+    int resetHot();
+
     /**
      * 修改东东农场数据
      * @param jdFruitEntity

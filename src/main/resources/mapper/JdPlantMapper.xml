@@ -8,6 +8,10 @@
         update jdPlant set help_status = 0,to_help_status = 1,is_Plant_hei = 0;
     </update>
 
+    <update id="resetHot">
+        update jdPlant set is_Plant_hei = 0;
+    </update>
+
     <update id="updateJdPlant" parameterType="JdPlantEntity">
         update jdPlant
         <set>

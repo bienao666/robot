@@ -159,6 +159,11 @@ public class JdServiceImpl implements JdService {
 
         boolean isBreak = false;
 
+        if (toHelpJdCks.size() == 0){
+            log.info("东东农场无可助力账号，结束");
+            return;
+        }
+
         for (JdCkEntity jdCk : jdCks) {
 
             if (limit != null) {
@@ -177,16 +182,19 @@ public class JdServiceImpl implements JdService {
             if (jdFruitEntity.getIsFruitHei() == 1) {
                 //东东农场火爆
                 continue;
-            }else {
+            }
+            if (StringUtils.isEmpty(jdFruitEntity.getHelpCode())){
                 JSONObject farmInfo = JdBeanChangeUtil.getjdfruit(jdCk.getCk());
-                /*{
-                    "code": "403",
-                        "message": "运行环境异常，请您从正规渠道参与活动，稍后再试~"
-                }*/
                 if (farmInfo == null){
                     //东东农场火爆
                     jdFruitEntity.setIsFruitHei(1);
                     jdFruitMapper.updateJdFruit(jdFruitEntity);
+                    try {
+                        log.info("东东农场助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
+                        Thread.sleep(zlcwaittime * 1000L);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     continue;
                 }else if(403 == farmInfo.getInteger("code")){
                     log.info("ip已黑。。。");
@@ -195,12 +203,19 @@ public class JdServiceImpl implements JdService {
                     //东东农场火爆
                     jdFruitEntity.setIsFruitHei(1);
                     jdFruitMapper.updateJdFruit(jdFruitEntity);
+                    try {
+                        log.info("东东农场助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
+                        Thread.sleep(zlcwaittime * 1000L);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     continue;
                 }else {
                     JSONObject farmUserPro = farmInfo.getJSONObject("farmUserPro");
                     //互助码
                     String fruitShareCode = farmUserPro.getString("shareCode");
                     jdFruitEntity.setHelpCode(fruitShareCode);
+                    jdFruitMapper.updateJdFruit(jdFruitEntity);
                 }
             }
             log.info("东东农场开始助力{}!!!", jdCk.getRemark());
@@ -230,6 +245,12 @@ public class JdServiceImpl implements JdService {
                             //东东农场火爆
                             jdFruitEntity.setIsFruitHei(1);
                             jdFruitMapper.updateJdFruit(jdFruitEntity);
+                            try {
+                                log.info("东东农场助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
+                                Thread.sleep(zlcwaittime * 1000L);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                             continue;
                         }else if(403 == farmInfo.getInteger("code")){
                             log.info("ip已黑。。。");
@@ -239,6 +260,12 @@ public class JdServiceImpl implements JdService {
                             //东东农场火爆
                             jdFruitEntity.setIsFruitHei(1);
                             jdFruitMapper.updateJdFruit(jdFruitEntity);
+                            try {
+                                log.info("东东农场助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
+                                Thread.sleep(zlcwaittime * 1000L);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                             continue;
                         }
                     }
@@ -457,6 +484,11 @@ public class JdServiceImpl implements JdService {
             log.info("查询到东东萌宠助力上限：{}个", limit);
         }
 
+        if (toHelpJdCks.size() == 0){
+            log.info("东东萌宠无可助力账号，结束");
+            return;
+        }
+
         for (JdCkEntity jdCk : jdCks) {
 
             if (limit != null) {
@@ -475,12 +507,19 @@ public class JdServiceImpl implements JdService {
             if (jdPetEntity.getIsPetHei() == 1) {
                 //东东萌宠火爆
                 continue;
-            }else {
+            }
+            if (StringUtils.isEmpty(jdPetEntity.getHelpCode())){
                 JSONObject petInfo = JdBeanChangeUtil.petRequest("initPetTown",jdCk.getCk());
                 if ("1018".equals(petInfo.getString("resultCode")) || "1019".equals(petInfo.getString("resultCode")) || "410".equals(petInfo.getString("resultCode"))){
                     //东东东东萌宠
                     jdPetEntity.setIsPetHei(1);
                     jdPetMapper.updateJdPet(jdPetEntity);
+                    try {
+                        log.info("东东萌宠助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
+                        Thread.sleep(zlcwaittime * 1000L);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     continue;
                 }else {
                     JSONObject petUserPro = petInfo.getJSONObject("result");
@@ -492,11 +531,18 @@ public class JdServiceImpl implements JdService {
                         //东东东东萌宠
                         jdPetEntity.setIsPetHei(1);
                         jdPetMapper.updateJdPet(jdPetEntity);
+                        try {
+                            log.info("东东萌宠助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
+                            Thread.sleep(zlcwaittime * 1000L);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         continue;
                     } else {
                         //互助码
                         String petShareCode = petUserPro.getString("shareCode");
                         jdCk.getJdPetEntity().setHelpCode(petShareCode);
+                        jdPetMapper.updateJdPet(jdPetEntity);
                     }
                 }
             }
@@ -522,6 +568,12 @@ public class JdServiceImpl implements JdService {
                             //东东萌宠火爆
                             toHelpJdPetEntity.setIsPetHei(1);
                             jdPetMapper.updateJdPet(toHelpJdPetEntity);
+                            try {
+                                log.info("东东萌宠助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
+                                Thread.sleep(zlcwaittime * 1000L);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                             continue;
                         }
                     }
@@ -627,6 +679,11 @@ public class JdServiceImpl implements JdService {
             log.info("查询到种豆得豆助力上限：{}个", limit);
         }
 
+        if (toHelpJdCks.size() == 0){
+            log.info("种豆得豆无可助力账号，结束");
+            return;
+        }
+
         for (JdCkEntity jdCk : jdCks) {
 
             if (limit != null) {
@@ -645,7 +702,8 @@ public class JdServiceImpl implements JdService {
             if (jdPlantEntity.getIsPlantHei() == 1) {
                 //种豆得豆火爆
                 continue;
-            }else {
+            }
+            if (StringUtils.isEmpty(jdPlantEntity.getHelpCode())){
                 JSONObject plantInfo = getPlantInfo(jdCk.getCk(), "plantBeanIndex");
                 if ("PB101".equals(plantInfo.getString("errorCode"))
                         || "PB003".equals(plantInfo.getString("errorCode"))
@@ -653,11 +711,18 @@ public class JdServiceImpl implements JdService {
                     //种豆得豆火爆
                     jdPlantEntity.setIsPlantHei(1);
                     jdPlantMapper.updateJdPlant(jdPlantEntity);
+                    try {
+                        log.info("种豆得豆助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
+                        Thread.sleep(zlcwaittime * 1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     continue;
                 } else {
                     String shareUrl = plantInfo.getJSONObject("data").getJSONObject("jwordShareInfo").getString("shareUrl");
                     String plantShareCode = shareUrl.split("plantUuid=")[1];
                     jdPlantEntity.setHelpCode(plantShareCode);
+                    jdPlantMapper.updateJdPlant(jdPlantEntity);
                 }
 
             }
@@ -686,6 +751,12 @@ public class JdServiceImpl implements JdService {
                             //种豆得豆火爆
                             toHelpJdPlantEntity.setIsPlantHei(1);
                             jdPlantMapper.updateJdPlant(toHelpJdPlantEntity);
+                            try {
+                                log.info("种豆得豆助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
+                                Thread.sleep(zlcwaittime * 1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                             continue;
                         }
                     }
@@ -1318,6 +1389,26 @@ public class JdServiceImpl implements JdService {
         }
         data.put("plant",plant);
         return data;
+    }
+
+    @Override
+    public void resetHot(Integer type) {
+        switch (type){
+            case 0:
+                //东东农场
+                jdFruitMapper.resetHot();
+                break;
+            case 1:
+                //东东萌宠
+                jdPetMapper.resetHot();
+                break;
+            case 2:
+                //种豆得豆
+                jdPlantMapper.resetHot();
+                break;
+            default:
+
+        }
     }
 
     /**

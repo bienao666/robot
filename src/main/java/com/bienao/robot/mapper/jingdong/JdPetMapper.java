@@ -15,6 +15,8 @@ public interface JdPetMapper {
      */
     int resetPetStatus();
 
+    int resetHot();
+
     /**
      * 修改东东萌宠数据
      * @param jdPetEntity

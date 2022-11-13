@@ -8,6 +8,10 @@
         update jdFruit set help_status = 0,to_help_status = 1,help_lottery_status = 0,to_help_lottery_status = 1,is_fruit_hei = 0;
     </update>
 
+    <update id="resetHot">
+        update jdFruit set is_fruit_hei = 0;
+    </update>
+
     <select id="queryCkWithoutShareCode" resultType="jdCkEntity">
         select * from jdck where fruit_share_code is null and is_fruit_hei = 0;
     </select>

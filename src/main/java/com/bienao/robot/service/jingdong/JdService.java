@@ -57,4 +57,6 @@ public interface JdService {
     void clear();
 
     JSONObject getZlcInfo();
+
+    void resetHot(Integer type);
 }

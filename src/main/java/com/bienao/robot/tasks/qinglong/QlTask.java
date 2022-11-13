@@ -33,7 +33,7 @@ public class QlTask {
     /**
      * 执行线报
      */
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "30 * * * * ?")
     public void handleWire() {
         //查询近十条未执行的线报
         List<WireActivityEntity> wireActivityEntities = wirelistMapper.queryToBeExecutedActivity();
@@ -54,7 +54,7 @@ public class QlTask {
      * 设置小车头
      * 10分钟设置一次
      */
-    @Scheduled(cron = "0 */10 * * * ?")
+    @Scheduled(cron = "30 */10 * * * ?")
     public void setSmallHead(){
         qlService.setSmallHead();
     }
@@ -73,7 +73,7 @@ public class QlTask {
     /**
      * 青龙检测
      */
-    @Scheduled(cron = "0 */30 * * * ?")
+    @Scheduled(cron = "40 */30 * * * ?")
     public void checkQl(){
         qlService.checkQl();
     }

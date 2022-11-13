@@ -113,6 +113,17 @@ public class ShareCodeController {
     }
 
     /**
+     * 重置火爆状态
+     */
+    @LoginToken
+    @GetMapping("/resetHot")
+    public Result resetHot(@RequestParam Integer type){
+        jdService.resetHot(type);
+        return Result.success();
+    }
+
+
+    /**
      * 维护助力码
      */
     @GetMapping("/updateShareCode")

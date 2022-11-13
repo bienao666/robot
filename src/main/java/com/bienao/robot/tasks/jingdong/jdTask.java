@@ -60,7 +60,7 @@ public class jdTask {
     /**
      * 助力池互助
      */
-    @Scheduled(cron = "20 0 0 * * ?")
+    @Scheduled(cron = "30 0 0 * * ?")
     public void shareHelp(){
         if (shareHelp){
             //重置助力
@@ -165,7 +165,7 @@ public class jdTask {
      * 青龙同步助力池
      * 每隔十分钟同步一次
      */
-    @Scheduled(cron = "0 */5 * * * ?")
+    @Scheduled(cron = "30 */5 * * * ?")
     public void qlToZlc(){
         String qltozlc = systemParamUtil.querySystemParam("QLTOZLC");
         if ("是".equals(qltozlc)){
@@ -176,7 +176,7 @@ public class jdTask {
     /**
      * 清空京东查询次数限制
      */
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 59 23 * * ?")
     public void clearJdQueryTimes(){
         ArrayList<String> clear = new ArrayList<>();
         Iterator<CacheObj<String, String>> iterator = redis.cacheObjIterator();
@@ -211,7 +211,7 @@ public class jdTask {
     /**
      * 重置赚钱大赢家
      */
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 59 23 * * ?")
     public void zqdyjReset(){
         zqdyjService.reset();
     }

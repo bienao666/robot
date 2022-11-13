@@ -8,6 +8,10 @@
         update jdPet set help_status = 0,to_help_status = 1,is_pet_hei = 0;
     </update>
 
+    <update id="resetHot">
+        update jdPet set is_pet_hei = 0;
+    </update>
+
     <update id="updateJdPet" parameterType="JdPetEntity">
         update jdPet
         <set>

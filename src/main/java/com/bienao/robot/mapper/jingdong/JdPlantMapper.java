@@ -15,6 +15,8 @@ public interface JdPlantMapper {
      */
     int resetPlantStatus();
 
+    int resetHot();
+
     /**
      * 修改种豆得豆数据
      * @param jdPlantEntity
