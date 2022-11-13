@@ -719,6 +719,7 @@ public class QlServiceImpl implements QlService {
                             boolean flag = qlUtil.runCron(url, ql.getTokenType(), ql.getToken(), cronIds);
                             if (flag) {
                                 list.add(url + "(" + remark + ")" + " 执行" + "(" + name + ")" + " 成功");
+                                Thread.sleep(4000);
                             } else {
                                 list.add(url + "(" + remark + ")" + " 执行" + "(" + name + ")" + " 失败");
                             }

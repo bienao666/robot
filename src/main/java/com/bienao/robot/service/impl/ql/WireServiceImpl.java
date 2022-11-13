@@ -227,6 +227,7 @@ public class WireServiceImpl implements WireService {
                                 boolean flag = qlUtil.runCron(url, ql.getTokenType(), ql.getToken(), cronIds);
                                 if (flag) {
                                     result.add(url + "(" + remark + ")" + " 线报 执行成功");
+                                    Thread.sleep(4000);
 //                                    handleFlag = true;
                                 } else {
                                     result.add(url + "(" + remark + ")" + " 线报 执行失败，请手动执行");
