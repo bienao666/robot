@@ -1093,6 +1093,7 @@ public class QlServiceImpl implements QlService {
                         }
                     } else {
                         //无效
+                        log.info("账号：{}已失效",env.getValue());
                         String autoDeleteExpireCk = systemParamUtil.querySystemParam("AUTODELETEEXPIRECK");
                         if ("是".equals(autoDeleteExpireCk)) {
                             String remarks = env.getRemarks();
@@ -1118,9 +1119,11 @@ public class QlServiceImpl implements QlService {
 
                                     ArrayList<String> uids = new ArrayList<>();
                                     uids.add(wxpusherUid);
+                                    log.info("正在通知该ck号主。。。");
                                     wxpusherUtil.sendMessage(content, "京东代挂账号过期", 1, null, uids, "");
                                 }
                             }
+                            log.info("正在删除改ck...");
                             //删除青龙过期ck
                             deleteQlCk(ql, env);
                         } else {
@@ -1326,7 +1329,8 @@ public class QlServiceImpl implements QlService {
     private void deleteQlCk(QlEntity qlEntity, QlEnv qlEnv) {
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(qlEnv.getId());
-        qlUtil.deleteEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), ids);
+        boolean b = qlUtil.deleteEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), ids);
+
     }
 
     public void sendMessage(JSONObject content, String ptPin, String wxPusherUid, QlEntity ql, String type) {
