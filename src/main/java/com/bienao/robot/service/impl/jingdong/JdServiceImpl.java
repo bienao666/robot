@@ -84,7 +84,7 @@ public class JdServiceImpl implements JdService {
         String fruitShareHelpIng = redis.get("fruitShareHelp",false);
         if (StringUtils.isEmpty(fruitShareHelpIng)) {
             //加锁
-            redis.put("fruitShareHelp", "true", (zlcwaittime * 2L + 30) * 1000);
+            redis.put("fruitShareHelp", "true", (zlcwaittime * 3L) * 1000);
         } else {
             //有锁
             log.info("东东农场互助进行中。。。");
@@ -189,6 +189,8 @@ public class JdServiceImpl implements JdService {
                     //东东农场火爆
                     jdFruitEntity.setIsFruitHei(1);
                     jdFruitMapper.updateJdFruit(jdFruitEntity);
+                    //加锁
+                    redis.put("fruitShareHelp", "true", (zlcwaittime * 3L) * 1000);
                     try {
                         log.info("东东农场助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
                         Thread.sleep(zlcwaittime * 1000L);
@@ -203,6 +205,8 @@ public class JdServiceImpl implements JdService {
                     //东东农场火爆
                     jdFruitEntity.setIsFruitHei(1);
                     jdFruitMapper.updateJdFruit(jdFruitEntity);
+                    //加锁
+                    redis.put("fruitShareHelp", "true", (zlcwaittime * 3L) * 1000);
                     try {
                         log.info("东东农场助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
                         Thread.sleep(zlcwaittime * 1000L);
@@ -245,6 +249,8 @@ public class JdServiceImpl implements JdService {
                             //东东农场火爆
                             jdFruitEntity.setIsFruitHei(1);
                             jdFruitMapper.updateJdFruit(jdFruitEntity);
+                            //加锁
+                            redis.put("fruitShareHelp", "true", (zlcwaittime * 3L) * 1000);
                             try {
                                 log.info("东东农场助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
                                 Thread.sleep(zlcwaittime * 1000L);
@@ -260,6 +266,8 @@ public class JdServiceImpl implements JdService {
                             //东东农场火爆
                             jdFruitEntity.setIsFruitHei(1);
                             jdFruitMapper.updateJdFruit(jdFruitEntity);
+                            //加锁
+                            redis.put("fruitShareHelp", "true", (zlcwaittime * 3L) * 1000);
                             try {
                                 log.info("东东农场助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
                                 Thread.sleep(zlcwaittime * 1000L);
@@ -273,8 +281,8 @@ public class JdServiceImpl implements JdService {
                         //助力
                         helpFruit(toHelpJdCk, jdCk);
 
-                        //续锁
-                        redis.put("fruitShareHelp", "true", (zlcwaittime + 30) * 1000L);
+                        //加锁
+                        redis.put("fruitShareHelp", "true", (zlcwaittime * 3L) * 1000);
 
                         try {
                             log.info("东东农场助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
@@ -411,7 +419,7 @@ public class JdServiceImpl implements JdService {
         String fruitShareHelpIng = redis.get("petShareHelp",false);
         if (StringUtils.isEmpty(fruitShareHelpIng)) {
             //加锁
-            redis.put("petShareHelp", "true", (zlcwaittime * 2L + 30) * 1000);
+            redis.put("petShareHelp", "true", (zlcwaittime * 3L) * 1000);
         } else {
             //有锁
             log.info("东东萌宠互助进行中。。。");
@@ -514,6 +522,8 @@ public class JdServiceImpl implements JdService {
                     //东东东东萌宠
                     jdPetEntity.setIsPetHei(1);
                     jdPetMapper.updateJdPet(jdPetEntity);
+                    //加锁
+                    redis.put("petShareHelp", "true", (zlcwaittime * 3L) * 1000);
                     try {
                         log.info("东东萌宠助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
                         Thread.sleep(zlcwaittime * 1000L);
@@ -531,6 +541,8 @@ public class JdServiceImpl implements JdService {
                         //东东东东萌宠
                         jdPetEntity.setIsPetHei(1);
                         jdPetMapper.updateJdPet(jdPetEntity);
+                        //加锁
+                        redis.put("petShareHelp", "true", (zlcwaittime * 3L) * 1000);
                         try {
                             log.info("东东萌宠助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
                             Thread.sleep(zlcwaittime * 1000L);
@@ -568,6 +580,8 @@ public class JdServiceImpl implements JdService {
                             //东东萌宠火爆
                             toHelpJdPetEntity.setIsPetHei(1);
                             jdPetMapper.updateJdPet(toHelpJdPetEntity);
+                            //加锁
+                            redis.put("petShareHelp", "true", (zlcwaittime * 3L) * 1000);
                             try {
                                 log.info("东东萌宠助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
                                 Thread.sleep(zlcwaittime * 1000L);
@@ -581,8 +595,8 @@ public class JdServiceImpl implements JdService {
                         //助力
                         helpPet(toHelpJdCk, jdCk);
 
-                        //续锁
-                        redis.put("petShareHelp", "true", (zlcwaittime + 30) * 1000L);
+                        //加锁
+                        redis.put("petShareHelp", "true", (zlcwaittime * 3L) * 1000);
 
                         try {
                             log.info("东东萌宠助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
@@ -606,7 +620,7 @@ public class JdServiceImpl implements JdService {
         String fruitShareHelpIng = redis.get("plantShareHelp",false);
         if (StringUtils.isEmpty(fruitShareHelpIng)) {
             //加锁
-            redis.put("plantShareHelp", "true", (zlcwaittime * 2L + 30) * 1000);
+            redis.put("plantShareHelp", "true", (zlcwaittime * 3L) * 1000);
         } else {
             //有锁
             log.info("种豆得豆互助进行中。。。");
@@ -711,6 +725,8 @@ public class JdServiceImpl implements JdService {
                     //种豆得豆火爆
                     jdPlantEntity.setIsPlantHei(1);
                     jdPlantMapper.updateJdPlant(jdPlantEntity);
+                    //加锁
+                    redis.put("plantShareHelp", "true", (zlcwaittime * 3L) * 1000);
                     try {
                         log.info("种豆得豆助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
                         Thread.sleep(zlcwaittime * 1000);
@@ -751,6 +767,8 @@ public class JdServiceImpl implements JdService {
                             //种豆得豆火爆
                             toHelpJdPlantEntity.setIsPlantHei(1);
                             jdPlantMapper.updateJdPlant(toHelpJdPlantEntity);
+                            //加锁
+                            redis.put("plantShareHelp", "true", (zlcwaittime * 3L) * 1000);
                             try {
                                 log.info("种豆得豆助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
                                 Thread.sleep(zlcwaittime * 1000);
@@ -764,8 +782,8 @@ public class JdServiceImpl implements JdService {
                         //助力
                         helpPlant(toHelpJdCk, jdCk);
 
-                        //续锁
-                        redis.put("plantShareHelp", "true", (zlcwaittime + 30) * 1000L);
+                        //加锁
+                        redis.put("plantShareHelp", "true", (zlcwaittime * 3L) * 1000);
 
                         try {
                             log.info("种豆得豆助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
