@@ -26,6 +26,11 @@ public class JDUtil {
                 .header("Accept-Encoding", "gzip, deflate, br")
                 .execute().body();
         log.info("查询当前ck结果：{}", result);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if (StringUtils.isEmpty(result)) {
             log.info("京东服务器返回空数据");
             throw new RuntimeException("京东服务器返回空数据");
@@ -60,6 +65,11 @@ public class JDUtil {
                 .header("Accept-Encoding", "gzip, deflate, br")
                 .execute().body();
         log.info("查询当前ck结果：{}", result);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if (StringUtils.isEmpty(result)) {
             log.info("京东服务器返回空数据");
             return true;
