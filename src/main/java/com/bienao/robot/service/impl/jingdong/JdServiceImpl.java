@@ -84,7 +84,7 @@ public class JdServiceImpl implements JdService {
         String fruitShareHelpIng = redis.get("fruitShareHelp",false);
         if (StringUtils.isEmpty(fruitShareHelpIng)) {
             //加锁
-            redis.put("fruitShareHelp", "true", (zlcwaittime + 10) * 1000L);
+            redis.put("fruitShareHelp", "true", (zlcwaittime * 2L + 30) * 1000);
         } else {
             //有锁
             log.info("东东农场互助进行中。。。");
@@ -274,7 +274,7 @@ public class JdServiceImpl implements JdService {
                         helpFruit(toHelpJdCk, jdCk);
 
                         //续锁
-                        redis.put("fruitShareHelp", "true", (zlcwaittime + 10) * 1000L);
+                        redis.put("fruitShareHelp", "true", (zlcwaittime + 30) * 1000L);
 
                         try {
                             log.info("东东农场助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
@@ -411,7 +411,7 @@ public class JdServiceImpl implements JdService {
         String fruitShareHelpIng = redis.get("petShareHelp",false);
         if (StringUtils.isEmpty(fruitShareHelpIng)) {
             //加锁
-            redis.put("petShareHelp", "true", (zlcwaittime + 10) * 1000L);
+            redis.put("petShareHelp", "true", (zlcwaittime * 2L + 30) * 1000);
         } else {
             //有锁
             log.info("东东萌宠互助进行中。。。");
@@ -582,7 +582,7 @@ public class JdServiceImpl implements JdService {
                         helpPet(toHelpJdCk, jdCk);
 
                         //续锁
-                        redis.put("petShareHelp", "true", (zlcwaittime + 10) * 1000L);
+                        redis.put("petShareHelp", "true", (zlcwaittime + 30) * 1000L);
 
                         try {
                             log.info("东东萌宠助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
@@ -606,7 +606,7 @@ public class JdServiceImpl implements JdService {
         String fruitShareHelpIng = redis.get("plantShareHelp",false);
         if (StringUtils.isEmpty(fruitShareHelpIng)) {
             //加锁
-            redis.put("plantShareHelp", "true", (zlcwaittime + 10) * 1000L);
+            redis.put("plantShareHelp", "true", (zlcwaittime * 2L + 30) * 1000);
         } else {
             //有锁
             log.info("种豆得豆互助进行中。。。");
@@ -765,7 +765,7 @@ public class JdServiceImpl implements JdService {
                         helpPlant(toHelpJdCk, jdCk);
 
                         //续锁
-                        redis.put("plantShareHelp", "true", (zlcwaittime + 10) * 1000L);
+                        redis.put("plantShareHelp", "true", (zlcwaittime + 30) * 1000L);
 
                         try {
                             log.info("种豆得豆助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
