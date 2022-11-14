@@ -1544,18 +1544,22 @@ public class JdServiceImpl implements JdService {
                 } else {
                     log.info("东东萌宠助力其他情况：{}", helpResult.toJSONString());
                 }
-            } else if ("已经助过力".equals(resultObject.getString("message"))) {
+            } else if ("1002".equals(resultObject.getString("resultCode"))) {
+                log.info(resultObject.getString("message"));
+                toHelpJdPetEntity.setIsPetHei(1);
+                jdPetMapper.updateJdPet(toHelpJdPetEntity);
+            }else if ("已经助过力".equals(resultObject.getString("message"))) {
                 log.info("此账号今天已经跑过助力了，跳出....");
             } else {
                 log.info("东东萌宠助力失败:{}", resultObject.toJSONString());
             }
-            Integer times = toHelpJdPetEntity.getTimes();
+            /*Integer times = toHelpJdPetEntity.getTimes();
             times++;
             if (times > 10) {
                 toHelpJdPetEntity.setToHelpStatus(0);
             } else {
                 toHelpJdPetEntity.setTimes(times);
-            }
+            }*/
         }
     }
 
@@ -1610,13 +1614,13 @@ public class JdServiceImpl implements JdService {
             } else {
                 log.info("种豆得豆助力失败:{}", resultObject.toJSONString());
             }
-            Integer times = toHelpJdPlantEntity.getTimes();
+            /*Integer times = toHelpJdPlantEntity.getTimes();
             times++;
             if (times > 10) {
                 toHelpJdPlantEntity.setToHelpStatus(0);
             } else {
                 toHelpJdPlantEntity.setTimes(times);
-            }
+            }*/
         }
     }
 
