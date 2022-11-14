@@ -236,8 +236,8 @@ public class JdServiceImpl implements JdService {
                         JSONObject farmInfo = JdBeanChangeUtil.getjdfruit(toHelpJdCk.getCk());
                         if (farmInfo == null){
                             //东东农场火爆
-                            jdFruitEntity.setIsFruitHei(1);
-                            jdFruitMapper.updateJdFruit(jdFruitEntity);
+                            toHelpJdFruitEntity.setIsFruitHei(1);
+                            jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
                             helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
                             continue;
                         }else if(403 == farmInfo.getInteger("code")){
@@ -246,8 +246,8 @@ public class JdServiceImpl implements JdService {
                             break;
                         }else if(farmInfo.getJSONObject("farmUserPro") == null){
                             //东东农场火爆
-                            jdFruitEntity.setIsFruitHei(1);
-                            jdFruitMapper.updateJdFruit(jdFruitEntity);
+                            toHelpJdFruitEntity.setIsFruitHei(1);
+                            jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
                             helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
                             continue;
                         }
