@@ -161,12 +161,12 @@ public class JdServiceImpl implements JdService {
         boolean isBreak = false;
 
         for (JdCkEntity jdCk : jdCks) {
-
-            if (toHelpJdCks.stream().filter(ck -> ck.getJdFruitEntity() == null || (ck.getJdFruitEntity().getIsFruitHei()) == 0 && ck.getJdFruitEntity().getToHelpStatus() == 1).count() == 0){
+            long count = toHelpJdCks.stream().filter(ck -> ck.getJdFruitEntity() == null || (ck.getJdFruitEntity().getIsFruitHei()) == 0 && ck.getJdFruitEntity().getToHelpStatus() == 1).count();
+            if (count == 0){
                 log.info("东东农场无可助力账号，结束");
                 return;
             }
-
+            log.info("东东农场可以去助力的ck还有：{}个", count);
             if (isBreak){
                 //ip黑了
                 break;
@@ -191,12 +191,12 @@ public class JdServiceImpl implements JdService {
             }
             if (StringUtils.isEmpty(jdFruitEntity.getHelpCode())){
                 JSONObject farmInfo = JdBeanChangeUtil.getjdfruit(jdCk.getCk());
+                helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
                 if (farmInfo == null){
                     //东东农场火爆
                     log.info(jdCk.getPtPin() + "东东农场火爆。。。");
                     jdFruitEntity.setIsFruitHei(1);
                     jdFruitMapper.updateJdFruit(jdFruitEntity);
-                    helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
                     continue;
                 }else if(403 == farmInfo.getInteger("code")){
                     log.info("ip已黑。。。");
@@ -209,7 +209,6 @@ public class JdServiceImpl implements JdService {
                     log.info(jdCk.getPtPin() + "东东农场火爆2。。。");
                     jdFruitEntity.setIsFruitHei(1);
                     jdFruitMapper.updateJdFruit(jdFruitEntity);
-                    helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
                     continue;
                 }else {
                     JSONObject farmUserPro = farmInfo.getJSONObject("farmUserPro");
@@ -240,12 +239,12 @@ public class JdServiceImpl implements JdService {
                         continue;
                     }else {
                         JSONObject farmInfo = JdBeanChangeUtil.getjdfruit(toHelpJdCk.getCk());
+                        helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
                         if (farmInfo == null){
                             //东东农场火爆
                             log.info(toHelpJdCk.getPtPin() + "东东农场火爆3。。。");
                             toHelpJdFruitEntity.setIsFruitHei(1);
                             jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
-                            helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
                             continue;
                         }else if(3 == farmInfo.getInteger("code")){
                             log.info(jdCk.getPtPin() + "账号过期。。。");
@@ -259,7 +258,6 @@ public class JdServiceImpl implements JdService {
                             log.info(toHelpJdCk.getPtPin() + "东东农场火爆4。。。");
                             toHelpJdFruitEntity.setIsFruitHei(1);
                             jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
-                            helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
                             continue;
                         }
                     }
@@ -267,7 +265,6 @@ public class JdServiceImpl implements JdService {
                     //助力
                     helpFruit(toHelpJdCk, jdCk);
                     helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -375,10 +372,13 @@ public class JdServiceImpl implements JdService {
 
         for (JdCkEntity jdCk : jdCks) {
 
-            if (toHelpJdCks.stream().filter(ck -> ck.getJdPetEntity() == null || (ck.getJdPetEntity().getIsPetHei()) == 0 && ck.getJdPetEntity().getToHelpStatus() == 1).count() == 0){
+            long count = toHelpJdCks.stream().filter(ck -> ck.getJdPetEntity() == null || (ck.getJdPetEntity().getIsPetHei()) == 0 && ck.getJdPetEntity().getToHelpStatus() == 1).count();
+            if (count == 0){
                 log.info("东东萌宠无可助力账号，结束");
                 return;
             }
+
+            log.info("东东萌宠可以去助力的ck还有：{}个", count);
 
             if (limit != null) {
                 int petTimes = jdPetMapper.getHelpTimes();
@@ -399,11 +399,11 @@ public class JdServiceImpl implements JdService {
             }
             if (StringUtils.isEmpty(jdPetEntity.getHelpCode())){
                 JSONObject petInfo = JdBeanChangeUtil.petRequest("initPetTown",jdCk.getCk());
+                helpWait("petShareHelp","东东萌宠" ,zlcwaittime);
                 if ("1018".equals(petInfo.getString("resultCode")) || "1019".equals(petInfo.getString("resultCode")) || "410".equals(petInfo.getString("resultCode"))){
                     //东东东东萌宠
                     jdPetEntity.setIsPetHei(1);
                     jdPetMapper.updateJdPet(jdPetEntity);
-                    helpWait("petShareHelp","东东萌宠" ,zlcwaittime);
                     continue;
                 }else {
                     JSONObject petUserPro = petInfo.getJSONObject("result");
@@ -416,7 +416,6 @@ public class JdServiceImpl implements JdService {
                         log.info(jdCk.getPtPin() + "东东萌宠火爆1。。。");
                         jdPetEntity.setIsPetHei(1);
                         jdPetMapper.updateJdPet(jdPetEntity);
-                        helpWait("petShareHelp","东东萌宠" ,zlcwaittime);
                         continue;
                     } else {
                         //互助码
@@ -447,12 +446,12 @@ public class JdServiceImpl implements JdService {
                         continue;
                     }else {
                         JSONObject initPet = JdBeanChangeUtil.petRequest("initPetTown",toHelpJdCk.getCk());
+                        helpWait("petShareHelp","东东萌宠" ,zlcwaittime);
                         if ("1018".equals(initPet.getString("resultCode")) || "1019".equals(initPet.getString("resultCode")) || "410".equals(initPet.getString("resultCode"))){
                             //东东萌宠火爆
                             log.info(toHelpJdCk.getPtPin() + "东东萌宠火爆2...");
                             toHelpJdPetEntity.setIsPetHei(1);
                             jdPetMapper.updateJdPet(toHelpJdPetEntity);
-                            helpWait("petShareHelp","东东萌宠" ,zlcwaittime);
                             continue;
                         }
                     }
@@ -549,11 +548,12 @@ public class JdServiceImpl implements JdService {
         }
 
         for (JdCkEntity jdCk : jdCks) {
-
-            if (toHelpJdCks.stream().filter(ck -> ck.getJdPlantEntity() == null || (ck.getJdPlantEntity().getIsPlantHei()) == 0 && ck.getJdPlantEntity().getToHelpStatus() == 1).count() == 0){
+            long count = toHelpJdCks.stream().filter(ck -> ck.getJdPlantEntity() == null || (ck.getJdPlantEntity().getIsPlantHei()) == 0 && ck.getJdPlantEntity().getToHelpStatus() == 1).count();
+            if (count == 0){
                 log.info("种豆得豆无可助力账号，结束");
                 return;
             }
+            log.info("种豆得豆可以去助力的还有：{}个", count);
 
             if (limit != null) {
                 int plantTimes = jdPlantMapper.getHelpTimes();
@@ -574,6 +574,7 @@ public class JdServiceImpl implements JdService {
             }
             if (StringUtils.isEmpty(jdPlantEntity.getHelpCode())){
                 JSONObject plantInfo = getPlantInfo(jdCk.getCk(), "plantBeanIndex");
+                helpWait("plantShareHelp","种豆得豆" ,zlcwaittime);
                 if ("PB101".equals(plantInfo.getString("errorCode"))
                         || "PB003".equals(plantInfo.getString("errorCode"))
                         || "3".equals(plantInfo.getString("code"))) {
@@ -581,7 +582,6 @@ public class JdServiceImpl implements JdService {
                     log.info(jdCk.getPtPin() + "种豆得豆火爆1。。。");
                     jdPlantEntity.setIsPlantHei(1);
                     jdPlantMapper.updateJdPlant(jdPlantEntity);
-                    helpWait("plantShareHelp","种豆得豆" ,zlcwaittime);
                     continue;
                 } else {
                     String shareUrl = plantInfo.getJSONObject("data").getJSONObject("jwordShareInfo").getString("shareUrl");
@@ -613,6 +613,7 @@ public class JdServiceImpl implements JdService {
                         continue;
                     }else {
                         JSONObject plantInfo = getPlantInfo(toHelpJdCk.getCk(), "plantBeanIndex");
+                        helpWait("plantShareHelp","种豆得豆" ,zlcwaittime);
                         if ("PB101".equals(plantInfo.getString("errorCode"))
                                 || "PB003".equals(plantInfo.getString("errorCode"))
                                 || "3".equals(plantInfo.getString("code"))){
@@ -620,7 +621,6 @@ public class JdServiceImpl implements JdService {
                             log.info(toHelpJdCk.getPtPin() + "种豆得豆火爆2。。。");
                             toHelpJdPlantEntity.setIsPlantHei(1);
                             jdPlantMapper.updateJdPlant(toHelpJdPlantEntity);
-                            helpWait("plantShareHelp","种豆得豆" ,zlcwaittime);
                             continue;
                         }
                     }

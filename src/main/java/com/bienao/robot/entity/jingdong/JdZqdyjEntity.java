@@ -25,6 +25,12 @@ public class JdZqdyjEntity {
     //是否还有助力 0否1是
     private Integer toHelpStatus;
 
+    //助力类型 0不助力 1过期时间 2永久
+    private Integer type;
+
+    //过期时间
+    private String expiryTime;
+
     //新增时间
     private String createdTime;
 

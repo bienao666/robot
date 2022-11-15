@@ -135,6 +135,8 @@ create table if not exists `jdZqdyj` (
                            `created_time` varchar DEFAULT (datetime('now', 'localtime')),
                            `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );
+alter TABLE  `jdZqdyj` add `type` INTEGER DEFAULT 0;
+alter TABLE  `jdZqdyj` add `expiry_time` varchar;
 create table if not exists `ylgy` (
                                          `id` INTEGER PRIMARY KEY AUTOINCREMENT,
                                          `uid` varchar,
