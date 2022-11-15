@@ -122,27 +122,6 @@ public class ShareCodeController {
         return Result.success();
     }
 
-
-    /**
-     * 维护助力码
-     */
-    @GetMapping("/updateShareCode")
-    public Result updateShareCode(){
-        try {
-            List<JdCkEntity> cks = jdService.queryCksAndActivity();
-            log.info("开始维护东东农场互助码...");
-            jdService.updateFruitShareCode(cks);
-            log.info("开始维护东东萌宠互助码...");
-            jdService.updatePetShareCode(cks);
-            log.info("开始维护种豆得豆互助码...");
-            jdService.updatePlantShareCode(cks);
-            return Result.success("维护助力码开始");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Result.error("-1","维护助力码异常");
-        }
-    }
-
     /**
      * 互助
      */
