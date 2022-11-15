@@ -200,6 +200,9 @@ public class JdServiceImpl implements JdService {
                 }else if(403 == farmInfo.getInteger("code")){
                     log.info("ip已黑。。。");
                     break;
+                }else if(3 == farmInfo.getInteger("code")){
+                    log.info("账号已过期");
+                    continue;
                 }else if(farmInfo.getJSONObject("farmUserPro") == null){
                     //东东农场火爆
                     jdFruitEntity.setIsFruitHei(1);
