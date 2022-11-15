@@ -160,12 +160,12 @@ public class JdServiceImpl implements JdService {
         //ip黑了
         boolean isBreak = false;
 
-        if (toHelpJdCks.size() == 0){
-            log.info("东东农场无可助力账号，结束");
-            return;
-        }
-
         for (JdCkEntity jdCk : jdCks) {
+
+            if (toHelpJdCks.stream().filter(ck -> ck.getJdFruitEntity().getToHelpStatus() == 1).count() == 0){
+                log.info("东东农场无可助力账号，结束");
+                return;
+            }
 
             if (isBreak){
                 //ip黑了
@@ -215,11 +215,12 @@ public class JdServiceImpl implements JdService {
                 }
             }
             log.info("东东农场开始助力{}!!!", jdCk.getRemark());
-
             for (JdCkEntity toHelpJdCk : toHelpJdCks) {
-                log.info("{}开始准备助力东东农场->{}", toHelpJdCk.getPtPin(), jdCk.getPtPin());
                 try {
                     JdFruitEntity toHelpJdFruitEntity = toHelpJdCk.getJdFruitEntity();
+                    if (toHelpJdFruitEntity.getToHelpStatus() != 1) {
+                        continue;
+                    }
                     if (jdFruitEntity.getHelpStatus() == 1) {
                         //当前账号已满助力，跳过当前循环
                         log.info("{}东东农场已助力满!!!", jdCk.getRemark());
@@ -252,11 +253,11 @@ public class JdServiceImpl implements JdService {
                             continue;
                         }
                     }
-                    if (toHelpJdFruitEntity.getToHelpStatus() == 1) {
-                        //助力
-                        helpFruit(toHelpJdCk, jdCk);
-                        helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
-                    }
+                    log.info("{}开始准备助力东东农场->{}", toHelpJdCk.getPtPin(), jdCk.getPtPin());
+                    //助力
+                    helpFruit(toHelpJdCk, jdCk);
+                    helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -278,116 +279,6 @@ public class JdServiceImpl implements JdService {
             e.printStackTrace();
         }
     }
-
-    /**
-     * 东东农场天天抽奖互助
-     */
-    /*@Async("asyncServiceExecutor")
-    @Override
-    public void fruitLotteryShareHelp(List<JdCkEntity> cks, int zlcwaittime) {
-        //需要被助力的ck集合
-        List<JdCkEntity> jdCks = new ArrayList<>();
-        //查询所有的svipck 未助力满
-        List<JdCkEntity> svipCks = new ArrayList<>();
-        //查询所有的vipck 未助力满
-        List<JdCkEntity> vipCks = new ArrayList<>();
-        //查询所有普通用户的ck 未助力满
-        List<JdCkEntity> ptCks = new ArrayList<>();
-        //有助力的ck集合
-        List<JdCkEntity> toHelpJdCks = new ArrayList<>();
-
-        for (JdCkEntity ck : cks) {
-            if (ck.getStatus() == 1) {
-                //ck失效
-                continue;
-            }
-            JdFruitEntity jdFruitEntity = ck.getJdFruitEntity();
-            if (jdFruitEntity != null && (jdFruitEntity.getIsFruitHei() == 0)) {
-                //东东农场不黑
-                if ((ck.getLevel() == 0) && (jdFruitEntity.getHelpLotteryStatus() == 0) && (StringUtils.isNotEmpty(jdFruitEntity.getHelpCode()))) {
-                    //自己 && 未助力满 && 互助码不为空
-                    svipCks.add(ck);
-                }
-                if ((ck.getLevel() == 1) && (jdFruitEntity.getHelpLotteryStatus() == 0) && (StringUtils.isNotEmpty(jdFruitEntity.getHelpCode()))) {
-                    //svip && 未助力满 && 互助码不为空
-                    svipCks.add(ck);
-                }
-                if ((ck.getLevel() == 2) && (jdFruitEntity.getHelpLotteryStatus() == 0) && (StringUtils.isNotEmpty(jdFruitEntity.getHelpCode()))) {
-                    //vip && 未助力满 && 互助码不为空
-                    vipCks.add(ck);
-                }
-                if ((ck.getLevel() == 3) && (jdFruitEntity.getHelpLotteryStatus() == 0) && (StringUtils.isNotEmpty(jdFruitEntity.getHelpCode()))) {
-                    //普通用户 && 未助力满 && 互助码不为空
-                    ptCks.add(ck);
-                }
-                if (jdFruitEntity.getToHelpLotteryStatus() == 1) {
-                    //还有助力
-                    toHelpJdCks.add(ck);
-                }
-            }
-        }
-
-        jdCks.addAll(svipCks);
-
-        //随机排序
-        Collections.shuffle(vipCks);
-        List<JdCkEntity> vipCks1 = vipCks.subList(0, vipCks.size() / 10);
-        List<JdCkEntity> vipCks2 = vipCks.subList(vipCks.size() / 10, vipCks.size());
-        //添加vipCk第一部分
-        jdCks.addAll(vipCks1);
-        //随机排序
-        Collections.shuffle(ptCks);
-        List<JdCkEntity> ptCks1 = ptCks.subList(0, ptCks.size() / 10);
-        List<JdCkEntity> ptCks2 = ptCks.subList(ptCks.size() / 10, ptCks.size());
-        //添加ck第一部分
-        jdCks.addAll(ptCks1);
-
-        //添加剩下的部分
-        jdCks.addAll(vipCks2);
-        jdCks.addAll(ptCks2);
-
-        Collections.shuffle(toHelpJdCks);
-
-        log.info("查询到需要被助力的ck：{}个", jdCks.size());
-        log.info("查询到可以去助力的ck：{}个", toHelpJdCks.size());
-        log.info("东东农场天天抽奖助力开始。。。");
-
-        for (JdCkEntity jdCk : jdCks) {
-            JdFruitEntity jdFruitEntity = jdCk.getJdFruitEntity();
-            log.info("东东农场天天抽奖开始助力{}!!!", jdCk.getRemark());
-            for (JdCkEntity toHelpJdCk : toHelpJdCks) {
-                JdFruitEntity toHelpJdFruitEntity = toHelpJdCk.getJdFruitEntity();
-                if (jdFruitEntity.getHelpLotteryStatus() == 1) {
-                    //当前账号已满助力，跳过当前循环
-                    log.info("{}东东农场天天抽奖已助力满!!!", jdCk.getRemark());
-                    break;
-                }
-                if (jdFruitEntity.getHelpCode().equals(toHelpJdFruitEntity.getHelpCode())) {
-                    //不能为自己助力
-                    continue;
-                }
-                if (StringUtils.isEmpty(toHelpJdFruitEntity.getHelpCode())) {
-                    //活动未初始化
-                    continue;
-                }
-                if (toHelpJdFruitEntity.getIsFruitHei() == 1) {
-                    //东东农场火爆
-                    continue;
-                }
-                if (toHelpJdFruitEntity.getToHelpLotteryStatus() == 1) {
-                    //助力
-                    helpFruitLottery(toHelpJdCk, jdCk);
-                    log.info("东东农场天天抽奖助力休息" + zlcwaittime * 1000 + "s防止黑ip...");
-                    try {
-                        Thread.sleep(zlcwaittime * 1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-        log.info("东东农场天天抽奖助力结束。。。");
-    }*/
 
     /**
      * 东东萌宠互助
@@ -472,12 +363,12 @@ public class JdServiceImpl implements JdService {
             log.info("查询到东东萌宠助力上限：{}个", limit);
         }
 
-        if (toHelpJdCks.size() == 0){
-            log.info("东东萌宠无可助力账号，结束");
-            return;
-        }
-
         for (JdCkEntity jdCk : jdCks) {
+
+            if (toHelpJdCks.stream().filter(ck -> ck.getJdPetEntity().getToHelpStatus() == 1).count() == 0){
+                log.info("东东萌宠无可助力账号，结束");
+                return;
+            }
 
             if (limit != null) {
                 int petTimes = jdPetMapper.getHelpTimes();
@@ -528,6 +419,9 @@ public class JdServiceImpl implements JdService {
             for (JdCkEntity toHelpJdCk : toHelpJdCks) {
                 try {
                     JdPetEntity toHelpJdPetEntity = toHelpJdCk.getJdPetEntity();
+                    if (toHelpJdPetEntity.getToHelpStatus() != 1) {
+                        continue;
+                    }
                     if (jdPetEntity.getHelpStatus() == 1) {
                         //当前账号已满助力，跳过当前循环
                         log.info("{}东东萌宠已助力满!!!", jdCk.getRemark());
@@ -550,11 +444,10 @@ public class JdServiceImpl implements JdService {
                             continue;
                         }
                     }
-                    if (toHelpJdPetEntity.getToHelpStatus() == 1) {
-                        //助力
-                        helpPet(toHelpJdCk, jdCk);
-                        helpWait("petShareHelp","东东萌宠" ,zlcwaittime);
-                    }
+                    //助力
+                    log.info("{}开始准备助力东东萌宠->{}", toHelpJdCk.getPtPin(), jdCk.getPtPin());
+                    helpPet(toHelpJdCk, jdCk);
+                    helpWait("petShareHelp","东东萌宠" ,zlcwaittime);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -643,12 +536,12 @@ public class JdServiceImpl implements JdService {
             log.info("查询到种豆得豆助力上限：{}个", limit);
         }
 
-        if (toHelpJdCks.size() == 0){
-            log.info("种豆得豆无可助力账号，结束");
-            return;
-        }
-
         for (JdCkEntity jdCk : jdCks) {
+
+            if (toHelpJdCks.stream().filter(ck -> ck.getJdPlantEntity().getToHelpStatus() == 1).count() == 0){
+                log.info("种豆得豆无可助力账号，结束");
+                return;
+            }
 
             if (limit != null) {
                 int plantTimes = jdPlantMapper.getHelpTimes();
@@ -690,6 +583,9 @@ public class JdServiceImpl implements JdService {
             for (JdCkEntity toHelpJdCk : toHelpJdCks) {
                 try {
                     JdPlantEntity toHelpJdPlantEntity = toHelpJdCk.getJdPlantEntity();
+                    if (toHelpJdPlantEntity.getToHelpStatus() != 1) {
+                        continue;
+                    }
                     if (jdPlantEntity.getHelpStatus() == 1) {
                         //当前账号已满助力，跳过当前循环
                         log.info("{}种豆得豆已助力满!!!", jdCk.getRemark());
@@ -714,11 +610,10 @@ public class JdServiceImpl implements JdService {
                             continue;
                         }
                     }
-                    if (toHelpJdPlantEntity.getToHelpStatus() == 1) {
-                        //助力
-                        helpPlant(toHelpJdCk, jdCk);
-                        helpWait("plantShareHelp","种豆得豆" ,zlcwaittime);
-                    }
+                    //助力
+                    log.info("{}开始准备助力种豆得豆->{}", toHelpJdCk.getPtPin(), jdCk.getPtPin());
+                    helpPlant(toHelpJdCk, jdCk);
+                    helpWait("plantShareHelp","种豆得豆" ,zlcwaittime);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
