@@ -764,12 +764,6 @@ public class JdServiceImpl implements JdService {
                     //跳出
                     t = 1;
                 }
-                try {
-                    log.info("休息60s防止黑ip...");
-                    Thread.sleep(6000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             } while (t == 0);
             log.info("统计" + jdCkEntity.getRemark() + "京豆结果：{}", yesterday);
             jdCkEntity.setJd(yesterday);
@@ -803,6 +797,12 @@ public class JdServiceImpl implements JdService {
                 .timeout(10000)
                 .execute().body();
         log.info("查询京豆详情结果：{}", result);
+        try {
+            log.info("休息6s防止黑ip...");
+            Thread.sleep(6000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if (StringUtils.isEmpty(result)) {
             log.info("查询京豆详情请求失败 ‼️‼️");
             return null;
@@ -861,7 +861,7 @@ public class JdServiceImpl implements JdService {
         if (jdck == null) {
             //添加
             jdck = new JdCkEntity();
-            jdck.setStatus(0);
+            jdck.setStatus(status);
             jdck.setCk(ck);
             jdck.setQlRemark(qlRemark);
             jdck.setLevel(2);
@@ -874,7 +874,6 @@ public class JdServiceImpl implements JdService {
         } else {
             //更新
             if (!ck.equals(jdck.getCk()) || (StringUtils.isNotEmpty(qlRemark) && !qlRemark.equals(jdck.getQlRemark())) || !status.equals(jdck.getStatus())) {
-                jdck.setStatus(0);
                 jdck.setCk(ck);
                 jdck.setQlRemark(qlRemark);
                 jdck.setStatus(status);
