@@ -193,6 +193,7 @@ public class JdServiceImpl implements JdService {
                 JSONObject farmInfo = JdBeanChangeUtil.getjdfruit(jdCk.getCk());
                 if (farmInfo == null){
                     //东东农场火爆
+                    log.info(jdCk.getPtPin() + "东东农场火爆。。。");
                     jdFruitEntity.setIsFruitHei(1);
                     jdFruitMapper.updateJdFruit(jdFruitEntity);
                     helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
@@ -201,10 +202,11 @@ public class JdServiceImpl implements JdService {
                     log.info("ip已黑。。。");
                     break;
                 }else if(3 == farmInfo.getInteger("code")){
-                    log.info("账号已过期");
+                    log.info(jdCk.getPtPin() + "账号过期。。。");
                     continue;
                 }else if(farmInfo.getJSONObject("farmUserPro") == null){
                     //东东农场火爆
+                    log.info(jdCk.getPtPin() + "东东农场火爆2。。。");
                     jdFruitEntity.setIsFruitHei(1);
                     jdFruitMapper.updateJdFruit(jdFruitEntity);
                     helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
@@ -240,9 +242,13 @@ public class JdServiceImpl implements JdService {
                         JSONObject farmInfo = JdBeanChangeUtil.getjdfruit(toHelpJdCk.getCk());
                         if (farmInfo == null){
                             //东东农场火爆
+                            log.info(toHelpJdCk.getPtPin() + "东东农场火爆3。。。");
                             toHelpJdFruitEntity.setIsFruitHei(1);
                             jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
                             helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
+                            continue;
+                        }else if(3 == farmInfo.getInteger("code")){
+                            log.info(jdCk.getPtPin() + "账号过期。。。");
                             continue;
                         }else if(403 == farmInfo.getInteger("code")){
                             log.info("ip已黑。。。");
@@ -250,6 +256,7 @@ public class JdServiceImpl implements JdService {
                             break;
                         }else if(farmInfo.getJSONObject("farmUserPro") == null){
                             //东东农场火爆
+                            log.info(toHelpJdCk.getPtPin() + "东东农场火爆4。。。");
                             toHelpJdFruitEntity.setIsFruitHei(1);
                             jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
                             helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
@@ -406,6 +413,7 @@ public class JdServiceImpl implements JdService {
                             || "0".equals(petUserPro.getString("petStatus"))
                             || StringUtils.isEmpty(petUserPro.getString("goodsInfo"))) {
                         //东东东东萌宠
+                        log.info(jdCk.getPtPin() + "东东萌宠火爆1。。。");
                         jdPetEntity.setIsPetHei(1);
                         jdPetMapper.updateJdPet(jdPetEntity);
                         helpWait("petShareHelp","东东萌宠" ,zlcwaittime);
@@ -441,6 +449,7 @@ public class JdServiceImpl implements JdService {
                         JSONObject initPet = JdBeanChangeUtil.petRequest("initPetTown",toHelpJdCk.getCk());
                         if ("1018".equals(initPet.getString("resultCode")) || "1019".equals(initPet.getString("resultCode")) || "410".equals(initPet.getString("resultCode"))){
                             //东东萌宠火爆
+                            log.info(toHelpJdCk.getPtPin() + "东东萌宠火爆2...");
                             toHelpJdPetEntity.setIsPetHei(1);
                             jdPetMapper.updateJdPet(toHelpJdPetEntity);
                             helpWait("petShareHelp","东东萌宠" ,zlcwaittime);
@@ -569,6 +578,7 @@ public class JdServiceImpl implements JdService {
                         || "PB003".equals(plantInfo.getString("errorCode"))
                         || "3".equals(plantInfo.getString("code"))) {
                     //种豆得豆火爆
+                    log.info(jdCk.getPtPin() + "种豆得豆火爆1。。。");
                     jdPlantEntity.setIsPlantHei(1);
                     jdPlantMapper.updateJdPlant(jdPlantEntity);
                     helpWait("plantShareHelp","种豆得豆" ,zlcwaittime);
@@ -607,6 +617,7 @@ public class JdServiceImpl implements JdService {
                                 || "PB003".equals(plantInfo.getString("errorCode"))
                                 || "3".equals(plantInfo.getString("code"))){
                             //种豆得豆火爆
+                            log.info(toHelpJdCk.getPtPin() + "种豆得豆火爆2。。。");
                             toHelpJdPlantEntity.setIsPlantHei(1);
                             jdPlantMapper.updateJdPlant(toHelpJdPlantEntity);
                             helpWait("plantShareHelp","种豆得豆" ,zlcwaittime);
