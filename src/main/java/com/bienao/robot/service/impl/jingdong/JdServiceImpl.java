@@ -162,7 +162,7 @@ public class JdServiceImpl implements JdService {
 
         for (JdCkEntity jdCk : jdCks) {
 
-            if (toHelpJdCks.stream().filter(ck -> ck.getJdFruitEntity().getToHelpStatus() == 1).count() == 0){
+            if (toHelpJdCks.stream().filter(ck -> ck.getJdFruitEntity() == null || (ck.getJdFruitEntity().getIsFruitHei()) == 0 && ck.getJdFruitEntity().getToHelpStatus() == 1).count() == 0){
                 log.info("东东农场无可助力账号，结束");
                 return;
             }
@@ -375,7 +375,7 @@ public class JdServiceImpl implements JdService {
 
         for (JdCkEntity jdCk : jdCks) {
 
-            if (toHelpJdCks.stream().filter(ck -> ck.getJdPetEntity().getToHelpStatus() == 1).count() == 0){
+            if (toHelpJdCks.stream().filter(ck -> ck.getJdPetEntity() == null || (ck.getJdPetEntity().getIsPetHei()) == 0 && ck.getJdPetEntity().getToHelpStatus() == 1).count() == 0){
                 log.info("东东萌宠无可助力账号，结束");
                 return;
             }
@@ -550,7 +550,7 @@ public class JdServiceImpl implements JdService {
 
         for (JdCkEntity jdCk : jdCks) {
 
-            if (toHelpJdCks.stream().filter(ck -> ck.getJdPlantEntity().getToHelpStatus() == 1).count() == 0){
+            if (toHelpJdCks.stream().filter(ck -> ck.getJdPlantEntity() == null || (ck.getJdPlantEntity().getIsPlantHei()) == 0 && ck.getJdPlantEntity().getToHelpStatus() == 1).count() == 0){
                 log.info("种豆得豆无可助力账号，结束");
                 return;
             }
