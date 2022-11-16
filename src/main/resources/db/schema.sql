@@ -136,7 +136,8 @@ create table if not exists `jdZqdyj` (
                            `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );
 alter TABLE  `jdZqdyj` add `type` INTEGER DEFAULT 0;
-alter TABLE  `jdZqdyj` add `expiry_time` varchar;
+alter TABLE  `jdZqdyj` add `remark` varchar;
+alter TABLE  `jdZqdyj` add `start_help_time` varchar DEFAULT (datetime('now', 'localtime'));
 create table if not exists `ylgy` (
                                          `id` INTEGER PRIMARY KEY AUTOINCREMENT,
                                          `uid` varchar,

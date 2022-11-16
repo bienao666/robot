@@ -35,7 +35,34 @@ public class ZqdyjController {
         if (StringUtils.isEmpty(account)){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "ck|口令不能为空");
         }
-        return zqdyjService.help(account);
+        boolean isTime = jsonObject.getBoolean("isTime");
+        String remark = jsonObject.getString("remark");
+        if (StringUtils.isEmpty(remark)){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "备注不能为空");
+        }
+        return zqdyjService.helpZqdyj(account,isTime,remark);
+    }
+
+    /**
+     * 赚钱大赢家助力清单
+     */
+    @LoginToken
+    @GetMapping("/getHelpList")
+    public Result getHelpList(){
+        return zqdyjService.getHelpList();
+    }
+
+    /**
+     * 删除赚钱大赢家
+     */
+    @LoginToken
+    @PostMapping("/delete")
+    public Result delete(@RequestBody JSONObject jsonObject){
+        Integer id = jsonObject.getInteger("id");
+        if (id == null){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "id不能为空");
+        }
+        return zqdyjService.delete();
     }
 
     /**

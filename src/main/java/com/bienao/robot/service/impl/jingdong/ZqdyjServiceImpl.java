@@ -6,9 +6,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.PatternConstant;
 import com.bienao.robot.Socket.ZqdyjWebSocket;
 import com.bienao.robot.entity.Result;
+import com.bienao.robot.entity.jingdong.JdCkEntity;
 import com.bienao.robot.entity.jingdong.JdZqdyjEntity;
 import com.bienao.robot.enums.ErrorCodeConstant;
+import com.bienao.robot.mapper.jingdong.JdCkMapper;
 import com.bienao.robot.mapper.jingdong.JdZqdyjMapper;
+import com.bienao.robot.redis.Redis;
 import com.bienao.robot.service.jingdong.ZqdyjService;
 import com.bienao.robot.utils.jingdong.JDUtil;
 import com.bienao.robot.utils.jingdong.MakeMoneyShopUtil;
@@ -34,13 +37,18 @@ public class ZqdyjServiceImpl implements ZqdyjService {
     @Autowired
     private ZqdyjWebSocket zqdyjWebSocket;
 
+    @Autowired
+    private JdCkMapper jdCkMapper;
+
     /**
      * 赚钱大赢家助力
-     * @param param
+     * @param param ck或者口令
+     * @param isTime 是否定时
+     * @param remark 备注
      * @return
      */
     @Override
-    public Result help(String param) {
+    public Result helpZqdyj(String param,boolean isTime,String remark) {
         //ck
         String needHelpck = "";
         //助力码
@@ -62,6 +70,34 @@ public class ZqdyjServiceImpl implements ZqdyjService {
                 //助力码
                 sId = info.getString("sId");
             }
+            if (isTime){
+                //判断是否存在
+                JdZqdyjEntity zqdyj = jdZqdyjMapper.getJdZqdyjByPtPin(needHelpPtPin);
+                if (zqdyj != null){
+                    //设置定时
+                    zqdyj.setHelpCode(sId);
+                    zqdyj.setType(1);
+                    zqdyj.setStartHelpTime(DateUtil.formatDateTime(DateUtil.date()));
+                    zqdyj.setRemark(remark);
+                    jdZqdyjMapper.update(zqdyj);
+                }else {
+                    //添加
+                    JdCkEntity jdCkEntity = new JdCkEntity();
+                    jdCkEntity.setCk(needHelpck);
+                    jdCkEntity.setPtPin(needHelpPtPin);
+                    jdCkEntity.setRemark(remark);
+                    jdCkEntity.setStatus(0);
+                    jdCkMapper.addCk(jdCkEntity);
+                    Integer maxId = jdCkMapper.queryMaxId();
+                    zqdyj = new JdZqdyjEntity();
+                    zqdyj.setCkId(maxId);
+                    zqdyj.setHelpCode(sId);
+                    zqdyj.setType(1);
+                    zqdyj.setStartHelpTime(DateUtil.formatDateTime(DateUtil.date()));
+                    zqdyj.setRemark(remark);
+                    jdZqdyjMapper.add(zqdyj);
+                }
+            }
         }else {
             //口令
             JSONObject res = JDUtil.parseCommand(param);
@@ -79,6 +115,25 @@ public class ZqdyjServiceImpl implements ZqdyjService {
                     break;
                 }
             }
+            if (isTime){
+                //判断是否存在
+                JdZqdyjEntity zqdyj = jdZqdyjMapper.getJdZqdyjByHelpCode(sId);
+                if (zqdyj != null){
+                    //设置定时
+                    zqdyj.setType(1);
+                    zqdyj.setStartHelpTime(DateUtil.formatDateTime(DateUtil.date()));
+                    zqdyj.setRemark(remark);
+                    jdZqdyjMapper.update(zqdyj);
+                }else {
+                    //添加
+                    zqdyj = new JdZqdyjEntity();
+                    zqdyj.setHelpCode(sId);
+                    zqdyj.setType(1);
+                    zqdyj.setStartHelpTime(DateUtil.formatDateTime(DateUtil.date()));
+                    zqdyj.setRemark(remark);
+                    jdZqdyjMapper.add(zqdyj);
+                }
+            }
         }
 
         //获取所有 有效的 还有助力的 非火爆的ck
@@ -90,133 +145,156 @@ public class ZqdyjServiceImpl implements ZqdyjService {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "没有可助力的账号了！！！");
         }
 
-        Integer MaxTime = 10;
-        Integer helpCount = 0;
+        String zqdyjhelp = Redis.redis.get("ZQDYJHELP");
+        if (StringUtils.isNotEmpty(zqdyjhelp)){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "正在助力中其他账号中，请等待。。。");
+        }
 
-        //开始助力
-        zqdyjWebSocket.sendMessageAll("开始助力...");
-        for (JSONObject jsonObject : zqdyjCk) {
+        help(needHelpPtPin,sId,needHelpck,remark,zqdyjCk);
+        return Result.success();
+    }
 
-            if (helpCount>=MaxTime){
-                break;
-            }
+    @Override
+    public List<JSONObject> getZqdyjCk(){
+        return jdZqdyjMapper.getZqdyjCk();
+    }
 
-            Integer ckid = jsonObject.getInteger("ckid");
-            String ck = jsonObject.getString("ck");
+    @Override
+    public void help(String needHelpPtPin,String sId,String needHelpck,String remark,List<JSONObject> zqdyjCk){
+        //加锁
+        Redis.redis.put("ZQDYJHELP", "true", 10L * 60 * 1000);
 
-            matcher = PatternConstant.jdPinPattern.matcher(ck);
-            if (matcher.find()){
+        try {
+            Integer MaxTime = 10;
+            Integer helpCount = 0;
 
-                String ptPin = matcher.group(1);
-                zqdyjWebSocket.sendMessageAll(ptPin+"去助力-->"+(StringUtils.isEmpty(needHelpPtPin)?sId:needHelpPtPin));
+            //开始助力
+            zqdyjWebSocket.sendMessageAll("开始助力...");
+            for (JSONObject jsonObject : zqdyjCk) {
 
-                JSONObject info = MakeMoneyShopUtil.getInfo(ck);
-
-                if (info.getInteger("code") == 13){
-                    //未登陆
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    zqdyjWebSocket.sendMessageAll(">>>>>>>>"+ptPin+"账号未登录<<<<<<<<");
-                    continue;
+                if (helpCount>=MaxTime){
+                    break;
                 }
 
-                if (info.getInteger("hot")==1){
-                    //火爆
-                    JdZqdyjEntity jdZqdyjEntity = new JdZqdyjEntity();
-                    jdZqdyjEntity.setCkId(ckid);
-                    jdZqdyjEntity.setIsHei(1);
-                    jdZqdyjEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
-                    updateZqdyjCk(jdZqdyjEntity);
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    zqdyjWebSocket.sendMessageAll(">>>>>>>>"+ptPin+"账号火爆<<<<<<<<");
-                    continue;
-                }
+                Integer ckid = jsonObject.getInteger("ckid");
+                String ck = jsonObject.getString("ck");
 
-                JSONObject help = MakeMoneyShopUtil.help(sId, ck);
-                if (help.getInteger("code") == 0){
-                    helpCount++;
-                    zqdyjWebSocket.sendMessageAll("!!!>>>>>>>>第"+helpCount+"次助力成功<<<<<<<<!!!");
-                }else if (help.getInteger("code") == 1002){
-                    zqdyjWebSocket.sendMessageAll(">>>>>>>>"+help.getString("msg")+"<<<<<<<<");
-                    return Result.error(ErrorCodeConstant.PARAMETER_ERROR, help.getString("msg"));
-                }else {
-                    if (help.getInteger("nohelp")==0){
-                        zqdyjWebSocket.sendMessageAll(">>>>>>>>今日无助力次数了<<<<<<<<");
-//                        log.info("今日无助力次数了！");
-                        JdZqdyjEntity jdZqdyjEntity = new JdZqdyjEntity();
-                        jdZqdyjEntity.setCkId(ckid);
-                        jdZqdyjEntity.setToHelpStatus(0);
-                        jdZqdyjEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
-                        updateZqdyjCk(jdZqdyjEntity);
-                    }else if (help.getInteger("nohelp")==1){
-                        zqdyjWebSocket.sendMessageAll(">>>>>>>>已助力过TA<<<<<<<<");
-                    }else if (help.getInteger("nohelp")==2){
-                        zqdyjWebSocket.sendMessageAll(">>>>>>>>不能为自己助力<<<<<<<<");
-                    }else if (help.getInteger("nohelp")==4){
-                        zqdyjWebSocket.sendMessageAll(">>>>>>>>"+ptPin+"账号火爆<<<<<<<<");
+                Matcher matcher = PatternConstant.jdPinPattern.matcher(ck);
+                if (matcher.find()){
+
+                    String ptPin = matcher.group(1);
+                    zqdyjWebSocket.sendMessageAll(ptPin+"去助力-->"+(StringUtils.isEmpty(remark)?needHelpPtPin:remark));
+
+                    JSONObject info = MakeMoneyShopUtil.getInfo(ck);
+
+                    if (info.getInteger("code") == 13){
+                        //未登陆
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        zqdyjWebSocket.sendMessageAll(">>>>>>>>"+ptPin+"账号未登录<<<<<<<<");
+                        continue;
+                    }
+
+                    if (info.getInteger("hot")==1){
+                        //火爆
                         JdZqdyjEntity jdZqdyjEntity = new JdZqdyjEntity();
                         jdZqdyjEntity.setCkId(ckid);
                         jdZqdyjEntity.setIsHei(1);
                         jdZqdyjEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
                         updateZqdyjCk(jdZqdyjEntity);
-                    }else if (help.getInteger("nohelp")==5){
-                        zqdyjWebSocket.sendMessageAll(">>>>>>>>"+needHelpPtPin+"已助力满<<<<<<<<");
-                        log.info("已助力满");
-                        break;
-                    }else {
-                        log.info("助力异常：{}",help.getString("msg"));
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        zqdyjWebSocket.sendMessageAll(">>>>>>>>"+ptPin+"账号火爆<<<<<<<<");
+                        continue;
                     }
-                }
-            }
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
 
-        //领取奖励
-        if (StringUtils.isNotEmpty(needHelpck)){
-            List<JSONObject> taskList = MakeMoneyShopUtil.getTask(needHelpck);
-            Double totalMoney = 0.00;
-            if (taskList != null){
-                zqdyjWebSocket.sendMessageAll("开始获取奖励...");
-                for (JSONObject task : taskList) {
-                    if (task.getInteger("awardStatus") != 1){
-                        for (int i = 0; i < (task.getInteger("realCompletedTimes") - task.getInteger("targetTimes") + 1); i++) {
-                            JSONObject res = MakeMoneyShopUtil.award(needHelpck, task.getInteger("taskId"));
-                            if (res!=null && res.getInteger("code")==0){
-                                Double money = res.getDouble("money");
-                                log.info("获得营业金："+money+"元");
-                                zqdyjWebSocket.sendMessageAll("获得营业金："+money+"元");
-                                if (3533 == task.getInteger("taskId")){
-                                    totalMoney += task.getInteger("completedTimes") * task.getInteger("reward") / 100.00;
-                                }
-                                if (3532 == task.getInteger("taskId")){
-                                    totalMoney += task.getInteger("completedTimes") * task.getInteger("reward") / 100.00;
-                                }
-                            }
-                            try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                    JSONObject help = MakeMoneyShopUtil.help(sId, ck);
+                    if (help.getInteger("code") == 0){
+                        helpCount++;
+                        zqdyjWebSocket.sendMessageAll("!!!>>>>>>>>第"+helpCount+"次助力成功<<<<<<<<!!!");
+                    }else if (help.getInteger("code") == 1002){
+                        zqdyjWebSocket.sendMessageAll(">>>>>>>>"+help.getString("msg")+"<<<<<<<<");
+                    }else {
+                        if (help.getInteger("nohelp")==0){
+                            zqdyjWebSocket.sendMessageAll(">>>>>>>>今日无助力次数了<<<<<<<<");
+    //                        log.info("今日无助力次数了！");
+                            JdZqdyjEntity jdZqdyjEntity = new JdZqdyjEntity();
+                            jdZqdyjEntity.setCkId(ckid);
+                            jdZqdyjEntity.setToHelpStatus(0);
+                            jdZqdyjEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
+                            updateZqdyjCk(jdZqdyjEntity);
+                        }else if (help.getInteger("nohelp")==1){
+                            zqdyjWebSocket.sendMessageAll(">>>>>>>>已助力过TA<<<<<<<<");
+                        }else if (help.getInteger("nohelp")==2){
+                            zqdyjWebSocket.sendMessageAll(">>>>>>>>不能为自己助力<<<<<<<<");
+                        }else if (help.getInteger("nohelp")==4){
+                            zqdyjWebSocket.sendMessageAll(">>>>>>>>"+ptPin+"账号火爆<<<<<<<<");
+                            JdZqdyjEntity jdZqdyjEntity = new JdZqdyjEntity();
+                            jdZqdyjEntity.setCkId(ckid);
+                            jdZqdyjEntity.setIsHei(1);
+                            jdZqdyjEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
+                            updateZqdyjCk(jdZqdyjEntity);
+                        }else if (help.getInteger("nohelp")==5){
+                            zqdyjWebSocket.sendMessageAll(">>>>>>>>"+(StringUtils.isEmpty(remark)?needHelpPtPin:remark)+"已助力满<<<<<<<<");
+                            log.info("已助力满");
+                            break;
+                        }else {
+                            log.info("助力异常：{}",help.getString("msg"));
                         }
                     }
                 }
-                log.info("今日获得营业金总额："+totalMoney+"元");
-                zqdyjWebSocket.sendMessageAll("今日获得营业金总额："+totalMoney+"元");
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-        }
 
-        return Result.success();
+            //领取奖励
+            if (StringUtils.isNotEmpty(needHelpck)){
+                List<JSONObject> taskList = MakeMoneyShopUtil.getTask(needHelpck);
+                Double totalMoney = 0.00;
+                if (taskList != null){
+                    zqdyjWebSocket.sendMessageAll("开始获取奖励...");
+                    for (JSONObject task : taskList) {
+                        if (task.getInteger("awardStatus") != 1){
+                            for (int i = 0; i < (task.getInteger("realCompletedTimes") - task.getInteger("targetTimes") + 1); i++) {
+                                JSONObject res = MakeMoneyShopUtil.award(needHelpck, task.getInteger("taskId"));
+                                if (res!=null && res.getInteger("code")==0){
+                                    Double money = res.getDouble("money");
+                                    log.info("获得营业金："+money+"元");
+                                    zqdyjWebSocket.sendMessageAll("获得营业金："+money+"元");
+                                    if (3533 == task.getInteger("taskId")){
+                                        totalMoney += task.getInteger("completedTimes") * task.getInteger("reward") / 100.00;
+                                    }
+                                    if (3532 == task.getInteger("taskId")){
+                                        totalMoney += task.getInteger("completedTimes") * task.getInteger("reward") / 100.00;
+                                    }
+                                }
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                    log.info("今日获得营业金总额："+totalMoney+"元");
+                    zqdyjWebSocket.sendMessageAll("今日获得营业金总额："+totalMoney+"元");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            //释放锁
+            Redis.redis.remove("ZQDYJHELP");
+        }
     }
 
     @Override
@@ -292,6 +370,23 @@ public class ZqdyjServiceImpl implements ZqdyjService {
     @Override
     public Result resetHot() {
         int count = jdZqdyjMapper.resetHot();
+        return Result.success();
+    }
+
+    @Override
+    public Result getHelpList() {
+        List<JdZqdyjEntity> helpList = jdZqdyjMapper.getHelpList();
+        return Result.success(helpList);
+    }
+
+    @Override
+    public Result delete() {
+        //设置定时
+        JdZqdyjEntity zqdyj = new JdZqdyjEntity();
+        zqdyj.setType(0);
+        zqdyj.setStartHelpTime("");
+        zqdyj.setRemark("");
+        jdZqdyjMapper.update(zqdyj);
         return Result.success();
     }
 

@@ -23,6 +23,7 @@ import com.bienao.robot.utils.ql.QlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -342,6 +343,7 @@ public class CkServiceImpl implements CkService {
     }
 
     @Override
+    @Async("asyncServiceExecutor")
     public void jkExchange(){
         //查询所有青龙
         List<QlEntity> qlEntities = qlMapper.queryQls(null);

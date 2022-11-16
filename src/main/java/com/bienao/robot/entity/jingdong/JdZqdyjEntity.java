@@ -28,12 +28,15 @@ public class JdZqdyjEntity {
     //助力类型 0不助力 1过期时间 2永久
     private Integer type;
 
-    //过期时间
-    private String expiryTime;
+    //备注
+    private String remark;
 
     //新增时间
     private String createdTime;
 
     //更新时间
     private String updatedTime;
+
+    //开始助力时间
+    private String startHelpTime;
 }

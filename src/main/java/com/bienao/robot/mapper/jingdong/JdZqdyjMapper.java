@@ -42,5 +42,11 @@ public interface JdZqdyjMapper {
 
     List<JSONObject> getZqdyjCk();
 
+    List<JdZqdyjEntity> getHelpList();
+
     int resetHot();
+
+    JdZqdyjEntity getJdZqdyjByPtPin(String ptPin);
+
+    JdZqdyjEntity getJdZqdyjByHelpCode(String helpCode);
 }

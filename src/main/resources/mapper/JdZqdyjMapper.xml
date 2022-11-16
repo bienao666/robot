@@ -20,11 +20,20 @@
             <if test="helpStatus != null">
                 help_status = #{helpStatus},
             </if>
+            <if test="type != null">
+                `type` = #{type},
+            </if>
             <if test="toHelpStatus != null">
                 to_help_status = #{toHelpStatus},
             </if>
-            <if test="updatedTime !=null">
+            <if test="updatedTime !=null and updatedTime != ''">
                 updated_time=#{updatedTime},
+            </if>
+            <if test="startHelpTime !=null and startHelpTime != ''">
+                start_help_time=#{startHelpTime},
+            </if>
+            <if test="remark !=null and remark != ''">
+                remark=#{remark},
             </if>
         </set>
         where id=#{id};
@@ -57,7 +66,8 @@
     </select>
 
     <insert id="add" parameterType="jdZqdyjEntity">
-        insert into jdZqdyj(help_code,ckid,is_hei,to_help_status) values (#{helpCode},#{ckId},#{isHei},#{toHelpStatus});
+        insert into jdZqdyj(help_code,ckid,is_hei,to_help_status,`type`,start_help_time,remark)
+            values (#{helpCode},#{ckId},#{isHei},#{toHelpStatus},#{type},#{startHelpTime},#{remark});
     </insert>
 
     <delete id="clear">
@@ -73,4 +83,21 @@
     <update id="resetHot">
         update jdZqdyj set is_hei=0 where is_hei=1
     </update>
+
+    <select id="getJdZqdyjByPtPin" resultType="jdZqdyjEntity">
+        select z.*
+            from jdck c
+            left join jdZqdyj z on z.ckid=c.id
+            where c.pt_pin=#{ptPin}
+    </select>
+
+    <select id="getJdZqdyjByHelpCode" resultType="jdZqdyjEntity">
+        select * from jdZqdyj where help_code=#{helpCode}
+    </select>
+
+    <select id="getHelpList" resultType="jdZqdyjEntity">
+        select * from jdZqdyj where `type`=1 order by start_help_time
+    </select>
+
+
 </mapper>

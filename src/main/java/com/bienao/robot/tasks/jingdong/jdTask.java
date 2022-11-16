@@ -2,9 +2,13 @@ package com.bienao.robot.tasks.jingdong;
 
 import cn.hutool.cache.Cache;
 import cn.hutool.cache.impl.CacheObj;
+import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.Constants.weixin.WXConstant;
 import com.bienao.robot.entity.Result;
 import com.bienao.robot.entity.jingdong.JdCkEntity;
+import com.bienao.robot.enums.ErrorCodeConstant;
+import com.bienao.robot.mapper.jingdong.JdZqdyjMapper;
+import com.bienao.robot.redis.Redis;
 import com.bienao.robot.service.jingdong.CkService;
 import com.bienao.robot.service.jingdong.JdDhService;
 import com.bienao.robot.service.jingdong.JdService;
@@ -18,8 +22,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 京东定时任务
@@ -198,6 +204,32 @@ public class jdTask {
     @Scheduled(cron = "0 0 0 * * ?")
     public void jdTimeTask(){
         ckService.jkExchange();
+    }
+
+    /**
+     * 大赢家定时助力
+     */
+    @Scheduled(cron = "0 0,10,20 0 * * ?")
+    public void helpZqdyj(){
+        //获取所有 有效的 还有助力的 非火爆的ck
+        List<JSONObject> zqdyjCk = zqdyjService.getZqdyjCk();
+        zqdyjCk = zqdyjCk.stream().filter(jsonObject -> !"1".equals(jsonObject.getString("isHei"))&&!"0".equals(jsonObject.getString("toHelpStatus"))).collect(Collectors.toList());
+        Collections.shuffle(zqdyjCk);
+
+        if (zqdyjCk.size()==0){
+            log.info("赚钱大赢家没有可助力的账号了！！！");
+            return ;
+        }
+
+        String zqdyjhelp = Redis.redis.get("ZQDYJHELP");
+        if (StringUtils.isNotEmpty(zqdyjhelp)){
+            log.info("正在助力中其他账号中，请等待。。。");
+            return;
+        }
+
+        for (JSONObject jsonObject : zqdyjCk) {
+//            zqdyjService.help(needHelpPtPin,sId,needHelpck,remark,zqdyjCk);
+        }
     }
 
     /**

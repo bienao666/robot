@@ -1,6 +1,9 @@
 package com.bienao.robot.service.jingdong;
 
+import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.Result;
+
+import java.util.List;
 
 public interface ZqdyjService {
 
@@ -9,7 +12,7 @@ public interface ZqdyjService {
      * @param param
      * @return
      */
-    Result help(String param);
+    Result helpZqdyj(String param,boolean isTime,String remark);
 
     void reset();
 
@@ -18,4 +21,12 @@ public interface ZqdyjService {
     Result getZqdyjData();
 
     Result resetHot();
+
+    Result getHelpList();
+
+    Result delete();
+
+    List<JSONObject> getZqdyjCk();
+
+    void help(String needHelpPtPin,String sId,String needHelpck,String remark,List<JSONObject> zqdyjCk);
 }

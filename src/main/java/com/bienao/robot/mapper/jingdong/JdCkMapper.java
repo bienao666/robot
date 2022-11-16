@@ -106,4 +106,6 @@ public interface JdCkMapper {
      * @return
      */
     List<String> getRecoveryQl();
+
+    Integer queryMaxId();
 }
