@@ -35,6 +35,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -161,7 +162,8 @@ public class JdServiceImpl implements JdService {
         boolean isBreak = false;
 
         for (JdCkEntity jdCk : jdCks) {
-            long count = toHelpJdCks.stream().filter(ck -> ck.getJdFruitEntity() == null || (ck.getJdFruitEntity().getIsFruitHei()) == 0 && ck.getJdFruitEntity().getToHelpStatus() == 1).count();
+            toHelpJdCks = toHelpJdCks.stream().filter(ck -> (ck.getStatus() == 0) && (ck.getJdFruitEntity() == null || (ck.getJdFruitEntity().getIsFruitHei()) == 0 && ck.getJdFruitEntity().getToHelpStatus() == 1)).collect(Collectors.toList());
+            int count = toHelpJdCks.size();
             if (count == 0){
                 log.info("东东农场无可助力账号，结束");
                 return;
@@ -247,6 +249,9 @@ public class JdServiceImpl implements JdService {
                             jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
                             continue;
                         }else if(3 == farmInfo.getInteger("code")){
+                            toHelpJdCk.setStatus(1);
+                            toHelpJdCk.setUpdatedTime(DateUtil.formatDateTime(new Date()));
+                            jdCkMapper.updateCk(toHelpJdCk);
                             log.info(jdCk.getPtPin() + "账号过期。。。");
                             continue;
                         }else if(403 == farmInfo.getInteger("code")){
@@ -371,8 +376,8 @@ public class JdServiceImpl implements JdService {
         }
 
         for (JdCkEntity jdCk : jdCks) {
-
-            long count = toHelpJdCks.stream().filter(ck -> ck.getJdPetEntity() == null || (ck.getJdPetEntity().getIsPetHei()) == 0 && ck.getJdPetEntity().getToHelpStatus() == 1).count();
+            toHelpJdCks = toHelpJdCks.stream().filter(ck -> (ck.getStatus() == 0) && (ck.getJdPetEntity() == null || (ck.getJdPetEntity().getIsPetHei()) == 0 && ck.getJdPetEntity().getToHelpStatus() == 1)).collect(Collectors.toList());
+            int count = toHelpJdCks.size();
             if (count == 0){
                 log.info("东东萌宠无可助力账号，结束");
                 return;
@@ -548,7 +553,9 @@ public class JdServiceImpl implements JdService {
         }
 
         for (JdCkEntity jdCk : jdCks) {
-            long count = toHelpJdCks.stream().filter(ck -> ck.getJdPlantEntity() == null || (ck.getJdPlantEntity().getIsPlantHei()) == 0 && ck.getJdPlantEntity().getToHelpStatus() == 1).count();
+            //过滤还有助力的
+            toHelpJdCks = toHelpJdCks.stream().filter(ck -> (ck.getStatus() == 0) && (ck.getJdPlantEntity() == null || (ck.getJdPlantEntity().getIsPlantHei()) == 0 && ck.getJdPlantEntity().getToHelpStatus() == 1)).collect(Collectors.toList());
+            int count = toHelpJdCks.size();
             if (count == 0){
                 log.info("种豆得豆无可助力账号，结束");
                 return;
@@ -570,6 +577,7 @@ public class JdServiceImpl implements JdService {
             }
             if (jdPlantEntity.getIsPlantHei() == 1) {
                 //种豆得豆火爆
+                log.info(jdCk.getPtPin() + "种豆得豆火爆0。。。，跳过");
                 continue;
             }
             if (StringUtils.isEmpty(jdPlantEntity.getHelpCode())){
@@ -579,7 +587,7 @@ public class JdServiceImpl implements JdService {
                         || "PB003".equals(plantInfo.getString("errorCode"))
                         || "3".equals(plantInfo.getString("code"))) {
                     //种豆得豆火爆
-                    log.info(jdCk.getPtPin() + "种豆得豆火爆1。。。");
+                    log.info(jdCk.getPtPin() + "种豆得豆火爆1。。。，跳过");
                     jdPlantEntity.setIsPlantHei(1);
                     jdPlantMapper.updateJdPlant(jdPlantEntity);
                     continue;
@@ -597,11 +605,12 @@ public class JdServiceImpl implements JdService {
                 try {
                     JdPlantEntity toHelpJdPlantEntity = toHelpJdCk.getJdPlantEntity();
                     if (toHelpJdPlantEntity.getToHelpStatus() != 1) {
+                        log.info(toHelpJdCk.getPtPin() + "已无可助力次数，跳过");
                         continue;
                     }
                     if (jdPlantEntity.getHelpStatus() == 1) {
                         //当前账号已满助力，跳过当前循环
-                        log.info("{}种豆得豆已助力满!!!", jdCk.getRemark());
+                        log.info("{}种豆得豆已助力满，跳过", jdCk.getRemark());
                         break;
                     }
                     if (jdCk.getCk().equals(toHelpJdCk.getCk())) {
@@ -610,6 +619,7 @@ public class JdServiceImpl implements JdService {
                     }
                     if (toHelpJdPlantEntity.getIsPlantHei() == 1) {
                         //种豆得豆火爆
+                        log.info(toHelpJdCk.getPtPin() + "种豆得豆火爆2。。。，跳过");
                         continue;
                     }else {
                         JSONObject plantInfo = getPlantInfo(toHelpJdCk.getCk(), "plantBeanIndex");
@@ -618,7 +628,7 @@ public class JdServiceImpl implements JdService {
                                 || "PB003".equals(plantInfo.getString("errorCode"))
                                 || "3".equals(plantInfo.getString("code"))){
                             //种豆得豆火爆
-                            log.info(toHelpJdCk.getPtPin() + "种豆得豆火爆2。。。");
+                            log.info(toHelpJdCk.getPtPin() + "种豆得豆火爆3。。。，跳过");
                             toHelpJdPlantEntity.setIsPlantHei(1);
                             jdPlantMapper.updateJdPlant(toHelpJdPlantEntity);
                             continue;
