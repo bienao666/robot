@@ -2,6 +2,7 @@ package com.bienao.robot.service.jingdong;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.Result;
+import com.bienao.robot.entity.jingdong.JdZqdyjEntity;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public interface ZqdyjService {
 
     Result resetHot();
 
-    Result getHelpList();
+    List<JdZqdyjEntity> getHelpList();
 
     Result delete();
 

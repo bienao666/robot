@@ -136,6 +136,11 @@ public class ZqdyjServiceImpl implements ZqdyjService {
             }
         }
 
+        String zqdyjhelp = Redis.redis.get("ZQDYJHELP");
+        if (StringUtils.isNotEmpty(zqdyjhelp)){
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "正在助力中其他账号中，请等待。。。");
+        }
+
         //获取所有 有效的 还有助力的 非火爆的ck
         List<JSONObject> zqdyjCk = jdZqdyjMapper.getZqdyjCk();
         zqdyjCk = zqdyjCk.stream().filter(jsonObject -> !"1".equals(jsonObject.getString("isHei"))&&!"0".equals(jsonObject.getString("toHelpStatus"))).collect(Collectors.toList());
@@ -145,12 +150,25 @@ public class ZqdyjServiceImpl implements ZqdyjService {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "没有可助力的账号了！！！");
         }
 
-        String zqdyjhelp = Redis.redis.get("ZQDYJHELP");
-        if (StringUtils.isNotEmpty(zqdyjhelp)){
-            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "正在助力中其他账号中，请等待。。。");
+        //获取待助力的账号
+        List<JdZqdyjEntity> helpList = getHelpList();
+        for (JdZqdyjEntity jdZqdyj : helpList) {
+            if (jdZqdyj.getHelpStatus() == 1) {
+                continue;
+            }
+            try {
+                String helpCode = jdZqdyj.getHelpCode();
+                remark = jdZqdyj.getRemark();
+                String ck = jdZqdyj.getCk();
+                matcher = PatternConstant.ckPattern.matcher(ck);
+                if (matcher.find()){
+                    needHelpPtPin = matcher.group(2);
+                }
+                help(needHelpPtPin,helpCode,ck,remark,zqdyjCk);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-
-        help(needHelpPtPin,sId,needHelpck,remark,zqdyjCk);
         return Result.success();
     }
 
@@ -364,6 +382,9 @@ public class ZqdyjServiceImpl implements ZqdyjService {
         //有助力
         Long hasHelp = zqdyjCk.stream().filter(jsonObject -> !"1".equals(jsonObject.getString("isHei"))&&!"0".equals(jsonObject.getString("toHelpStatus"))).count();
         res.put("hasHelp",hasHelp);
+
+        List<JdZqdyjEntity> helpList = jdZqdyjMapper.getHelpList();
+        res.put("helpList",helpList);
         return Result.success(res);
     }
 
@@ -374,9 +395,9 @@ public class ZqdyjServiceImpl implements ZqdyjService {
     }
 
     @Override
-    public Result getHelpList() {
+    public List<JdZqdyjEntity> getHelpList() {
         List<JdZqdyjEntity> helpList = jdZqdyjMapper.getHelpList();
-        return Result.success(helpList);
+        return helpList;
     }
 
     @Override

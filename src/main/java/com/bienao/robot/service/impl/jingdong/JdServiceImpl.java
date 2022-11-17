@@ -189,6 +189,7 @@ public class JdServiceImpl implements JdService {
             }
             if (jdFruitEntity.getIsFruitHei() == 1) {
                 //东东农场火爆
+                log.info(jdCk.getPtPin() + "东东农场火爆1。。。");
                 continue;
             }
             if (StringUtils.isEmpty(jdFruitEntity.getHelpCode())){
@@ -196,7 +197,7 @@ public class JdServiceImpl implements JdService {
                 helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
                 if (farmInfo == null){
                     //东东农场火爆
-                    log.info(jdCk.getPtPin() + "东东农场火爆。。。");
+                    log.info(jdCk.getPtPin() + "东东农场火爆2。。。");
                     jdFruitEntity.setIsFruitHei(1);
                     jdFruitMapper.updateJdFruit(jdFruitEntity);
                     continue;
@@ -208,7 +209,7 @@ public class JdServiceImpl implements JdService {
                     continue;
                 }else if(farmInfo.getJSONObject("farmUserPro") == null){
                     //东东农场火爆
-                    log.info(jdCk.getPtPin() + "东东农场火爆2。。。");
+                    log.info(jdCk.getPtPin() + "东东农场火爆3。。。");
                     jdFruitEntity.setIsFruitHei(1);
                     jdFruitMapper.updateJdFruit(jdFruitEntity);
                     continue;
@@ -238,13 +239,14 @@ public class JdServiceImpl implements JdService {
                     }
                     if (toHelpJdFruitEntity.getIsFruitHei() == 1) {
                         //东东农场火爆
+                        log.info(toHelpJdCk.getPtPin() + "东东农场火爆3。。。");
                         continue;
                     }else {
                         JSONObject farmInfo = JdBeanChangeUtil.getjdfruit(toHelpJdCk.getCk());
                         helpWait("fruitShareHelp","东东农场" ,zlcwaittime);
                         if (farmInfo == null){
                             //东东农场火爆
-                            log.info(toHelpJdCk.getPtPin() + "东东农场火爆3。。。");
+                            log.info(toHelpJdCk.getPtPin() + "东东农场火爆4。。。");
                             toHelpJdFruitEntity.setIsFruitHei(1);
                             jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
                             continue;
@@ -260,7 +262,7 @@ public class JdServiceImpl implements JdService {
                             break;
                         }else if(farmInfo.getJSONObject("farmUserPro") == null){
                             //东东农场火爆
-                            log.info(toHelpJdCk.getPtPin() + "东东农场火爆4。。。");
+                            log.info(toHelpJdCk.getPtPin() + "东东农场火爆5。。。");
                             toHelpJdFruitEntity.setIsFruitHei(1);
                             jdFruitMapper.updateJdFruit(toHelpJdFruitEntity);
                             continue;

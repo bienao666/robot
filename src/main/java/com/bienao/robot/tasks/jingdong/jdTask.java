@@ -3,9 +3,11 @@ package com.bienao.robot.tasks.jingdong;
 import cn.hutool.cache.Cache;
 import cn.hutool.cache.impl.CacheObj;
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.Constants.PatternConstant;
 import com.bienao.robot.Constants.weixin.WXConstant;
 import com.bienao.robot.entity.Result;
 import com.bienao.robot.entity.jingdong.JdCkEntity;
+import com.bienao.robot.entity.jingdong.JdZqdyjEntity;
 import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.mapper.jingdong.JdZqdyjMapper;
 import com.bienao.robot.redis.Redis;
@@ -25,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 /**
@@ -209,26 +212,43 @@ public class jdTask {
     /**
      * 大赢家定时助力
      */
-    @Scheduled(cron = "0 0,10,20 0 * * ?")
+    @Scheduled(cron = "0 0-30/5 0 * * ?")
     public void helpZqdyj(){
+        String zqdyjhelp = Redis.redis.get("ZQDYJHELP");
+        if (StringUtils.isNotEmpty(zqdyjhelp)){
+            log.info("正在助力中其他账号中，跳过");
+            return;
+        }
+
         //获取所有 有效的 还有助力的 非火爆的ck
         List<JSONObject> zqdyjCk = zqdyjService.getZqdyjCk();
         zqdyjCk = zqdyjCk.stream().filter(jsonObject -> !"1".equals(jsonObject.getString("isHei"))&&!"0".equals(jsonObject.getString("toHelpStatus"))).collect(Collectors.toList());
-        Collections.shuffle(zqdyjCk);
 
         if (zqdyjCk.size()==0){
             log.info("赚钱大赢家没有可助力的账号了！！！");
             return ;
         }
+        Collections.shuffle(zqdyjCk);
 
-        String zqdyjhelp = Redis.redis.get("ZQDYJHELP");
-        if (StringUtils.isNotEmpty(zqdyjhelp)){
-            log.info("正在助力中其他账号中，请等待。。。");
-            return;
-        }
-
-        for (JSONObject jsonObject : zqdyjCk) {
-//            zqdyjService.help(needHelpPtPin,sId,needHelpck,remark,zqdyjCk);
+        //获取待助力的账号
+        List<JdZqdyjEntity> helpList = zqdyjService.getHelpList();
+        for (JdZqdyjEntity jdZqdyj : helpList) {
+            if (jdZqdyj.getHelpStatus() == 1) {
+                continue;
+            }
+            try {
+                String helpCode = jdZqdyj.getHelpCode();
+                String remark = jdZqdyj.getRemark();
+                String ck = jdZqdyj.getCk();
+                Matcher matcher = PatternConstant.ckPattern.matcher(ck);
+                String needHelpPtPin = "";
+                if (matcher.find()){
+                    needHelpPtPin = matcher.group(2);
+                }
+                zqdyjService.help(needHelpPtPin,helpCode,ck,remark,zqdyjCk);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

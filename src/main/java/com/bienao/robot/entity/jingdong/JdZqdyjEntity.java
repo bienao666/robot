@@ -39,4 +39,10 @@ public class JdZqdyjEntity {
 
     //开始助力时间
     private String startHelpTime;
+
+    //ck
+    private String ck;
+
+    //是否有效
+    private Integer status;
 }

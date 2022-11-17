@@ -49,7 +49,7 @@ public class ZqdyjController {
     @LoginToken
     @GetMapping("/getHelpList")
     public Result getHelpList(){
-        return zqdyjService.getHelpList();
+        return Result.success(zqdyjService.getHelpList());
     }
 
     /**

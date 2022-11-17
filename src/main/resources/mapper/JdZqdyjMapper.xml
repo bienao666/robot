@@ -96,7 +96,9 @@
     </select>
 
     <select id="getHelpList" resultType="jdZqdyjEntity">
-        select * from jdZqdyj where `type`=1 order by start_help_time
+        select z.*,c.status status,c.ck from jdZqdyj z
+            left join jdck c on z.ckid = c.id
+        where `type`=1 order by start_help_time
     </select>
 
 
