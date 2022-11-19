@@ -29,5 +29,5 @@ public interface ZqdyjService {
 
     List<JSONObject> getZqdyjCk();
 
-    void help(String needHelpPtPin,String sId,String needHelpck,String remark,List<JSONObject> zqdyjCk);
+    void help(Integer zqdyjId,String needHelpPtPin,String sId,String needHelpck,String remark,List<JSONObject> zqdyjCk);
 }

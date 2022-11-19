@@ -49,4 +49,6 @@ public interface JdZqdyjMapper {
     JdZqdyjEntity getJdZqdyjByPtPin(String ptPin);
 
     JdZqdyjEntity getJdZqdyjByHelpCode(String helpCode);
+
+    Integer queryMaxId();
 }

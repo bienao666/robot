@@ -101,5 +101,8 @@
         where z.type=1 order by z.start_help_time
     </select>
 
+    <select id="queryMaxId" resultType="java.lang.Integer">
+        select max(id) from wire
+    </select>
 
 </mapper>

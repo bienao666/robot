@@ -53,6 +53,8 @@ public class ZqdyjServiceImpl implements ZqdyjService {
         String needHelpck = "";
         //助力码
         String sId ="";
+        //
+        Integer zqdyjId = null;
 
         //判断是ck还是口令
         Matcher matcher = PatternConstant.ckPattern.matcher(param);
@@ -79,6 +81,7 @@ public class ZqdyjServiceImpl implements ZqdyjService {
                     zqdyj.setType(1);
                     zqdyj.setStartHelpTime(DateUtil.formatDateTime(DateUtil.date()));
                     zqdyj.setRemark(remark);
+                    zqdyjId = zqdyj.getId();
                     jdZqdyjMapper.update(zqdyj);
                 }else {
                     //添加
@@ -96,6 +99,7 @@ public class ZqdyjServiceImpl implements ZqdyjService {
                     zqdyj.setStartHelpTime(DateUtil.formatDateTime(DateUtil.date()));
                     zqdyj.setRemark(remark);
                     jdZqdyjMapper.add(zqdyj);
+                    zqdyjId = jdZqdyjMapper.queryMaxId();
                 }
             }
         }else {
@@ -124,6 +128,7 @@ public class ZqdyjServiceImpl implements ZqdyjService {
                     zqdyj.setStartHelpTime(DateUtil.formatDateTime(DateUtil.date()));
                     zqdyj.setRemark(remark);
                     jdZqdyjMapper.update(zqdyj);
+                    zqdyjId = zqdyj.getId();
                 }else {
                     //添加
                     zqdyj = new JdZqdyjEntity();
@@ -132,6 +137,7 @@ public class ZqdyjServiceImpl implements ZqdyjService {
                     zqdyj.setStartHelpTime(DateUtil.formatDateTime(DateUtil.date()));
                     zqdyj.setRemark(remark);
                     jdZqdyjMapper.add(zqdyj);
+                    zqdyjId = jdZqdyjMapper.queryMaxId();
                 }
             }
         }
@@ -164,7 +170,7 @@ public class ZqdyjServiceImpl implements ZqdyjService {
                 if (matcher.find()){
                     needHelpPtPin = matcher.group(2);
                 }
-                help(needHelpPtPin,helpCode,ck,remark,zqdyjCk);
+                help(zqdyjId,needHelpPtPin,helpCode,ck,remark,zqdyjCk);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -178,7 +184,7 @@ public class ZqdyjServiceImpl implements ZqdyjService {
     }
 
     @Override
-    public void help(String needHelpPtPin,String sId,String needHelpck,String remark,List<JSONObject> zqdyjCk){
+    public void help(Integer zqdyjId,String needHelpPtPin,String sId,String needHelpck,String remark,List<JSONObject> zqdyjCk){
         //加锁
         Redis.redis.put("ZQDYJHELP", "true", 10L * 60 * 1000);
 
@@ -261,6 +267,12 @@ public class ZqdyjServiceImpl implements ZqdyjService {
                         }else if (help.getInteger("nohelp")==5){
                             zqdyjWebSocket.sendMessageAll(">>>>>>>>"+(StringUtils.isEmpty(remark)?needHelpPtPin:remark)+"已助力满<<<<<<<<");
                             log.info("已助力满");
+                            zqdyjWebSocket.sendMessageAll(">>>>>>>>"+ptPin+"账号火爆<<<<<<<<");
+                            JdZqdyjEntity jdZqdyjEntity = new JdZqdyjEntity();
+                            jdZqdyjEntity.setHelpStatus(1);
+                            jdZqdyjEntity.setId(zqdyjId);
+                            jdZqdyjEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
+                            jdZqdyjMapper.update(jdZqdyjEntity);
                             break;
                         }else {
                             log.info("助力异常：{}",help.getString("msg"));

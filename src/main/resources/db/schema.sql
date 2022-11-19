@@ -137,7 +137,7 @@ create table if not exists `jdZqdyj` (
 );
 alter TABLE  `jdZqdyj` add `type` INTEGER DEFAULT 0;
 alter TABLE  `jdZqdyj` add `remark` varchar;
-alter TABLE  `jdZqdyj` add `start_help_time` varchar DEFAULT (datetime('now', 'localtime'));
+alter TABLE  `jdZqdyj` add `start_help_time` varchar;
 create table if not exists `ylgy` (
                                          `id` INTEGER PRIMARY KEY AUTOINCREMENT,
                                          `uid` varchar,

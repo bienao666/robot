@@ -222,7 +222,8 @@ public class jdTask {
 
         //获取所有 有效的 还有助力的 非火爆的ck
         List<JSONObject> zqdyjCk = zqdyjService.getZqdyjCk();
-        zqdyjCk = zqdyjCk.stream().filter(jsonObject -> !"1".equals(jsonObject.getString("isHei"))&&!"0".equals(jsonObject.getString("toHelpStatus"))).collect(Collectors.toList());
+        zqdyjCk = zqdyjCk.stream().filter(jsonObject -> "0".equals(jsonObject.getString("isHei"))
+                && "1".equals(jsonObject.getString("toHelpStatus"))).collect(Collectors.toList());
 
         if (zqdyjCk.size()==0){
             log.info("赚钱大赢家没有可助力的账号了！！！");
@@ -237,6 +238,7 @@ public class jdTask {
                 continue;
             }
             try {
+                Integer id = jdZqdyj.getId();
                 String helpCode = jdZqdyj.getHelpCode();
                 String remark = jdZqdyj.getRemark();
                 String ck = jdZqdyj.getCk();
@@ -245,7 +247,7 @@ public class jdTask {
                 if (matcher.find()){
                     needHelpPtPin = matcher.group(2);
                 }
-                zqdyjService.help(needHelpPtPin,helpCode,ck,remark,zqdyjCk);
+                zqdyjService.help(id,needHelpPtPin,helpCode,ck,remark,zqdyjCk);
             } catch (Exception e) {
                 e.printStackTrace();
             }
