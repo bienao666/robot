@@ -611,6 +611,12 @@ public class WireServiceImpl implements WireService {
         keys.add("jd_wdzfd_activityId");
         addWire("微定制瓜分福袋","jd_wdzfd.js",keys);
 
+        keys.add("jd_lzkj_loreal_invite_url");
+        addWire("邀请入会有礼（lzkj_loreal）","jd_lzkj_loreal_invite.js",keys);
+
+        keys.add("jd_showInviteJoin_activityUrl");
+        addWire("邀请入会赢好礼（京耕）","jd_jinggeng_showInviteJoin.js",keys);
+
         /*keys.add("M_WX_SHOP_GIFT_URL");
         addWire("","",keys);
 
