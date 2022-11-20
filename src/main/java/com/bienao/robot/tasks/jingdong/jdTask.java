@@ -212,7 +212,7 @@ public class jdTask {
     /**
      * 大赢家定时助力
      */
-    @Scheduled(cron = "0 0-30/5 0 * * ?")
+    @Scheduled(cron = "45 0-30/5 0 * * ?")
     public void helpZqdyj(){
         String zqdyjhelp = Redis.redis.get("ZQDYJHELP");
         if (StringUtils.isNotEmpty(zqdyjhelp)){
