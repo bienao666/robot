@@ -30,4 +30,10 @@ public interface ZqdyjService {
     List<JSONObject> getZqdyjCk();
 
     void help(Integer zqdyjId,String needHelpPtPin,String sId,String needHelpck,String remark,List<JSONObject> zqdyjCk);
+
+
+    /**
+     * 赚钱大赢家助力-助力列表助力
+     */
+    Result help2(Integer id, String helpCode, String ck,String remark);
 }

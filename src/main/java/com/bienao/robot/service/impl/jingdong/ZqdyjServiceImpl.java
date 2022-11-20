@@ -144,7 +144,7 @@ public class ZqdyjServiceImpl implements ZqdyjService {
 
         String zqdyjhelp = Redis.redis.get("ZQDYJHELP");
         if (StringUtils.isNotEmpty(zqdyjhelp)){
-            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "正在助力中其他账号中，请等待。。。");
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "正在助力其他账号中，已添加至助力列表，请等待。。。");
         }
 
         //获取所有 有效的 还有助力的 非火爆的ck
@@ -156,25 +156,7 @@ public class ZqdyjServiceImpl implements ZqdyjService {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "没有可助力的账号了！！！");
         }
 
-        //获取待助力的账号
-        List<JdZqdyjEntity> helpList = getHelpList();
-        for (JdZqdyjEntity jdZqdyj : helpList) {
-            if (jdZqdyj.getHelpStatus() == 1) {
-                continue;
-            }
-            try {
-                String helpCode = jdZqdyj.getHelpCode();
-                remark = jdZqdyj.getRemark();
-                String ck = jdZqdyj.getCk();
-                matcher = PatternConstant.ckPattern.matcher(ck);
-                if (matcher.find()){
-                    needHelpPtPin = matcher.group(2);
-                }
-                help(zqdyjId,needHelpPtPin,helpCode,ck,remark,zqdyjCk);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        help(zqdyjId,needHelpPtPin,sId,needHelpck,remark,zqdyjCk);
         return Result.success();
     }
 
@@ -325,6 +307,39 @@ public class ZqdyjServiceImpl implements ZqdyjService {
             //释放锁
             Redis.redis.remove("ZQDYJHELP");
         }
+    }
+
+    @Override
+    @Async("asyncServiceExecutor")
+    public Result help2(Integer id, String helpCode, String ck,String remark) {
+        String zqdyjhelp = Redis.redis.get("ZQDYJHELP");
+        if (StringUtils.isNotEmpty(zqdyjhelp)){
+            log.info("正在助力中其他账号中，跳过");
+            return Result.error(ErrorCodeConstant.SERVICE_ERROR,"正在助力中其他账号中!!!");
+        }
+
+        //获取所有 有效的 还有助力的 非火爆的ck
+        List<JSONObject> zqdyjCk = getZqdyjCk();
+        zqdyjCk = zqdyjCk.stream().filter(jsonObject -> "0".equals(jsonObject.getString("isHei"))
+                && "1".equals(jsonObject.getString("toHelpStatus"))).collect(Collectors.toList());
+
+        if (zqdyjCk.size()==0){
+            log.info("赚钱大赢家没有可助力的账号了!!!");
+            return Result.error(ErrorCodeConstant.SERVICE_ERROR,"赚钱大赢家没有可助力的账号了!!!");
+        }
+        Collections.shuffle(zqdyjCk);
+
+        try {
+            Matcher matcher = PatternConstant.ckPattern.matcher(ck);
+            String needHelpPtPin = "";
+            if (matcher.find()){
+                needHelpPtPin = matcher.group(2);
+            }
+            help(id,needHelpPtPin,helpCode,ck,remark,zqdyjCk);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Result.success();
     }
 
     @Override

@@ -44,6 +44,20 @@ public class ZqdyjController {
     }
 
     /**
+     * 赚钱大赢家助力-助力列表助力
+     */
+    @LoginToken
+    @PostMapping("/help2")
+    public Result help2(@RequestBody JSONObject jsonObject){
+        Integer id = jsonObject.getInteger("id");
+        String helpCode = jsonObject.getString("helpCode");
+        String ck = jsonObject.getString("ck");
+        String remark = jsonObject.getString("remark");
+        zqdyjService.help2(id,helpCode,ck,remark);
+        return Result.success();
+    }
+
+    /**
      * 赚钱大赢家助力清单
      */
     @LoginToken
@@ -86,10 +100,6 @@ public class ZqdyjController {
     @PassToken
     @PostMapping("/test")
     public Result test(@RequestBody JSONObject jsonObject){
-        String account = jsonObject.getString("account");
-        if (StringUtils.isEmpty(account)){
-            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "ck或者助力码不能为空");
-        }
-        return zqdyjService.test(account);
+        return zqdyjService.test("");
     }
 }
