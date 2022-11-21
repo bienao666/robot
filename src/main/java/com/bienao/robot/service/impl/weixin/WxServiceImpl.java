@@ -556,13 +556,13 @@ public class WxServiceImpl implements WxService {
                 return;
             }
             List<Group> groups = groupMapper.queryDistinctGroup(null, fromGroupId);
-            if (groups.size()!=1){
+            if (groups.size()==0){
                 weChatUtil.sendTextMsg(fromGroupId+"群不存在",content);
                 return;
             }
             Group fromGroup = groups.get(0);
             groups = groupMapper.queryDistinctGroup(null, toGroupId);
-            if (groups.size()!=1){
+            if (groups.size()==0){
                 weChatUtil.sendTextMsg(fromGroupId+"群不存在",content);
                 return;
             }
