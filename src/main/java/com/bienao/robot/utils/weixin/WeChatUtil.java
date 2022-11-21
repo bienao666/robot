@@ -112,6 +112,98 @@ public class WeChatUtil {
         }
     }
 
+    /**
+     * 发送链接消息
+     */
+    public void sendLinkMsg(String xml, JSONObject content) {
+        try {
+            JSONObject body = new JSONObject();
+            String from_group = content.getString("from_group");
+            if (StringUtils.isNotEmpty(from_group)) {
+                //群聊消息
+                //对象WXID（好友ID/群ID/公众号ID）
+                body.put("to_wxid", from_group);
+            } else {
+                //私聊消息
+                //对象WXID（好友ID/群ID/公众号ID）
+                body.put("to_wxid", content.getString("from_wxid"));
+            }
+            //消息
+            body.put("xml", xml);
+            //密钥
+            body.put("token", vlmToken);
+            //机器人ID
+            body.put("robot_wxid", content.getString("robot_wxid"));
+            //API名
+            body.put("api", "SendLinkMsg");
+            String result = HttpRequest.post(vlwUrl)
+                    .header("User-Agent", "apifox/1.0.0 (https://www.apifox.cn)")
+                    .header("Content-Type", "application/json")
+                    .body(body.toJSONString())
+                    .execute().body();
+            if (StringUtils.isEmpty(result)) {
+                log.info("发送链接消息接口调用失败");
+                log.info("{}信息发送失败", body.toJSONString());
+            } else {
+                JSONObject jsonObject = JSONObject.parseObject(result);
+                if ("200".equals(jsonObject.getString("Code"))) {
+                    log.info("发送链接消息接口调用失败");
+                    log.info("{}信息发送失败", body.toJSONString());
+                } else {
+                    log.info("发送链接消息成功");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 发送小程序消息
+     */
+    public void sendXmlMsg(String xml, JSONObject content) {
+        try {
+            JSONObject body = new JSONObject();
+            String from_group = content.getString("from_group");
+            if (StringUtils.isNotEmpty(from_group)) {
+                //群聊消息
+                //对象WXID（好友ID/群ID/公众号ID）
+                body.put("to_wxid", from_group);
+            } else {
+                //私聊消息
+                //对象WXID（好友ID/群ID/公众号ID）
+                body.put("to_wxid", content.getString("from_wxid"));
+            }
+            //消息
+            body.put("xml", xml);
+            //密钥
+            body.put("token", vlmToken);
+            //机器人ID
+            body.put("robot_wxid", content.getString("robot_wxid"));
+            //API名
+            body.put("api", "SendXmlMsg");
+            String result = HttpRequest.post(vlwUrl)
+                    .header("User-Agent", "apifox/1.0.0 (https://www.apifox.cn)")
+                    .header("Content-Type", "application/json")
+                    .body(body.toJSONString())
+                    .execute().body();
+            if (StringUtils.isEmpty(result)) {
+                log.info("发送小程序消息接口调用失败");
+                log.info("{}信息发送失败", body.toJSONString());
+            } else {
+                JSONObject jsonObject = JSONObject.parseObject(result);
+                if ("200".equals(jsonObject.getString("Code"))) {
+                    log.info("发送小程序消息接口调用失败");
+                    log.info("{}信息发送失败", body.toJSONString());
+                } else {
+                    log.info("发送小程序消息成功");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void sendTextMsgToMaster(String msg) {
         JSONObject content = new JSONObject();
         String robortwxid = systemParamUtil.querySystemParam("ROBORTWXID");

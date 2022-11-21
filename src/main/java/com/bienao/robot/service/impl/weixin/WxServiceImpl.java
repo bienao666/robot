@@ -163,7 +163,7 @@ public class WxServiceImpl implements WxService {
         List<ForwardEntity> list = forwardMapper.queryForward(String.valueOf(from_group), null, null, null);
         if (list.size() > 0) {
             for (ForwardEntity forwardEntity : list) {
-                forwardUtil.forward(msg, forwardEntity.getTo(), forwardEntity.getTotype());
+                forwardUtil.forward(type,msg, forwardEntity.getTo(), forwardEntity.getTotype());
             }
         }
 

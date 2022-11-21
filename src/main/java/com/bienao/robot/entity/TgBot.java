@@ -100,7 +100,7 @@ public class TgBot extends TelegramLongPollingBot {
             if (list.size()>0){
                 ForwardUtil forwardUtil = applicationContext.getBean(ForwardUtil.class);
                 for (ForwardEntity forwardEntity : list) {
-                    forwardUtil.forward(text,forwardEntity.getTo(),forwardEntity.getTotype());
+                    forwardUtil.forward(1,text,forwardEntity.getTo(),forwardEntity.getTotype());
                 }
             }
         }
