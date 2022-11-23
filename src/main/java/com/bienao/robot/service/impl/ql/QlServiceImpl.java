@@ -1101,30 +1101,32 @@ public class QlServiceImpl implements QlService {
                         String autoDeleteExpireCk = systemParamUtil.querySystemParam("AUTODELETEEXPIRECK");
                         if ("是".equals(autoDeleteExpireCk)) {
                             String remarks = env.getRemarks();
-                            Matcher matcher = PatternConstant.jdRemarkPattern.matcher(remarks);
-                            if (matcher.find()) {
+                            if(StringUtils.isNotEmpty(remarks)){
+                                Matcher matcher = PatternConstant.jdRemarkPattern.matcher(remarks);
+                                if (matcher.find()) {
 
-                                String wxpusherUid = matcher.group(3);
-                                if (StringUtils.isNotEmpty(wxpusherUid)) {
-                                    String remark = matcher.group(1);
-                                    if (StringUtils.isEmpty(remark)) {
-                                        matcher = PatternConstant.jdPinPattern.matcher(env.getValue());
-                                        if (matcher.find()) {
-                                            remark = matcher.group(1);
+                                    String wxpusherUid = matcher.group(3);
+                                    if (StringUtils.isNotEmpty(wxpusherUid)) {
+                                        String remark = matcher.group(1);
+                                        if (StringUtils.isEmpty(remark)) {
+                                            matcher = PatternConstant.jdPinPattern.matcher(env.getValue());
+                                            if (matcher.find()) {
+                                                remark = matcher.group(1);
+                                            }
                                         }
+
+                                        String content = "您的京东刷豆账号：" + remark + "已过期！！！";
+
+                                        String jdLonginUrl = systemParamUtil.querySystemParam("JDLONGINURL");
+                                        if (StringUtils.isNotEmpty(jdLonginUrl)) {
+                                            content += "\n如还需继续刷豆请打开下方网址重新登陆\n" + jdLonginUrl;
+                                        }
+
+                                        ArrayList<String> uids = new ArrayList<>();
+                                        uids.add(wxpusherUid);
+                                        log.info("正在通知该ck号主。。。");
+                                        wxpusherUtil.sendMessage(content, "京东代挂账号过期", 1, null, uids, "");
                                     }
-
-                                    String content = "您的京东刷豆账号：" + remark + "已过期！！！";
-
-                                    String jdLonginUrl = systemParamUtil.querySystemParam("JDLONGINURL");
-                                    if (StringUtils.isNotEmpty(jdLonginUrl)) {
-                                        content += "\n如还需继续刷豆请打开下方网址重新登陆\n" + jdLonginUrl;
-                                    }
-
-                                    ArrayList<String> uids = new ArrayList<>();
-                                    uids.add(wxpusherUid);
-                                    log.info("正在通知该ck号主。。。");
-                                    wxpusherUtil.sendMessage(content, "京东代挂账号过期", 1, null, uids, "");
                                 }
                             }
                             log.info("正在删除改ck...");
