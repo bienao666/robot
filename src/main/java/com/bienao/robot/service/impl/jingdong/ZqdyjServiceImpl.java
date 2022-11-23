@@ -432,9 +432,10 @@ public class ZqdyjServiceImpl implements ZqdyjService {
     }
 
     @Override
-    public Result delete() {
+    public Result delete(Integer id) {
         //设置定时
         JdZqdyjEntity zqdyj = new JdZqdyjEntity();
+        zqdyj.setId(id);
         zqdyj.setType(0);
         zqdyj.setStartHelpTime("");
         zqdyj.setRemark("");

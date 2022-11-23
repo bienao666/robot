@@ -76,7 +76,7 @@ public class ZqdyjController {
         if (id == null){
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "id不能为空");
         }
-        return zqdyjService.delete();
+        return zqdyjService.delete(id);
     }
 
     /**

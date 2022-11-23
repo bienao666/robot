@@ -25,7 +25,7 @@ public interface ZqdyjService {
 
     List<JdZqdyjEntity> getHelpList();
 
-    Result delete();
+    Result delete(Integer id);
 
     List<JSONObject> getZqdyjCk();
 
