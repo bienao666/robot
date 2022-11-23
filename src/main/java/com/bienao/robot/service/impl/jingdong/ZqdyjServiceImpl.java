@@ -254,7 +254,11 @@ public class ZqdyjServiceImpl implements ZqdyjService {
                             jdZqdyjEntity.setHelpStatus(1);
                             jdZqdyjEntity.setId(zqdyjId);
                             jdZqdyjEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
-                            jdZqdyjMapper.update(jdZqdyjEntity);
+                            int update = jdZqdyjMapper.update(jdZqdyjEntity);
+                            if (update != 1){
+                                log.info(remark+"已助力满,更新状态失败,尝试再更新一次。。。");
+                                jdZqdyjMapper.update(jdZqdyjEntity);
+                            }
                             break;
                         }else {
                             log.info("助力异常：{}",help.getString("msg"));
