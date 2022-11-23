@@ -617,6 +617,9 @@ public class WireServiceImpl implements WireService {
         keys.add("jd_showInviteJoin_activityUrl");
         addWire("邀请入会赢好礼（京耕）","jd_jinggeng_showInviteJoin.js",keys);
 
+        keys.add("jd_shopDraw_activityUrl");
+        addWire("店铺左侧刮刮乐","jd_shopDraw.js",keys);
+
         /*keys.add("M_WX_SHOP_GIFT_URL");
         addWire("","",keys);
 
