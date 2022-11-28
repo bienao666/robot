@@ -911,14 +911,68 @@ public class WxServiceImpl implements WxService {
         if ("readIdentifyingCode".equals(operate)) {
             log.info("京东登陆-readIdentifyingCode");
             String phone = redis.get(from_wxid + "phone",false);
-            String ck = verifyCode(phone, msg);
+            JSONObject data = verifyCode(phone, msg);
+            if (data == null){
+                redis.remove(from_wxid + "operate");
+                weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
+                return;
+            }
+            if (data.getBoolean("success")){
+                String ck = data.getJSONObject("data").getString("ck");
+                if (StringUtils.isEmpty(ck)) {
+                    redis.remove(from_wxid + "operate");
+                    weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
+                    return;
+                }
+
+                addJdCk(ck,content);
+                return;
+            }
+            if (data.getJSONObject("data").getInteger("status") == 555){
+                //需要验证
+                if ("USER_ID".equals(data.getJSONObject("data").getString("mode"))){
+                    weChatUtil.sendTextMsg("你的账号需要验证才能登陆，请在一分钟内输入你京东账号绑定的身份证的前2位和后4位(若包含字母X,请输入大写字母)：(输入q退出当前操作)", content);
+                    redis.put(from_wxid + "operate", "readIdentifyingCode", 5 * 60 * 1000);
+                    redis.put(from_wxid + "operate", "verifyCardCode", 60 * 1000);
+                }else {
+                    data = verifyCardCode(phone, "123456");
+                    if (data == null){
+                        redis.remove(from_wxid + "operate");
+                        weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
+                        return;
+                    }
+                    String ck = data.getString("ck");
+                    if (StringUtils.isEmpty(ck)) {
+                        redis.remove(from_wxid + "operate");
+                        weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
+                        return;
+                    }
+
+                    addJdCk(ck,content);
+                }
+                return;
+            }
+        }
+
+        if ("verifyCardCode".equals(operate)){
+            log.info("京东登陆-verifyCardCode");
+            String phone = redis.get(from_wxid + "phone",false);
+            JSONObject data = verifyCardCode(phone, msg);
+
+            if (data == null){
+                redis.remove(from_wxid + "operate");
+                weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
+                return;
+            }
+
+            String ck = data.getString("ck");
             if (StringUtils.isEmpty(ck)) {
                 redis.remove(from_wxid + "operate");
                 weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
-            } else {
-                addJdCk(ck,content);
+                return;
             }
-            return;
+
+            addJdCk(ck,content);
         }
 
         //羊了个羊
@@ -2092,7 +2146,7 @@ public class WxServiceImpl implements WxService {
      * @param phone
      * @return
      */
-    public String verifyCode(String phone, String code) {
+    public JSONObject verifyCode(String phone, String code) {
         String jdlonginurl = systemParamUtil.querySystemParam("JDLONGINURL").replace("login", "");
         if (!jdlonginurl.endsWith("/")) {
             jdlonginurl += "/";
@@ -2107,10 +2161,37 @@ public class WxServiceImpl implements WxService {
                 .execute().body();
         if (StringUtils.isNotEmpty(resultStr)) {
             log.info("手机号{}短信登陆结果：{}", phone, resultStr);
+            return JSONObject.parseObject(resultStr);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * nark校验身份证
+     *
+     * @param phone
+     * @return
+     */
+    public JSONObject verifyCardCode(String phone, String code) {
+        String jdlonginurl = systemParamUtil.querySystemParam("JDLONGINURL").replace("login", "");
+        if (!jdlonginurl.endsWith("/")) {
+            jdlonginurl += "/";
+        }
+        JSONObject body = new JSONObject();
+        body.put("Phone", phone);
+        body.put("QQ", "");
+        body.put("qlkey", 0);
+        body.put("Code", code);
+        String resultStr = HttpRequest.post(jdlonginurl + "api/VerifyCardCode")
+                .body(body.toJSONString())
+                .execute().body();
+        if (StringUtils.isNotEmpty(resultStr)) {
+            log.info("手机号{}校验身份证：{}", phone, resultStr);
             JSONObject res = JSONObject.parseObject(resultStr);
-            if (res.getBoolean("success")) {
-                return res.getJSONObject("data").get("ck").toString();
-            } else {
+            if (res.getBoolean("success")){
+                return res.getJSONObject("data");
+            }else {
                 return null;
             }
         } else {
