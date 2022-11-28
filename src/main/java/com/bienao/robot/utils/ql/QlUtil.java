@@ -755,7 +755,7 @@ public class QlUtil {
             String resStr = HttpRequest.put(url + "open/crons/run")
                     .header("Authorization",tokenType + " " + token)
                     .body(JSONObject.toJSONString(ids))
-                    .timeout(2000)
+                    .timeout(10000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙根据id运行任务失败");
