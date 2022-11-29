@@ -84,16 +84,22 @@ public class ZqdyjServiceImpl implements ZqdyjService {
                     zqdyjId = zqdyj.getId();
                     jdZqdyjMapper.update(zqdyj);
                 }else {
-                    //添加
-                    JdCkEntity jdCkEntity = new JdCkEntity();
-                    jdCkEntity.setCk(needHelpck);
-                    jdCkEntity.setPtPin(needHelpPtPin);
-                    jdCkEntity.setRemark(remark);
-                    jdCkEntity.setStatus(0);
-                    jdCkMapper.addCk(jdCkEntity);
-                    Integer maxId = jdCkMapper.queryMaxId();
+                    JdCkEntity query = new JdCkEntity();
+                    query.setPtPin(needHelpPtPin);
+                    JdCkEntity jdCkEntity = jdCkMapper.queryCk(query);
+                    if (jdCkEntity == null){
+                        jdCkEntity = new JdCkEntity();
+                        //添加
+                        jdCkEntity.setCk(needHelpck);
+                        jdCkEntity.setPtPin(needHelpPtPin);
+                        jdCkEntity.setRemark(remark);
+                        jdCkEntity.setStatus(0);
+                        jdCkMapper.addCk(jdCkEntity);
+                        Integer maxId = jdCkMapper.queryMaxId();
+                        jdCkEntity.setId(maxId);
+                    }
                     zqdyj = new JdZqdyjEntity();
-                    zqdyj.setCkId(maxId);
+                    zqdyj.setCkId(jdCkEntity.getId());
                     zqdyj.setHelpCode(sId);
                     zqdyj.setType(1);
                     zqdyj.setStartHelpTime(DateUtil.formatDateTime(DateUtil.date()));

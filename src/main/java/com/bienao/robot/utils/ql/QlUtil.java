@@ -62,7 +62,7 @@ public class QlUtil {
         try {
             String resStr = HttpRequest.get(url + "open/envs")
                     .header("Authorization",tokenType + " " + token)
-                    .timeout(2000)
+                    .timeout(10000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙获取所有环境变量详情失败");
