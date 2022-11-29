@@ -1,10 +1,12 @@
 package com.bienao.robot.controller.command;
 
+import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.annotation.LoginToken;
 import com.bienao.robot.annotation.PassToken;
 import com.bienao.robot.entity.CommandEntity;
 import com.bienao.robot.entity.Result;
 import com.bienao.robot.service.command.CommandService;
+import com.bienao.robot.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -40,11 +42,15 @@ public class CommandController {
      * @param command
      * @return
      */
-    @LoginToken
+    @PassToken
     @GetMapping("/queryCommand")
     public Result queryCommand(@RequestParam(value = "command",required = false) String command,
-                               @RequestParam(value = "function",required = false) String function){
-        return commandService.queryCommand(command,function);
+                               @RequestParam(value = "function",required = false) String function,
+                               @RequestParam(value = "pageNo") Integer pageNo,
+                               @RequestParam(value = "pageSize") Integer pageSize){
+        List<CommandEntity> commandEntities = commandService.queryCommand(command, function);
+        JSONObject page = PageUtil.page(commandEntities, pageNo, pageSize);
+        return Result.success(page);
     }
 
     /**

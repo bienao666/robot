@@ -24,6 +24,9 @@
         <if test="function != null and function != ''">
             and `function` like ('%'||#{function}||'%')
         </if>
+        <if test="isBuiltIn != null">
+            and `is_built_in` = #{isBuiltIn}
+        </if>
     </select>
 
     <select id="queryAllCommand" resultType="string">

@@ -30,9 +30,7 @@
     <update id="updateSystemParam" parameterType="systemParam">
         update systemParam
         <set>
-            <if test="value !=null and value !=''">
-                value=#{value},
-            </if>
+            value=#{value},
             <if test="codeName !=null and codeName !=''">
                 codeName=#{codeName},
             </if>

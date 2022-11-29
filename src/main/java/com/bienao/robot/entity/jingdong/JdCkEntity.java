@@ -27,7 +27,7 @@ public class JdCkEntity {
     @NotNull(message = "等级不能为空")
     private Integer level;
 
-    //是否有效 0否1是
+    //是否有效 0有效1无效
     private Integer status;
 
     //当日京豆收益
@@ -50,4 +50,31 @@ public class JdCkEntity {
 
     //种豆得豆
     private JdPlantEntity jdPlantEntity;
+
+    //所属青龙id
+    private Integer qlId;
+
+    //所属青龙备注
+    private String qlRemark;
+
+    //ck在青龙的位置
+    private int qlindex;
+
+    //农场状态 0正常 1火爆
+    private Integer fruitStataus;
+
+    //农场是否助力满
+    private Integer fruitHelp;
+
+    //萌宠状态 0正常 1火爆
+    private Integer petStataus;
+
+    //萌宠是否助力满
+    private Integer petHelp;
+
+    //种豆状态 0正常 1火爆
+    private Integer plantStataus;
+
+    //种豆是否助力满
+    private Integer plantHelp;
 }

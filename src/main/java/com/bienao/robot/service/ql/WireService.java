@@ -60,7 +60,7 @@ public interface WireService {
      * 查询线报活动
      * @return
      */
-    Result queryActivity(Integer pageNo,Integer pageSize);
+    Result queryActivity(Integer pageNo,Integer pageSize,String content);
 
     void handleWire(Integer id,String script,String content);
 

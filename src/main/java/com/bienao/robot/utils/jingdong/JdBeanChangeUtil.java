@@ -80,20 +80,73 @@ public class JdBeanChangeUtil {
     /**
      * 查询京东资产详情
      *
-     * @param ptPin
+     * @param jdCk
      */
-    public String getJdBeanChange(String ptPin) {
-        JdCkEntity jdCkQuery = new JdCkEntity();
-        jdCkQuery.setPtPin(ptPin);
-        JdCkEntity jdCk = jdCkMapper.queryCk(jdCkQuery);
+    public String getJdBeanChange(JdCkEntity jdCk) {
+        cookie = "";
+        overdue = "";
+        userName = "";
+        beanCount = 0;
+        incomeBean = 0;
+        expenseBean = 0;
+        todayIncomeBean = 0;
+        todayOutcomeBean = 0;
+        errorMsg = "";
+        isLogin = true;
+        nickName = "";
+        levelName = "";
+        message = "";
+        balance = 0.00F;
+        expiredBalance = 0.00F;
+        JdzzNum = 0;
+        JdMsScore = 0;
+        JdFarmProdName = "";
+        JdtreeEnergy = 0;
+        JdtreeTotalEnergy = 0;
+        treeState = 0;
+        JdwaterTotalT = 0;
+        JdwaterD = 0;
+        JDwaterEveryDayT = 0;
+        JDtotalcash = 0;
+        JDEggcnt = 0;
+        Jxmctoken = "";
+        DdFactoryReceive = "";
+        jxFactoryInfo = "";
+        jxFactoryReceive = "";
+        jdCash = 0;
+        isPlusVip = 0;
+        JingXiang = "";
+        //月收入
+        int allincomeBean = 0;
+        //月支出
+        int allexpenseBean = 0;
+        int joylevel = 0;
+        String TempBaipiao = "";
+        String enCryptMethodJD = "";
+
         cookie = jdCk.getCk();
         overdue = "【挂机天数】" + DateUtil.between(DateUtil.parseDate(jdCk.getCreatedTime()), DateUtil.date(), DateUnit.DAY) + "天";
-        userName = URLDecoder.decode(ptPin, CharsetUtil.defaultCharset());
+        userName = URLDecoder.decode(jdCk.getPtPin(), CharsetUtil.defaultCharset());
+
         try {
             TotalBean();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        if (!isLogin){
+            return "账号过期，请重新登陆";
+        }
+
+        try {
+            bean();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (!isLogin){
+            return "账号过期，请重新登陆";
+        }
+
         try {
             TotalBean2();
         } catch (Exception e) {
@@ -138,11 +191,6 @@ public class JdBeanChangeUtil {
         }
         //
 //        JxmcGetRequest();
-        try {
-            bean();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         try {
             redPacket();
@@ -171,11 +219,19 @@ public class JdBeanChangeUtil {
         if (StringUtils.isNotEmpty(JingXiang)){
             ReturnMessage += JingXiang;
         }
-        ReturnMessage += "\n【今日京豆】收"+todayIncomeBean+"豆";
+        if (todayIncomeBean != 0){
+            ReturnMessage += "\n【今日京豆】收"+todayIncomeBean+"豆";
+        }else {
+            ReturnMessage += "\n【今日京豆】查询异常";
+        }
         if (todayOutcomeBean != 0) {
             ReturnMessage += ",支"+todayOutcomeBean+"豆";
         }
-        ReturnMessage += "\n【昨日京豆】收"+incomeBean+"豆";
+        if (incomeBean != 0){
+            ReturnMessage += "\n【昨日京豆】收"+incomeBean+"豆";
+        }else {
+            ReturnMessage += "\n【昨日京豆】查询异常";
+        }
         if (expenseBean != 0) {
             ReturnMessage += ",支"+expenseBean+"豆";
         }
@@ -240,8 +296,8 @@ public class JdBeanChangeUtil {
 //            allReceiveMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】${$.jxFactoryReceive} (京喜工厂)\n`;
 //            TempBaipiao += `【京喜工厂】${$.jxFactoryReceive} 可以兑换了!\n`;
 //        }
-        JSONObject response = PetRequest("energyCollect");
-        JSONObject initPetTownRes = PetRequest("initPetTown");
+        JSONObject response = petRequest("energyCollect",cookie);
+        JSONObject initPetTownRes = petRequest("initPetTown",cookie);
         if (initPetTownRes.getInteger("code") == 0 && initPetTownRes.getInteger("resultCode") == 0 && "success".equals(initPetTownRes.getString("message"))) {
             JSONObject petInfo = initPetTownRes.getJSONObject("result");
             if (petInfo.getInteger("userStatus") == 0) {
@@ -253,7 +309,7 @@ public class JdBeanChangeUtil {
                 TempBaipiao += "【东东萌宠】未选择物品! \n";
             } else if (response.getInteger("resultCode") == 0) {
                 ReturnMessage += "【东东萌宠】"+petInfo.getJSONObject("goodsInfo").getString("goodsName");
-                ReturnMessage += "("+response.getJSONObject("result").getDouble("medalPercent")+"%,"+String.valueOf(response.getJSONObject("result").getDouble("medalNum")/(response.getJSONObject("result").getDouble("medalNum") + response.getJSONObject("result").getDouble("needCollectMedalNum"))+"块)\n");
+                ReturnMessage += "("+response.getJSONObject("result").getDouble("medalPercent")+"%,"+response.getJSONObject("result").getInteger("medalNum")+"/"+(response.getJSONObject("result").getInteger("medalNum") + response.getJSONObject("result").getInteger("needCollectMedalNum")+"块)\n");
             } else if (petInfo.getJSONObject("goodsInfo")==null) {
                 ReturnMessage += "【东东萌宠】暂未选购新的商品!\n";
                 TempBaipiao += "【东东萌宠】暂未选购新的商品!\n";
@@ -261,12 +317,12 @@ public class JdBeanChangeUtil {
         }
         ReturnMessage += overdue+"\n";
         ReturnMessage += message;
-        ReturnMessage += "⭕活动攻略:⭕" + "\n";
+        ReturnMessage += "\n活动攻略:" + "\n";
         ReturnMessage += "【京东赚赚】微信->京东赚赚小程序->底部赚好礼->提现无门槛红包(京东使用)\n";
         ReturnMessage += "【东东农场】京东->我的->东东农场,完成是京东红包,可以用于京东app的任意商品\n";
         ReturnMessage += "【东东萌宠】京东->我的->东东萌宠,完成是京东红包,可以用于京东app的任意商品\n";
 //        ReturnMessage += "【极速金币】京东极速版->我的->金币(极速版使用)\n";
-//        ReturnMessage += "【京东秒杀】京东->中间频道往右划找到京东秒杀->中间点立即签到->兑换无门槛红包(京东使用)\n";
+        ReturnMessage += "【京东秒杀】京东->中间频道往右划找到京东秒杀->中间点立即签到->兑换无门槛红包(京东使用)\n";
 //        ReturnMessage += "【领现金】京东->我的->东东萌宠->领现金(微信提现+京东红包)\n";
 //        ReturnMessage += "【京喜工厂】京喜->我的->京喜工厂,完成是商品红包,用于购买指定商品(不兑换会过期)\n";
 //        ReturnMessage += "【京东金融】京东金融app->我的->养猪猪,完成是白条支付券,支付方式选白条支付时立减.\n";
@@ -274,17 +330,23 @@ public class JdBeanChangeUtil {
         return ReturnMessage;
     }
 
-    public JSONObject PetRequest(String function_id){
+    public static JSONObject petRequest(String function_id,String cookie){
         JSONObject body = new JSONObject();
         body.put("version",2);
         body.put("channel","app");
-        String resStr = HttpRequest.post(JDAPIHOST + "?functionId=" + function_id)
+        String resStr = HttpRequest.post("https://api.m.jd.com/client.action?functionId=" + function_id)
                 .header("Cookie", cookie)
                 .header("User-Agent", GetUserAgentUtil.getUserAgent())
                 .header("Host", "api.m.jd.com")
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .body("body=" + EscapeUtil.escape(body.toJSONString()) + "&appid=wh5&loginWQBiz=pet-town&clientVersion=9.0.4")
                 .timeout(3000).execute().body();
+        log.info("查询东东萌宠数据："+resStr);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if (StringUtils.isNotEmpty(resStr)){
             return JSONObject.parseObject(resStr);
         }else {
@@ -394,7 +456,7 @@ public class JdBeanChangeUtil {
                                 }
                             }
                         }
-                        if (time <= end && time >= begin) {
+                        if (time >= begin && time <= end) {
                             //昨天
                             String eventMassage = detail.getString("eventMassage");
                             if (!eventMassage.contains("退还") && !eventMassage.contains("物流") && !eventMassage.contains("扣赠")) {
@@ -414,6 +476,7 @@ public class JdBeanChangeUtil {
                     }
                 } else if ("3".equals(jingBeanBalanceDetail.getString("code"))) {
                     log.info("ck已过期，或者填写不规范");
+                    isLogin = false;
                     //跳出
                     t = 1;
                 } else {
@@ -491,44 +554,56 @@ public class JdBeanChangeUtil {
 
     public void getjdfruit() {
         try {
-            JSONObject body = new JSONObject();
-            body.put("version", 4);
-            String result = HttpRequest.post(JDAPIHOST + "?functionId=initForFarm")
-                    .header("accept", "*/*")
-                    .header("Accept-Encoding", "gzip, deflate, br")
-                    .header("accept-language", "zh-CN,zh;q=0.9")
-                    .header("cache-control", "no-cache")
-                    .header("Cookie", cookie)
-                    .header("origin", "https://home.m.jd.com")
-                    .header("pragma", "no-cache")
-                    .header("Referer", "https://home.m.jd.com/myJd/newhome.action")
-                    .header("sec-fetch-dest", "empty")
-                    .header("sec-fetch-mode", "cors")
-                    .header("sec-fetch-site", "same-site")
-                    .header("User-Agent", GetUserAgentUtil.getUserAgent())
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .body("body=" + URLEncodeUtil.encode(body.toJSONString()) + "&appid=wh5&clientVersion=9.1.0")
-                    .timeout(3000)
-                    .execute().body();
-            if (StringUtils.isNotEmpty(result)) {
-                JSONObject farmInfo = JSONObject.parseObject(result);
-                JSONObject farmUserPro = farmInfo.getJSONObject("farmUserPro");
-                if (farmUserPro != null) {
-                    JdFarmProdName = farmUserPro.getString("name");
-                    JdtreeEnergy = farmUserPro.getInteger("treeEnergy");
-                    JdtreeTotalEnergy = farmUserPro.getInteger("treeTotalEnergy");
-                    treeState = farmInfo.getInteger("treeState");
-                    int waterEveryDayT = JDwaterEveryDayT;
-                    //一共还需浇多少次水
-                    int waterTotalT = (farmUserPro.getInteger("treeTotalEnergy") - farmUserPro.getInteger("treeEnergy") - farmUserPro.getInteger("totalEnergy")) / 10;
-                    int waterD = new BigDecimal(waterTotalT).divide(new BigDecimal(waterEveryDayT), 0, BigDecimal.ROUND_HALF_UP).intValue();
-                    JdwaterTotalT = waterTotalT;
-                    JdwaterD = waterD;
-                }
+            JSONObject farmInfo = getjdfruit(cookie);
+            JSONObject farmUserPro = farmInfo.getJSONObject("farmUserPro");
+            if (farmUserPro != null) {
+                JdFarmProdName = farmUserPro.getString("name");
+                JdtreeEnergy = farmUserPro.getInteger("treeEnergy");
+                JdtreeTotalEnergy = farmUserPro.getInteger("treeTotalEnergy");
+                treeState = farmInfo.getInteger("treeState");
+                int waterEveryDayT = JDwaterEveryDayT;
+                //一共还需浇多少次水
+                int waterTotalT = (farmUserPro.getInteger("treeTotalEnergy") - farmUserPro.getInteger("treeEnergy") - farmUserPro.getInteger("totalEnergy")) / 10;
+                int waterD = new BigDecimal(waterTotalT).divide(new BigDecimal(waterEveryDayT), 0, BigDecimal.ROUND_HALF_UP).intValue();
+                JdwaterTotalT = waterTotalT;
+                JdwaterD = waterD;
             }
+
         } catch (HttpException e) {
             log.error("getjdfruit方法异常：" + e.getMessage());
         }
+    }
+
+    public static JSONObject getjdfruit(String ck){
+        JSONObject body = new JSONObject();
+        body.put("version", 4);
+        String result = HttpRequest.post("https://api.m.jd.com/client.action?functionId=initForFarm")
+                .header("accept", "*/*")
+                .header("Accept-Encoding", "gzip, deflate, br")
+                .header("accept-language", "zh-CN,zh;q=0.9")
+                .header("cache-control", "no-cache")
+                .header("Cookie", ck)
+                .header("origin", "https://home.m.jd.com")
+                .header("pragma", "no-cache")
+                .header("Referer", "https://home.m.jd.com/myJd/newhome.action")
+                .header("sec-fetch-dest", "empty")
+                .header("sec-fetch-mode", "cors")
+                .header("sec-fetch-site", "same-site")
+                .header("User-Agent", GetUserAgentUtil.getUserAgent())
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .body("body=" + URLEncodeUtil.encode(body.toJSONString()) + "&appid=wh5&clientVersion=9.1.0")
+                .timeout(3000)
+                .execute().body();
+        log.info("查询东东农场数据："+result);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if (StringUtils.isNotEmpty(result)) {
+            return JSONObject.parseObject(result);
+        }
+        return null;
     }
 
     public void TotalBean() {
@@ -592,9 +667,9 @@ public class JdBeanChangeUtil {
                     return;
                 }
                 String petName = userInfo.getString("petName");
-                if (StringUtils.isNotEmpty(petName)) {
-                    nickName = petName;
-                }
+//                if (StringUtils.isNotEmpty(petName)) {
+//                    nickName = petName;
+//                }
                 if (beanCount == 0) {
                     beanCount = userInfo.getInteger("jingBean");
                     isPlusVip = 3;
@@ -675,9 +750,7 @@ public class JdBeanChangeUtil {
                     .execute().body();
             if (StringUtils.isNotEmpty(result)) {
                 JSONObject res = JSONObject.parseObject(result);
-                if (res.getInteger("code") == 2041 || res.getInteger("code") == 2042) {
-                    JdMsScore = res.getJSONObject("data").getJSONObject("result").getJSONObject("assignment").getInteger("assignmentPoints");
-                }
+                JdMsScore = res.getJSONObject("result").getJSONObject("assignment").getInteger("assignmentPoints");
             }
         } catch (HttpException e) {
             log.error("getMs方法异常：" + e.getMessage());

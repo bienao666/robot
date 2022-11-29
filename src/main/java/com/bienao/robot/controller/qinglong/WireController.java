@@ -82,10 +82,6 @@ public class WireController {
         log.info("开始updateWire：{}",System.currentTimeMillis());
         Result result;
         try {
-            Integer id = wireEntity.getId();
-            if (id==null){
-                return Result.error(ErrorCodeConstant.PARAMETER_ERROR,"参数异常");
-            }
             result = wireService.updateWire(wireEntity);
         } catch (Exception e) {
             e.printStackTrace();
@@ -141,10 +137,11 @@ public class WireController {
     @LoginToken
     @GetMapping("/queryActivity")
     public Result queryActivity(@RequestParam(value = "pageNo") Integer pageNo,
-                                @RequestParam(value = "pageSize") Integer pageSize){
+                                @RequestParam(value = "pageSize") Integer pageSize,
+                                @RequestParam(value = "content") String content){
         long start = System.currentTimeMillis();
         log.info("开始queryActivity：{}",System.currentTimeMillis());
-        Result result = wireService.queryActivity(pageNo,pageSize);
+        Result result = wireService.queryActivity(pageNo,pageSize,content);
         long end = System.currentTimeMillis();
         log.info("queryActivity结束：{}",System.currentTimeMillis());
         log.info("queryActivity耗时：{}ms",(end-start));
@@ -152,7 +149,7 @@ public class WireController {
     }
 
     /**
-     * 执行线报活动
+     * 立即执行线报活动
      */
     @LoginToken
     @GetMapping("/handleActivity")

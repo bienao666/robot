@@ -28,6 +28,8 @@ public class CommandServiceImpl implements CommandService {
         addCommandEntities("我的uid","查询自己的uid","",1,commands,commandEntities);
         addCommandEntities("myuid","查询自己的uid","",1,commands,commandEntities);
         addCommandEntities("群号","查询微信群群号","",1,commands,commandEntities);
+        addCommandEntities("群号 xxx","根据微信群名称查询微信群群号","",1,commands,commandEntities);
+        addCommandEntities("群号列表","查询所有群号","",1,commands,commandEntities);
         addCommandEntities("监听","监听此群消息","开始监听",1,commands,commandEntities);
         addCommandEntities("取消监听","取消监听此群消息","取消监听成功",1,commands,commandEntities);
         addCommandEntities("q","退出当前操作","已退出",1,commands,commandEntities);
@@ -52,6 +54,11 @@ public class CommandServiceImpl implements CommandService {
         addCommandEntities("老色批","随机获取一张老色批图片","",1,commands,commandEntities);
         addCommandEntities("xx天气","查询xx城市的天气","",1,commands,commandEntities);
         addCommandEntities("比价","根据商品链接查询价格信息","",1,commands,commandEntities);
+        addCommandEntities("启用 xxx","启用京东ck xxx","启用成功",1,commands,commandEntities);
+        addCommandEntities("禁用 xxx","禁用京东ck xxx","禁用成功",1,commands,commandEntities);
+        addCommandEntities("转发 群号1 群号2","转发群号1的消息到群号2","",1,commands,commandEntities);
+        addCommandEntities("取消转发 群号1 群号2","取消转发群号1的消到群号2","",1,commands,commandEntities);
+        addCommandEntities("扭","随机获取一个小姐姐跳舞短视频","",1,commands,commandEntities);
         if (commandEntities.size()>0){
             commandMapper.addCommands(commandEntities);
         }
@@ -69,9 +76,9 @@ public class CommandServiceImpl implements CommandService {
     }
 
     @Override
-    public Result queryCommand(String command, String function) {
-        List<CommandEntity> commandEntities = commandMapper.queryCommand(command, function);
-        return Result.success(commandEntities);
+    public List<CommandEntity> queryCommand(String command, String function) {
+        List<CommandEntity> commandEntities = commandMapper.queryCommand(command, function,null);
+        return commandEntities;
     }
 
     @Override

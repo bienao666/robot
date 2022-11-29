@@ -12,7 +12,7 @@ public class Group {
     //群号id
     private String groupid;
 
-    //微信群名称
+    //群名称
     private String groupName;
 
     //功能类型

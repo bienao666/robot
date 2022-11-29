@@ -1,9 +1,12 @@
 package com.bienao.robot.controller.systemParam;
 
+import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.annotation.LoginToken;
+import com.bienao.robot.annotation.PassToken;
 import com.bienao.robot.entity.SystemParam;
 import com.bienao.robot.enums.ErrorCodeConstant;
 import com.bienao.robot.entity.Result;
+import com.bienao.robot.utils.PageUtil;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -66,11 +69,14 @@ public class SystemParamController {
      * 查询参数
      * @param code
      */
-    @LoginToken
+    @PassToken
     @GetMapping("/querySystemParams")
-    public Result querySystemParams(@RequestParam(value = "code",required = false) String code){
+    public Result querySystemParams(@RequestParam(value = "code",required = false) String code,
+                                    @RequestParam(value = "pageNo") Integer pageNo,
+                                    @RequestParam(value = "pageSize") Integer pageSize){
         List<SystemParam> systemParams = systemParamUtil.queryShowSystems(code);
-        return Result.success(systemParams);
+        JSONObject page = PageUtil.page(systemParams, pageNo, pageSize);
+        return Result.success(page);
     }
 
     /**

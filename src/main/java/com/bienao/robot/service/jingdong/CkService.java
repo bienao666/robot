@@ -32,11 +32,26 @@ public interface CkService {
     /**
      * 检查ck是否过期
      */
-    void checkCk();
+    void checkZlc();
 
-    List<JdCkEntity> getJdCks(String ck,String ptPin,Integer level,Integer status);
+    Result getJdCks(String ck,Integer level,Integer status,String remark,Integer pageNo,Integer pageSize);
 
     Result updateJdCk(JdCkEntity jdCkEntity);
 
     Result deleteJdCks(List<Integer> ids);
+
+    Result getJdCkList(String ck, String ptPin, Integer status,String qlName,Integer pageNo,Integer pageSize);
+
+    void jkExchange();
+
+    Result enableJdCk(List<JSONObject> cks);
+
+    Result disableJdCk(List<JSONObject> cks);
+
+    Result deleteJdCk(List<JSONObject> cks);
+
+    /**
+     * 过期ck
+     */
+    Result expireCk(List<String> ids);
 }

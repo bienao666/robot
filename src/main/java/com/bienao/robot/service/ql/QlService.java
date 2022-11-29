@@ -27,6 +27,11 @@ public interface QlService {
     Result queryQls(List<Integer> ids);
 
     /**
+     * 青龙检测
+     */
+    Result checkQl();
+
+    /**
      * 更新青龙
      * @param ql
      */
@@ -65,6 +70,13 @@ public interface QlService {
     Result cancelHead();
 
     /**
+     * 延迟取消车头
+     *
+     * @return
+     */
+    void waitCancelHead();
+
+    /**
      * 停止脚本
      * @param command
      * @return
@@ -100,4 +112,37 @@ public interface QlService {
      * @return
      */
     void addJdCk(JSONObject content,String ck, String ptPin, String wxPusherUid);
+
+    void setSmallHead();
+
+    /**
+     * 韭菜友好设置
+     */
+    void leekFriendly();
+
+    /**
+     * 多青龙 ck分布优化
+     */
+    void autoAdjust();
+
+    /**
+     * ck检测
+     */
+    void checkCk();
+
+    /**
+     * 恢复青龙ck
+     */
+    Result recoveryCk(String oldQl, String newQl);
+
+    /**
+     * 获取待恢复青龙
+     * @return
+     */
+    Result getRecoveryQl();
+
+    /**
+     * 京东红包领取通知
+     */
+    void notifyRedPacket();
 }

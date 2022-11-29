@@ -24,7 +24,7 @@ public class ylgyTask {
     /**
      * 羊了个羊代刷
      */
-    @Scheduled(cron = "0 0/1 * * * ?")
+    /*@Scheduled(cron = "0 0/1 * * * ?")
     public void brush() {
         //查询待刷账号
         List<JSONObject> list = ylgyService.query();
@@ -39,5 +39,5 @@ public class ylgyTask {
             }
             ylgyService.handleBrush(id,uid,token,time);
         }
-    }
+    }*/
 }

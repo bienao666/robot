@@ -30,8 +30,8 @@
         </foreach>
     </delete>
 
-    <select id="queryScript" resultType="string">
-        select w.script from wireKey wk
+    <select id="queryScript" resultType="wireEntity">
+        select w.script,w.status from wireKey wk
         left join wire w on wk.wireId=w.id
         where wk.key = #{key}
     </select>

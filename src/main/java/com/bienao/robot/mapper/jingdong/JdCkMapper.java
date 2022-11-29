@@ -75,4 +75,37 @@ public interface JdCkMapper {
      * @return
      */
     Integer queryCkCount();
+
+    /**
+     * 查询东东农场已助力满的ck
+     * @return
+     */
+    List<JdCkEntity> queryHasHelpFruitCk();
+
+    /**
+     * 查询东东萌宠已助力满的ck
+     * @return
+     */
+    List<JdCkEntity> queryHasHelpPetCk();
+
+    /**
+     * 查询种豆得豆已助力满的ck
+     * @return
+     */
+    List<JdCkEntity> queryHasHelpPlantCk();
+
+    /**
+     * 过期ck
+     * @param ids
+     * @return
+     */
+    List<JdCkEntity> queryByIdsCk(List<Integer> ids);
+
+    /**
+     * 获取待恢复青龙
+     * @return
+     */
+    List<String> getRecoveryQl();
+
+    Integer queryMaxId();
 }

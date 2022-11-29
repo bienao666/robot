@@ -21,10 +21,13 @@ import com.bienao.robot.mapper.jingdong.JdCkMapper;
 import com.bienao.robot.service.jingdong.CkService;
 import com.bienao.robot.service.jingdong.JdService;
 import com.bienao.robot.service.ql.QlService;
+import com.bienao.robot.service.ql.WireService;
 import com.bienao.robot.service.user.UserService;
+import com.bienao.robot.service.weixin.ForwardService;
 import com.bienao.robot.service.weixin.WxService;
 import com.bienao.robot.utils.*;
 import com.bienao.robot.utils.jingdong.JdBeanChangeUtil;
+import com.bienao.robot.utils.ql.QlUtil;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import com.bienao.robot.utils.weixin.WeChatUtil;
 import com.google.common.collect.EvictingQueue;
@@ -90,13 +93,33 @@ public class WxServiceImpl implements WxService {
     @Autowired
     private JdBeanChangeUtil jdBeanChangeUtil;
 
+    @Autowired
+    private QlMapper qlMapper;
+
+    @Autowired
+    private QlUtil qlUtil;
+
+    @Autowired
+    private ForwardMapper forwardMapper;
+
+    @Autowired
+    private ForwardService forwardService;
+
+    @Autowired
+    private ForwardUtil forwardUtil;
+
+    @Autowired
+    private WireService wireService;
+
     private Cache<String, String> redis = WXConstant.redis;
 
     private Pattern lowerDatePattern = Pattern.compile("/Date\\((\\d+)\\+");
 
-    private static Pattern ckPattern = Pattern.compile("pt_pin=(.+?);");
+    private static Pattern jdPinPattern = Pattern.compile("pt_pin=(.+?);");
 
-    @Async("asyncServiceExecutor")
+    private static Pattern ckPattern = Pattern.compile("pt_key=(.+?);pt_pin=(.+?);");
+
+    @Async("messageAsyncServiceExecutor")
     @Override
     public void handleMessage(JSONObject message) {
         JSONObject content = message.getJSONObject("content");
@@ -104,22 +127,52 @@ public class WxServiceImpl implements WxService {
         //同意好友添加
         Integer type = content.getInteger("type");
         if (14 == type) {
-            weChatUtil.agreeFriendVerify(content);
+            String isautoagreeaddwx = systemParamUtil.querySystemParam("ISAUTOAGREEADDWX");
+            if ("是".equals(isautoagreeaddwx)){
+                weChatUtil.agreeFriendVerify(content);
+            }
+            return;
+        }
+
+        //获取微信群号
+        String from_group = content.getString("from_group");
+
+        //记录群
+        if (StringUtils.isNotEmpty(from_group)) {
+            List<Group> groups = groupMapper.queryGroupByGroupId(from_group);
+            if (groups.size() == 0) {
+                Group group = new Group();
+                group.setGroupid(from_group);
+                group.setGroupName(content.getString("from_group_name"));
+                groupMapper.addGroup(group);
+            }
+        }
+
+        //判断用户是否白名单
+        if (!checkUserStatus(content)){
             return;
         }
 
         //发送人
         String from_wxid = content.getString("from_wxid");
+
+
         String msg = content.getString("msg").trim();
+
+        //转发
+        List<ForwardEntity> list = forwardMapper.queryForward(String.valueOf(from_group), null, null, null);
+        if (list.size() > 0) {
+            for (ForwardEntity forwardEntity : list) {
+                forwardUtil.forward(type,msg, forwardEntity.getTo(), forwardEntity.getTotype());
+            }
+        }
+
 
         //机器人
         String robortwxid = systemParamUtil.querySystemParam("ROBORTWXID");
         if (StringUtils.isEmpty(robortwxid)) {
             systemParamUtil.updateSystemParam("ROBORTWXID", "机器人", content.getString("robot_wxid"));
         }
-
-        //获取微信群号
-        String from_group = content.getString("from_group");
 
         //监听群
         if ("监听".equals(msg.trim()) && StringUtils.isNotEmpty(from_group) && weChatUtil.isMaster(content)) {
@@ -139,6 +192,7 @@ public class WxServiceImpl implements WxService {
             } else {
                 weChatUtil.sendTextMsg("开始监听", content);
             }
+            return;
         }
 
         //取消监听群
@@ -150,8 +204,8 @@ public class WxServiceImpl implements WxService {
             } else {
                 weChatUtil.sendTextMsg("未监听此群，无法取消", content);
             }
+            return;
         }
-
         //判断是否在监听范围
         if (StringUtils.isNotEmpty(from_group)) {
             //获取所有监听群号
@@ -167,28 +221,64 @@ public class WxServiceImpl implements WxService {
             }
         }
 
+        if (msg.contains("export ")) {
+            String islistenwire = systemParamUtil.querySystemParam("ISLISTENWIRE");
+            if ("是".equals(islistenwire)){
+                Result result = wireService.addActivity(msg);
+                if ("200".equals(result.getCode())) {
+                    weChatUtil.sendTextMsg("线报添加成功", content);
+                } else {
+                    weChatUtil.sendTextMsg(result.getMessage(), content);
+                }
+            }
+            return;
+        }
+
+        //京东ck
+        if (ckPattern.matcher(msg.replace(" ","").trim()).find()){
+            addJdCk(msg,content);
+            return;
+        }
+
         //退出当前操作
-        if ("q".equals(msg.trim())) {
+        if ("q".equals(msg)) {
+            log.info("退出当前操作：{}", msg);
             redis.remove(from_wxid + "operate");
             weChatUtil.sendTextMsg("已退出", content);
             return;
         }
 
         //查看当前操作
-        String operate = redis.get(from_wxid + "operate");
+        String operate = redis.get(from_wxid + "operate",false);
         if (StringUtils.isNotEmpty(operate)) {
+            log.info("处理当前操作：{}", operate);
             handleOperate(content, operate, msg, from_wxid);
             return;
         }
 
         //系统参数
-        if (msg.startsWith("设置") || msg.startsWith("启用") || msg.startsWith("关闭")) {
+        if (msg.startsWith("设置") || msg.startsWith("关闭")) {
             handleSetSysParam(content);
             return;
         }
+        //扭一扭
+        if ("扭".equals(msg) || "扭一扭".equals(msg)){
+            handleNiuYiNiu(content);
+            return;
+        }
         //功能列表
-        if ("菜单".equals(msg)) {
+        /*if ("菜单".equals(msg)) {
             handleFunctionList(content);
+            return;
+        }*/
+        //转发
+        if (msg.startsWith("转发")) {
+            handleForward(content);
+            return;
+        }
+        //取消转发
+        if (msg.startsWith("取消转发")) {
+            handleQxForward(content);
             return;
         }
         //京东资产查询
@@ -216,6 +306,17 @@ public class WxServiceImpl implements WxService {
             handleAddGroup(content);
             return;
         }
+        //禁用
+        if (msg.startsWith("禁用")) {
+            handleDisableCk(content);
+            return;
+        }
+        //启用
+        if (msg.startsWith("启用")) {
+            handleEnableCk(content);
+            return;
+        }
+
         //登陆
         if ("登陆".equals(msg) || "登录".equals(msg)) {
             handleJdLogin(content);
@@ -276,6 +377,11 @@ public class WxServiceImpl implements WxService {
             handleQxTsWb(content);
             return;
         }
+        //命令
+        if ("命令".equals(msg)) {
+            handleCommand(content);
+            return;
+        }
         //推送支付宝红包
         if (msg.trim().equals("推送支付宝红包")) {
             handleTsZfbHb(content);
@@ -316,27 +422,31 @@ public class WxServiceImpl implements WxService {
             handleWeather(content);
             return;
         }
-        //比价
-        if ("比价".equals(msg)) {
-            weChatUtil.sendTextMsg("请直接发送商品连接，我会自动识别", content);
+        if ("是".equals(systemParamUtil.querySystemParam("ISCOMPAREGOODSPRICE"))){
+            //比价
+            if ("比价".equals(msg)) {
+                weChatUtil.sendTextMsg("请直接发送商品连接，我会自动识别", content);
+                return;
+            }
+            if (msg.contains("item.m.jd.com") || msg.contains("m.tb.cn") || msg.contains("mobile.yangkeduo.com")) {
+                handleGoods(msg, content);
+                return;
+            }
         }
-        if (msg.contains("item.m.jd.com") || msg.contains("m.tb.cn") || msg.contains("mobile.yangkeduo.com")) {
-            handleGoods(msg, content);
-            return;
-        }
-        //青龙管理
-        /*if (msg.trim().equals("青龙")) {
-            qingLongGuanLiUtil.handleQingLong(content);
-            return;
-        }*/
+
         //查询我的uid
         if ("我的uid".equals(msg.trim()) || "myuid".equals(msg.trim())) {
             handleMyUid(content);
             return;
         }
+        //查询所有群号
+        if ("群号列表".equals(msg.trim())) {
+            handleGroupCodes(content);
+            return;
+        }
         //查询群id
-        if ("群号".equals(msg.trim()) || "groupCode".equals(msg.trim())) {
-            handleMyUid(content);
+        if (msg.startsWith("群号")) {
+            handleGroupCode(content);
             return;
         }
         //查询微信管理员
@@ -345,9 +455,9 @@ public class WxServiceImpl implements WxService {
             return;
         }
 
-        List<CommandEntity> commandEntities = commandMapper.queryCommand("", "");
+        List<CommandEntity> commandEntities = commandMapper.queryCommand("", "",0);
         for (CommandEntity commandEntity : commandEntities) {
-            if (msg.trim().contains(commandEntity.getCommand())) {
+            if (msg.trim().equals(commandEntity.getCommand())) {
                 weChatUtil.sendTextMsg(commandEntity.getReply(), content);
                 return;
             }
@@ -355,10 +465,239 @@ public class WxServiceImpl implements WxService {
 
         if (NumberUtil.isInteger(msg)) {
             Integer num = Integer.valueOf(msg);
-            String publicKey = redis.get("publicKey");
+            String publicKey = redis.get("publicKey",false);
             if (num <= 50 && StringUtils.isNotEmpty(publicKey)) {
                 handleLast(content, num, publicKey);
             }
+        }
+    }
+
+    /**
+     * 扭一扭
+     * @param content
+     */
+    private void handleNiuYiNiu(JSONObject content) {
+        String url = "http://api.qemao.com/api/douyin/";
+        url += HttpRequest.get(url).timeout(3000).execute().header("location").replace("./","");
+        weChatUtil.sendVideoMsg(url,content);
+    }
+
+    public boolean checkUserStatus(JSONObject content){
+        String from_wxid = content.getString("from_wxid");
+        User userQuery = new User();
+        userQuery.setWxid(from_wxid);
+        User user = userService.queryUser(userQuery);
+        if (user==null){
+            //新增
+            user = new User();
+            user.setWxid(from_wxid);
+            user.setWxName(content.getString("from_name"));
+            userService.addUser(user);
+        }else {
+            if (user.getStatus()==1){
+                //已拉黑
+                log.info(from_wxid+"该用户已拉黑");
+                return false;
+            }
+        }
+        log.info(from_wxid+"该用户正常");
+        return true;
+    }
+
+    /**
+     * 取消转发群消息
+     * @param content
+     */
+    private void handleQxForward(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag){
+            String msg = content.getString("msg").replace("取消转发", "").trim();
+            String[] split = msg.split(" ");
+            if (split.length != 2){
+                weChatUtil.sendTextMsg("取消转发格式有误",content);
+                return;
+            }
+            String fromGroupId = split[0];
+            String toGroupId = split[1];
+            List<ForwardEntity> forwardEntities = forwardMapper.queryForward(fromGroupId, null, toGroupId, null);
+            if (forwardEntities.size() == 0 ){
+                weChatUtil.sendTextMsg("转发不存在",content);
+                return;
+            }
+            ArrayList<Integer> ids = new ArrayList<>();
+            ids.add(forwardEntities.get(0).getId());
+            int i = forwardService.deleteForward(ids);
+            if (i == 0){
+                weChatUtil.sendTextMsg("取消失败",content);
+            }else {
+                weChatUtil.sendTextMsg("取消转发",content);
+            }
+        }
+    }
+
+    /**
+     * 转发群消息
+     * @param content
+     */
+    private void handleForward(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag){
+            String msg = content.getString("msg").replace("转发", "").trim();
+            String[] split = msg.split(" ");
+            if (split.length != 2){
+                weChatUtil.sendTextMsg("转发格式有误",content);
+                return;
+            }
+            String fromGroupId = split[0];
+            String toGroupId = split[1];
+            List<ForwardEntity> forwardEntities = forwardMapper.queryForward(fromGroupId, null, toGroupId, null);
+            if (forwardEntities.size() > 0 ){
+                weChatUtil.sendTextMsg("改转发已设置过",content);
+                return;
+            }
+            List<Group> groups = groupMapper.queryDistinctGroup(null, fromGroupId);
+            if (groups.size()==0){
+                weChatUtil.sendTextMsg(fromGroupId+"群不存在",content);
+                return;
+            }
+            Group fromGroup = groups.get(0);
+            groups = groupMapper.queryDistinctGroup(null, toGroupId);
+            if (groups.size()==0){
+                weChatUtil.sendTextMsg(fromGroupId+"群不存在",content);
+                return;
+            }
+            Group toGroup = groups.get(0);
+            int i = forwardService.addForward(fromGroup,toGroup);
+            if (i == 1){
+                weChatUtil.sendTextMsg("开启转发",content);
+            }else {
+                weChatUtil.sendTextMsg("转发失败",content);
+            }
+        }
+    }
+
+    /**
+     * 查询所有群号列表
+     * @param content
+     */
+    private void handleGroupCodes(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag){
+            List<Group> groups = groupMapper.queryDistinctGroup(null,null);
+            String msg = "";
+            for (Group group : groups) {
+                msg += group.getGroupName() + "\n  " + group.getGroupid() + "\n";
+            }
+            weChatUtil.sendTextMsg(msg,content);
+        }
+    }
+
+    /**
+     * 查询所有的命令
+     *
+     * @param content
+     */
+    private void handleCommand(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag){
+            List<CommandEntity> commandEntities = commandMapper.queryCommand(null, null,null);
+            String msg = "";
+            for (CommandEntity commandEntity : commandEntities) {
+                msg += commandEntity.getCommand() + " -> " + commandEntity.getFunction() + "\n";
+            }
+            weChatUtil.sendTextMsg(msg, content);
+        }
+    }
+
+    /**
+     * 启用京东ck
+     *
+     * @param content
+     */
+    private void handleEnableCk(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag){
+            String ck = content.getString("msg").replace("启用", "").replace(" ", "");
+            //查询所有青龙
+            List<QlEntity> qlEntities = qlMapper.queryQls(null);
+            boolean isReturn = false;
+            for (QlEntity qlEntity : qlEntities) {
+                if (isReturn) {
+                    return;
+                }
+                List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
+                for (QlEnv env : envs) {
+                    if ("JD_COOKIE".equals(env.getName()) && env.getValue().contains(ck)) {
+                        ArrayList<Integer> ids = new ArrayList<>();
+                        ids.add(env.getId());
+                        qlUtil.enableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), ids);
+                        isReturn = true;
+                        weChatUtil.sendTextMsg("启用成功", content);
+                        break;
+                    }
+                }
+            }
+            weChatUtil.sendTextMsg("启用失败，该ck不存在", content);
+        }
+    }
+
+    /**
+     * 禁用京东ck
+     *
+     * @param content
+     */
+    private void handleDisableCk(JSONObject content) {
+        boolean flag = weChatUtil.isMaster(content);
+        if (flag){
+            String ck = content.getString("msg").replace("禁用", "").replace(" ", "");
+            //查询所有青龙
+            List<QlEntity> qlEntities = qlMapper.queryQls(null);
+            boolean isReturn = false;
+            for (QlEntity qlEntity : qlEntities) {
+                if (isReturn) {
+                    return;
+                }
+                List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
+                for (QlEnv env : envs) {
+                    if ("JD_COOKIE".equals(env.getName()) && env.getValue().contains(ck)) {
+                        ArrayList<Integer> ids = new ArrayList<>();
+                        ids.add(env.getId());
+                        qlUtil.disableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), ids);
+                        isReturn = true;
+                        weChatUtil.sendTextMsg("禁用成功", content);
+                        break;
+                    }
+                }
+            }
+            weChatUtil.sendTextMsg("禁用失败，该ck不存在", content);
+        }
+    }
+
+    /**
+     * 微信安全措施
+     * @return
+     */
+    public boolean wxSafeCheck(String operate,JSONObject content){
+        String iswxsafe = systemParamUtil.querySystemParam("ISWXSAFE");
+        if ("否".equals(iswxsafe)){
+            return true;
+        }
+        String from_wxid = content.getString("from_wxid");
+        //限制一天只能查3次
+        String timesStr = redis.get(from_wxid + operate,false);
+        if (StringUtils.isEmpty(timesStr)) {
+            redis.put(from_wxid + operate, DateUtil.formatDateTime(DateUtil.date()));
+            return true;
+        } else {
+            //上次查询时间
+            DateTime lastTime = DateUtil.parse(redis.get(from_wxid + operate,false));
+            DateTime limitTime = DateUtil.offsetSecond(lastTime, 30);
+            if (limitTime.getTime() > DateUtil.date().getTime()) {
+//                weChatUtil.sendTextMsg("抱歉，请在" + DateUtil.formatDateTime(limitTime) + "后再试", content);
+                return false;
+            }
+            redis.put(from_wxid + operate, DateUtil.formatDateTime(DateUtil.date()));
+            return true;
         }
     }
 
@@ -367,34 +706,63 @@ public class WxServiceImpl implements WxService {
      *
      * @param content
      */
-    private void handleQueryJdAssets(JSONObject content) {
+    @Override
+    public void handleQueryJdAssets(JSONObject content) {
         String from_wxid = content.getString("from_wxid");
+        //限制一天只能查3次
+        String timesStr = redis.get(from_wxid + "QueryTimes",false);
+        if (StringUtils.isNotEmpty(timesStr)) {
+            Integer times = Integer.parseInt(timesStr);
+            if (times > 3) {
+                weChatUtil.sendTextMsg("抱歉，今日查询次数已耗尽，请明日再查询（robot保护京东账号策略：一天只能查三次）", content);
+                return;
+            }
+            //限制查询间隔3个小时
+            //上次查询时间
+            DateTime lastTime = DateUtil.parse(redis.get(from_wxid + "QueryTime",false));
+            DateTime limitTime = DateUtil.offsetHour(lastTime, 3);
+            if (limitTime.getTime() > DateUtil.date().getTime()) {
+                weChatUtil.sendTextMsg("抱歉，请在" + DateUtil.formatDateTime(limitTime) + "后查询（robot保护京东账号策略：查询间隔3小时）", content);
+                return;
+            }
+        }
         User userQuery = new User();
         userQuery.setWxid(from_wxid);
         User user = userService.queryUser(userQuery);
-        if (user == null) {
-            weChatUtil.sendTextMsg("尚未登陆，请先登陆", content);
+        if (StringUtils.isEmpty(user.getJdPtPin().replace("#",""))||"null".equals(user.getJdPtPin().replace("#",""))) {
+            weChatUtil.sendTextMsg("未查询到账号，请先登陆", content);
             return;
         }
         String jdPtPins = user.getJdPtPin();
         String[] split = jdPtPins.split("#");
         for (String jdPtPin : split) {
+            if (StringUtils.isEmpty(jdPtPin)){
+                continue;
+            }
             JdCkEntity jdCkEntityQuery = new JdCkEntity();
             jdCkEntityQuery.setPtPin(jdPtPin);
             JdCkEntity jdCkEntity = jdCkMapper.queryCk(jdCkEntityQuery);
-            if (jdCkEntity!=null && jdCkEntity.getStatus()==1){
-                weChatUtil.sendTextMsg("京东账号已过期，请重新登陆", content);
-                return;
+            if (jdCkEntity != null && jdCkEntity.getStatus() == 1) {
+                weChatUtil.sendTextMsg(jdPtPin+"京东账号已过期，请重新登陆", content);
+                continue;
             }
             String jdBeanChange = null;
             try {
-                jdBeanChange = jdBeanChangeUtil.getJdBeanChange(user.getJdPtPin());
+                jdBeanChange = jdBeanChangeUtil.getJdBeanChange(jdCkEntity);
                 weChatUtil.sendTextMsg(jdBeanChange, content);
             } catch (Exception e) {
                 e.printStackTrace();
-                weChatUtil.sendTextMsg("robot异常，请联系管理员维护", content);
-                return;
+                weChatUtil.sendTextMsg(jdPtPin+"京东资产查询接口异常，请稍后再试", content);
+                continue;
             }
+        }
+        if (StringUtils.isEmpty(timesStr)){
+            redis.put(from_wxid + "QueryTimes", "1");
+            redis.put(from_wxid + "QueryTime", DateUtil.formatDateTime(DateUtil.date()));
+        }else {
+            Integer times = Integer.parseInt(timesStr);
+            redis.put(from_wxid + "QueryTimes", String.valueOf(times + 1));
+            redis.put(from_wxid + "QueryTime", DateUtil.formatDateTime(DateUtil.date()));
         }
     }
 
@@ -509,8 +877,10 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleLSP(JSONObject content) {
-        String url = HttpRequest.get("https://api.uomg.com/api/rand.img3?format=images").execute().header("location");
-        weChatUtil.sendImageMsg(url, content);
+        if (wxSafeCheck("lsp",content)){
+            String url = HttpRequest.get("https://api.uomg.com/api/rand.img3?format=images").execute().header("location");
+            weChatUtil.sendImageMsg(url, content);
+        }
     }
 
     /**
@@ -521,6 +891,7 @@ public class WxServiceImpl implements WxService {
     private void handleOperate(JSONObject content, String operate, String msg, String from_wxid) {
         //京东登陆
         if ("readPhone".equals(operate)) {
+            log.info("京东登陆-readPhone");
             if (VerifyUtil.verifyPhone(msg)) {
                 redis.put(from_wxid + "phone", msg, 5 * 60 * 1000);
                 if (sendSMS(msg)) {
@@ -538,75 +909,83 @@ public class WxServiceImpl implements WxService {
         }
         //京东登陆
         if ("readIdentifyingCode".equals(operate)) {
-            String phone = redis.get(from_wxid + "phone");
-            String ck = verifyCode(phone, msg);
+            log.info("京东登陆-readIdentifyingCode");
+            String phone = redis.get(from_wxid + "phone",false);
+            JSONObject data = verifyCode(phone, msg);
+            if (data == null){
+                redis.remove(from_wxid + "operate");
+                weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
+                return;
+            }
+            if (data.getBoolean("success")){
+                String ck = data.getJSONObject("data").getString("ck");
+                if (StringUtils.isEmpty(ck)) {
+                    redis.remove(from_wxid + "operate");
+                    weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
+                    return;
+                }
+
+                addJdCk(ck,content);
+                return;
+            }
+            if (data.getJSONObject("data").getInteger("status") == 555){
+                //需要验证
+                if ("USER_ID".equals(data.getJSONObject("data").getString("mode"))){
+                    weChatUtil.sendTextMsg("你的账号需要验证才能登陆，请在一分钟内输入你京东账号绑定的身份证的前2位和后4位(若包含字母X,请输入大写字母)：(输入q退出当前操作)", content);
+                    redis.put(from_wxid + "operate", "readIdentifyingCode", 5 * 60 * 1000);
+                    redis.put(from_wxid + "operate", "verifyCardCode", 60 * 1000);
+                }else {
+                    data = verifyCardCode(phone, "123456");
+                    if (data == null){
+                        redis.remove(from_wxid + "operate");
+                        weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
+                        return;
+                    }
+                    String ck = data.getString("ck");
+                    if (StringUtils.isEmpty(ck)) {
+                        redis.remove(from_wxid + "operate");
+                        weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
+                        return;
+                    }
+
+                    addJdCk(ck,content);
+                }
+                return;
+            }
+        }
+
+        if ("verifyCardCode".equals(operate)){
+            log.info("京东登陆-verifyCardCode");
+            String phone = redis.get(from_wxid + "phone",false);
+            JSONObject data = verifyCardCode(phone, msg);
+
+            if (data == null){
+                redis.remove(from_wxid + "operate");
+                weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
+                return;
+            }
+
+            String ck = data.getString("ck");
             if (StringUtils.isEmpty(ck)) {
                 redis.remove(from_wxid + "operate");
                 weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
-            } else {
-                String ptPin = "";
-                Matcher matcher = ckPattern.matcher(ck);
-                if (matcher.find()) {
-                    ptPin = matcher.group(1);
-                }
-                String wxpusherUid = "";
-                //生成wxpusher二维码
-                if (wxpusherUtil.getWxpusherCode(content)) {
-                    try {
-                        Thread.sleep(11 * 1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        for (int i = 0; i < 2; i++) {
-                            weChatUtil.sendTextMsg("正在配置资产推送中，请稍后。。。", content);
-                            wxpusherUid = wxpusherUtil.getWxpusherUid(content);
-                            if (StringUtils.isNotEmpty(wxpusherUid)) {
-                                break;
-                            }
-                            try {
-                                Thread.sleep(11 * 1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    if (StringUtils.isEmpty(wxpusherUid)) {
-                        weChatUtil.sendTextMsg("资产推送配置失败，可重新登陆或者联系管理员手动配置", content);
-                    }
-                    //保存ck
-                    qlService.addJdCk(content, ck, ptPin, wxpusherUid);
-                } else {
-                    //保存ck
-                    qlService.addJdCk(content, ck, ptPin, "");
-                }
-                //保存cookie
-                JdCkEntity jdCkEntity = new JdCkEntity();
-                jdCkEntity.setCk(ck);
-                jdCkEntity.setPtPin(ptPin);
-                jdCkEntity.setStatus(0);
-                jdCkEntity.setLevel(2);
-                ckService.addCkWithOutCheck(jdCkEntity);
-                //保存user
-                userService.saveUser(content,from_wxid,ptPin,wxpusherUid);
-                redis.remove(from_wxid + "operate");
+                return;
             }
-            return;
+
+            addJdCk(ck,content);
         }
 
         //羊了个羊
-        if ("brushylgy".equals(operate)) {
+        /*if ("brushylgy".equals(operate)) {
             if ("y".equals(msg)) {
                 weChatUtil.sendTextMsg("请在10s内输入需要刷的次数：(输入q退出当前操作)", content);
                 redis.put(from_wxid + "ylgyUid", redis.get(from_wxid + "ylgyUid"), 15 * 1000);
                 redis.put(from_wxid + "ylgyToken", redis.get(from_wxid + "ylgyToken"), 15 * 1000);
                 redis.put(from_wxid + "operate", "brushylgytimes", 11 * 1000);
             }
-        }
+        }*/
 
-        if ("brushylgytimes".equals(operate)) {
+        /*if ("brushylgytimes".equals(operate)) {
             if (NumberUtil.isInteger(msg)) {
                 Integer times = Integer.parseInt(msg);
                 if (times <= 0 || times > 1000000) {
@@ -629,7 +1008,58 @@ public class WxServiceImpl implements WxService {
                 redis.put(from_wxid + "ylgyToken", redis.get(from_wxid + "ylgyToken"), 15 * 1000);
                 redis.put(from_wxid + "operate", "brushylgytimes", 11 * 1000);
             }
+        }*/
+    }
+
+    private void addJdCk(String ck,JSONObject content){
+        String ptPin = "";
+        Matcher matcher = jdPinPattern.matcher(ck);
+        if (matcher.find()) {
+            ptPin = matcher.group(1);
         }
+        String wxpusherUid = "";
+        //生成wxpusher二维码
+        if (wxpusherUtil.getWxpusherCode(content)) {
+            try {
+                Thread.sleep(11 * 1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            try {
+                for (int i = 0; i < 2; i++) {
+                    weChatUtil.sendTextMsg("正在配置资产推送中，请稍后。。。", content);
+                    wxpusherUid = wxpusherUtil.getWxpusherUid(content);
+                    if (StringUtils.isNotEmpty(wxpusherUid)) {
+                        break;
+                    }
+                    try {
+                        Thread.sleep(11 * 1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (StringUtils.isEmpty(wxpusherUid)) {
+                weChatUtil.sendTextMsg("未扫码，资产推送配置失败", content);
+            }
+            //保存ck
+            qlService.addJdCk(content, ck, ptPin, wxpusherUid);
+        } else {
+            //保存ck
+            qlService.addJdCk(content, ck, ptPin, "");
+        }
+        //保存本地cookie
+        JdCkEntity jdCkEntity = new JdCkEntity();
+        jdCkEntity.setCk(ck);
+        jdCkEntity.setPtPin(ptPin);
+        jdCkEntity.setStatus(0);
+        jdCkEntity.setLevel(2);
+        ckService.addCkWithOutCheck(jdCkEntity);
+        //保存user
+        userService.saveUser(content, content.getString("from_wxid"), ptPin, wxpusherUid);
+        redis.remove(content.getString("from_wxid") + "operate");
     }
 
     /**
@@ -914,7 +1344,7 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleFunctionList(JSONObject content) {
-        weChatUtil.sendTextMsg(redis.get("functionList"), content);
+        weChatUtil.sendTextMsg(redis.get("functionList",false), content);
     }
 
     /**
@@ -923,7 +1353,7 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleSetSysParam(JSONObject content) {
-        String msg = content.getString("msg").replace("设置", "").replace("启用", "").replace("关闭", "").trim();
+        String msg = content.getString("msg").replace("设置", "").replace("关闭", "").trim();
         String[] split = msg.split(" ");
         if (split.length >= 1) {
             if (StringUtils.isEmpty(systemParamUtil.querySystemParam("WXMASTERS")) && "微信管理员".equals(split[0])) {
@@ -1001,9 +1431,22 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     public void handleGroupCode(JSONObject content) {
+        String groupName = content.getString("msg").replace("群号","").trim();
+        String msg = "";
+        if (StringUtils.isEmpty(groupName)){
+            msg = content.getString("from_group");
+        }else {
+            List<Group> groups = groupMapper.queryDistinctGroup(groupName,null);
+            if (groups.size()==0){
+                msg = "未查到"+groupName+"群";
+            }else {
+                for (Group group : groups) {
+                    msg += group.getGroupName() + "\n  " + group.getGroupid() + "\n";
+                }
+            }
+        }
         //发送人
-        String from_group = content.getString("from_group");
-        weChatUtil.sendTextMsg(from_group, content);
+        weChatUtil.sendTextMsg(msg, content);
     }
 
 
@@ -1258,7 +1701,9 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleMJX(JSONObject content) {
-        weChatUtil.sendImageMsg("http://api.uomg.com/api/rand.img3", content);
+        if (wxSafeCheck("mjx",content)){
+            weChatUtil.sendImageMsg("http://api.uomg.com/api/rand.img3", content);
+        }
     }
 
     /**
@@ -1267,12 +1712,14 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleJuPai(JSONObject content) {
-        String msg = content.getString("msg");
-        msg = msg.replace("举牌", "").replace(" ", "");
-        if (StringUtils.isEmpty(msg)) {
-            weChatUtil.sendTextMsg("正确命令是：举牌 要举牌的内容", content);
-        } else {
-            weChatUtil.sendImageMsg("http://lkaa.top/API/pai/?msg=" + URLEncoder.encode(msg), content);
+        if (wxSafeCheck("jp", content)){
+            String msg = content.getString("msg");
+            msg = msg.replace("举牌", "").replace(" ", "");
+            if (StringUtils.isEmpty(msg)) {
+                weChatUtil.sendTextMsg("正确命令是：举牌 要举牌的内容", content);
+            } else {
+                weChatUtil.sendImageMsg("http://lkaa.top/API/pai/?msg=" + URLEncoder.encode(msg), content);
+            }
         }
     }
 
@@ -1309,7 +1756,7 @@ public class WxServiceImpl implements WxService {
     }
 
     public void handleLastWeiBo(JSONObject content, Integer num) {
-        String bandListStr = redis.get("WbBandLists");
+        String bandListStr = redis.get("WbBandLists",false);
         List<JSONObject> bandLists = JSONArray.parseArray(bandListStr, JSONObject.class);
         int index = 1;
         for (JSONObject band : bandLists) {
@@ -1324,6 +1771,40 @@ public class WxServiceImpl implements WxService {
             }
         }
     }
+
+    /*public static void main(String[] args) {
+        Festival festival = new Festival("国庆节", 10, 1, false, 0L);
+        Date now = new Date();
+        int year = DateUtil.year(now);
+        int month = 0;
+        int day = 0;
+        // 如果节日为农历，则取出对应的公历日
+        if (festival.isChineseDate()) {
+            DateTime festivalDay = new DateTime(new ChineseDate(year, festival.getMonth(), festival.getDay()).getGregorianDate().getTime());
+            month = festivalDay.month()+1;
+            day = festivalDay.dayOfMonth();
+        } else {
+            month = festival.getMonth();
+            day = festival.getDay();
+        }
+        // 如果当前日期大于等于节日的月份和天数，则年数取下一年
+        if (DateUtil.month(now)+1 > month) {
+            year++;
+        }else {
+            if (DateUtil.month(now)+1 == month && DateUtil.dayOfMonth(now) >= day){
+                year++;
+            }
+        }
+        DateTime festivalDay;
+        // 如果节日为农历，则取出对应的公历日
+        if (festival.isChineseDate()) {
+            festivalDay = new DateTime(new ChineseDate(year, festival.getMonth(), festival.getDay()).getGregorianDate().getTime());
+        } else {
+            festivalDay = DateUtil.parse(year + "-" + festival.getMonth() + "-" + festival.getDay());
+        }
+        // 计算当前日期和节日（公历日）的天数差 并保存
+        System.out.println(DateUtil.betweenDay(now, festivalDay, false));
+    }*/
 
 
     /**
@@ -1353,7 +1834,7 @@ public class WxServiceImpl implements WxService {
         festivalList.add(new Festival("国庆节", 10, 1, false, 0L));
         festivalList.add(new Festival("七夕节", 7, 7, true, 0L));
         festivalList.add(new Festival("情人节", 2, 14, false, 0L));
-        festivalList.add(new Festival("重阳节", 9, 9, true, 0L));
+//        festivalList.add(new Festival("重阳节", 9, 9, true, 0L));
         // 获取节日时间差
         festivalList.forEach(this::getGregorianDayDiff);
         // 存放周末 【不剔除法定调休】【周末无需关心月/日】
@@ -1394,9 +1875,24 @@ public class WxServiceImpl implements WxService {
         // 获取当前日期
         Date now = new Date();
         int year = DateUtil.year(now);
+        int month = 0;
+        int day = 0;
+        // 如果节日为农历，则取出今年对应的公历日
+        if (festival.isChineseDate()) {
+            DateTime festivalDay = new DateTime(new ChineseDate(year, festival.getMonth(), festival.getDay()).getGregorianDate().getTime());
+            month = festivalDay.month()+1;
+            day = festivalDay.dayOfMonth();
+        } else {
+            month = festival.getMonth();
+            day = festival.getDay();
+        }
         // 如果当前日期大于等于节日的月份和天数，则年数取下一年
-        if (DateUtil.month(now) >= festival.getMonth() && DateUtil.dayOfMonth(now) >= festival.getDay()) {
+        if (DateUtil.month(now)+1 > month) {
             year++;
+        }else {
+            if (DateUtil.month(now)+1 == month && DateUtil.dayOfMonth(now) >= day){
+                year++;
+            }
         }
         DateTime festivalDay;
         // 如果节日为农历，则取出对应的公历日
@@ -1452,7 +1948,7 @@ public class WxServiceImpl implements WxService {
         StringBuilder result = new StringBuilder();
         String key = systemParamUtil.querySystemParam("HEFENGKEY");
         if (StringUtils.isEmpty(key)) {
-            weChatUtil.sendTextMsg("请先去 https://dev.qweather.com 网站注册申请key，对机器人发送：设置 和风key 你的key", content);
+            weChatUtil.sendTextMsg("请先去 https://dev.qweather.com 网站注册申请key并配置系统参数", content);
             return;
         }
         try {
@@ -1631,6 +2127,7 @@ public class WxServiceImpl implements WxService {
         String resultStr = HttpRequest.post(jdlonginurl + "api/SendSMS")
                 .body(body.toJSONString())
                 .execute().body();
+        log.info("nark发送手机号结果：{}",resultStr);
         if (StringUtils.isNotEmpty(resultStr)) {
             JSONObject res = JSONObject.parseObject(resultStr);
             if (res.getBoolean("success")) {
@@ -1649,7 +2146,7 @@ public class WxServiceImpl implements WxService {
      * @param phone
      * @return
      */
-    public String verifyCode(String phone, String code) {
+    public JSONObject verifyCode(String phone, String code) {
         String jdlonginurl = systemParamUtil.querySystemParam("JDLONGINURL").replace("login", "");
         if (!jdlonginurl.endsWith("/")) {
             jdlonginurl += "/";
@@ -1664,10 +2161,37 @@ public class WxServiceImpl implements WxService {
                 .execute().body();
         if (StringUtils.isNotEmpty(resultStr)) {
             log.info("手机号{}短信登陆结果：{}", phone, resultStr);
+            return JSONObject.parseObject(resultStr);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * nark校验身份证
+     *
+     * @param phone
+     * @return
+     */
+    public JSONObject verifyCardCode(String phone, String code) {
+        String jdlonginurl = systemParamUtil.querySystemParam("JDLONGINURL").replace("login", "");
+        if (!jdlonginurl.endsWith("/")) {
+            jdlonginurl += "/";
+        }
+        JSONObject body = new JSONObject();
+        body.put("Phone", phone);
+        body.put("QQ", "");
+        body.put("qlkey", 0);
+        body.put("Code", code);
+        String resultStr = HttpRequest.post(jdlonginurl + "api/VerifyCardCode")
+                .body(body.toJSONString())
+                .execute().body();
+        if (StringUtils.isNotEmpty(resultStr)) {
+            log.info("手机号{}校验身份证：{}", phone, resultStr);
             JSONObject res = JSONObject.parseObject(resultStr);
-            if (res.getBoolean("success")) {
-                return res.getJSONObject("data").get("ck").toString();
-            } else {
+            if (res.getBoolean("success")){
+                return res.getJSONObject("data");
+            }else {
                 return null;
             }
         } else {

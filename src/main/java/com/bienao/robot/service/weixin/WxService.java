@@ -34,4 +34,6 @@ public interface WxService {
     void timeWxbs();
 
     void timeHandleZfbHb();
+
+    void handleQueryJdAssets(JSONObject content);
 }

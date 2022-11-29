@@ -98,11 +98,14 @@ public class WireServiceImpl implements WireService {
     public Result updateWire(WireEntity wireEntity) {
         wireEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
         wireMapper.updateWire(wireEntity);
-        ArrayList<Integer> ids = new ArrayList<>();
-        ids.add(wireEntity.getId());
-        wireKeyMapper.deleteWireKey(ids);
-        for (WireKeyEntity key : wireEntity.getKeys()) {
-            wireKeyMapper.addWireKey(wireEntity.getId(),key.getKey());
+        List<WireKeyEntity> keys = wireEntity.getKeys();
+        if (keys!=null && keys.size()>0){
+            ArrayList<Integer> ids = new ArrayList<>();
+            ids.add(wireEntity.getId());
+            wireKeyMapper.deleteWireKey(ids);
+            for (WireKeyEntity key : wireEntity.getKeys()) {
+                wireKeyMapper.addWireKey(wireEntity.getId(),key.getKey());
+            }
         }
         return Result.success("修改成功");
     }
@@ -137,6 +140,14 @@ public class WireServiceImpl implements WireService {
     @Override
     public Result handleActivity(Integer wireListId,String script,String wire) {
         log.info("执行线报活动：{}->{}",script,wire);
+
+        //是否需要设置大车头
+        WireEntity wireEntity = wireMapper.queryWire(script);
+        if (wireEntity.getSetHead()==1){
+            //配置大车头
+            qlService.oneKeyHead();
+        }
+
         ArrayList<String> result = new ArrayList<>();
         List<String> list = Arrays.asList(wire.split("\\r?\\n"));
         ArrayList<String> keys = new ArrayList<>();
@@ -148,6 +159,9 @@ public class WireServiceImpl implements WireService {
                 String configs = qlUtil.getFile(ql.getUrl(), ql.getTokenType(), ql.getToken(), "config.sh");
                 for (String config : list) {
                     if (!config.contains("export")){
+                        continue;
+                    }
+                    if (config.contains("并发变量") || config.contains("你的助力码")){
                         continue;
                     }
                     if (config.contains("=")){
@@ -209,9 +223,11 @@ public class WireServiceImpl implements WireService {
                                 Integer id = cron.getId();
                                 List<Integer> cronIds = new ArrayList<>();
                                 cronIds.add(id);
+                                qlUtil.stopCron(url, ql.getTokenType(), ql.getToken(), cronIds);
                                 boolean flag = qlUtil.runCron(url, ql.getTokenType(), ql.getToken(), cronIds);
                                 if (flag) {
                                     result.add(url + "(" + remark + ")" + " 线报 执行成功");
+                                    Thread.sleep(4000);
 //                                    handleFlag = true;
                                 } else {
                                     result.add(url + "(" + remark + ")" + " 线报 执行失败，请手动执行");
@@ -233,9 +249,15 @@ public class WireServiceImpl implements WireService {
                 }
             }
         }
+
+        if (wireEntity.getSetHead()==1){
+            //延迟取消大车头
+            qlService.waitCancelHead();
+        }
+
         //更新线报表
         if (result.size()!=0){
-            wirelistMapper.updateWirelist(wireListId,JSONObject.toJSONString(result),new Date());
+            wirelistMapper.updateWirelist(wireListId,JSONObject.toJSONString(result),DateUtil.formatDateTime(new Date()));
             return Result.success();
         }else {
             return Result.error(ErrorCodeConstant.SERVICE_ERROR,"线报执行异常");
@@ -249,8 +271,9 @@ public class WireServiceImpl implements WireService {
      */
     @Override
     public Result addActivity(String wire) {
-        String script = "";
+        List<WireEntity> wires = new ArrayList<>();
         List<String> list = Arrays.asList(wire.split("\\r?\\n"));
+        StringBuilder s = new StringBuilder();
         for (String config : list) {
             if (config.contains("#") && (config.contains(".js") || config.contains(".py"))){
                 continue;
@@ -258,36 +281,40 @@ public class WireServiceImpl implements WireService {
             if (config.contains("=")){
                 //export 参数名
                 String s1 = config.split("=")[0];
+                int index = s1.indexOf("export");
+                if (index!=0){
+                    s1 = s1.substring(index);
+                }
                 String key = s1.replace("export", "").replace(" ", "");
                 String value = config.split("=")[1];
-                String redis = Redis.wireRedis.get(key + value);
-                if (StringUtils.isNotEmpty(redis)){
-                    return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"该线报活动已存在，添加失败");
-                }
-                Redis.wireRedis.put(key + value,"1",24 * 60 * 60 * 1000);
-                String s = wireKeyMapper.queryScript(key);
-                if (s!=null){
-                    script = s;
+                s.append(key).append(value);
+                List<WireEntity> wireEntities = wireKeyMapper.queryScript(key);
+                if (wireEntities != null) {
+                    for (WireEntity wireEntity : wireEntities) {
+                        if (wireEntity.getStatus() != 1) {
+                            wires.add(wireEntity);
+                        }
+                    }
                     break;
                 }
             }
         }
-        if (StringUtils.isEmpty(script)){
-            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败，线报不存在，请先添加");
-        }
-        int i = 0;
-        try {
-            i = wirelistMapper.addActivity(script,wire);
-        } catch (Exception e) {
+        String redis = Redis.wireRedis.get(s.toString(),false);
+        if (StringUtils.isNotEmpty(redis)){
             return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"该线报活动已存在，添加失败");
         }
-        Integer maxId = wirelistMapper.queryMaxId();
-        handleWire(maxId,script,wire);
-        if (i!=0){
-            return Result.success("添加成功");
-        }else {
-            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败");
+        Redis.wireRedis.put(s.toString(),"1",24 * 60 * 60 * 1000);
+
+        if (wires.size()==0){
+            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"添加失败，线报不存在，请先添加");
         }
+
+        for (WireEntity wireEntity : wires) {
+            wirelistMapper.addActivity(wireEntity.getScript(),wire);
+            Integer maxId = wirelistMapper.queryMaxId();
+            handleWire(maxId,wireEntity.getScript(),wire);
+        }
+        return Result.success("添加成功");
     }
 
     /**
@@ -296,8 +323,8 @@ public class WireServiceImpl implements WireService {
      * @return
      */
     @Override
-    public Result queryActivity(Integer pageNo,Integer pageSize) {
-        List<WireActivityEntity> wireActivityEntities = wirelistMapper.queryActivity();
+    public Result queryActivity(Integer pageNo,Integer pageSize, String content) {
+        List<WireActivityEntity> wireActivityEntities = wirelistMapper.queryActivity(content);
         int start = PageUtil.getStart(pageNo, pageSize) - pageSize;
         int end = PageUtil.getEnd(pageNo, pageSize) - pageSize;
         JSONObject result = new JSONObject();
@@ -316,7 +343,7 @@ public class WireServiceImpl implements WireService {
      */
     @Override
     public Result queryWire(String key,Integer pageNo,Integer pageSize) {
-        List<WireEntity> wireEntities = wireMapper.queryWire(key);
+        List<WireEntity> wireEntities = wireMapper.queryWires(key);
         int start = PageUtil.getStart(pageNo, pageSize) - pageSize;
         int end = PageUtil.getEnd(pageNo, pageSize) - pageSize;
         JSONObject result = new JSONObject();
@@ -363,16 +390,12 @@ public class WireServiceImpl implements WireService {
         }
         //该任务都是未运行中
         if (!status.contains(0)){
-            //配置大车头
-            qlService.oneKeyHead();
             //执行该任务
             try {
                 handleActivity(id,script,content);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            //取消大车头
-            qlService.cancelHead();
         }
     }
     @Async("asyncServiceExecutor")
@@ -401,10 +424,6 @@ public class WireServiceImpl implements WireService {
 
         keys.add("M_WX_LUCK_DRAW_URL");
         addWire("M幸运抽奖","m_jd_wx_luckDraw.js",keys);
-
-        keys.add("SHOP_TOKENS");
-        keys.add("DPQDTK");
-        addWire("店铺签到","jd_shop_sign.js",keys);
 
         keys.add("jd_nzmhurl");
         addWire("女装盲盒","jd_nzmh.js",keys);
@@ -476,10 +495,10 @@ public class WireServiceImpl implements WireService {
 
         keys.add("yhyactivityId");
         keys.add("yhyauthorCode");
-        addWire("邀请赢大礼/邀好友赢大礼","jd_yqhy.py",keys);
+        addWire("邀请赢大礼","jd_prodev.py",keys);
 
-        keys.add("jd_wxShopFollowActivity_activityId");
-        addWire("关注抽奖","jd_wxShopFollowActivity.js",keys);
+        keys.add("jd_wxShopFollowActivity_activityUrl");
+        addWire("关注店铺有礼","jd_wxShopFollowActivity.js",keys);
 
         keys.add("jd_wxUnPackingActivity_activityId");
         addWire("LZ让福袋飞通用活动","jd_wxUnPackingActivity.js",keys);
@@ -510,12 +529,6 @@ public class WireServiceImpl implements WireService {
 
         keys.add("jd_cjwxShopFollowActivity_activityId");
         addWire("CJ关注店铺有礼","jd_cjwxShopFollowActivity.js",keys);
-
-        keys.add("jd_wxKnowledgeActivity_activityId");
-        addWire("LZ知识超人通用活动","jd_wxKnowledgeActivity.js",keys);
-
-        keys.add("jd_cjwxKnowledgeActivity_activityId");
-        addWire("CJ知识超人通用活动","jd_cjwxKnowledgeActivity.js",keys);
 
         keys.add("jd_wxBuildActivity_activityId");
         addWire("LZ盖楼有礼","jd_wxBuildActivity.js",keys);
@@ -573,6 +586,45 @@ public class WireServiceImpl implements WireService {
 
         keys.add("jd_wxShopGift_activityUrl");
         addWire("店铺礼包特效","jd_wxShopGift.js",keys);
+
+        keys.add("jd_wxKnowledgeActivity_activityUrl");
+        addWire("知识超人","jd_wxKnowledgeActivity.js",keys);
+
+        keys.add("DPQDTK");
+        addWire("常规店铺签到","jd_dpqd.js",keys);
+
+        keys.add("jd_cart_item_activityUrl");
+        addWire("收藏大师-加购有礼","jd_txzj_cart_item.js",keys);
+
+        keys.add("jd_collect_item_activityUrl");
+        addWire("收藏大师-关注有礼","jd_txzj_collect_item.js",keys);
+
+        keys.add("jd_collect_shop_activityUrl");
+        addWire("收藏大师-关注商品","jd_collect_shop.js",keys);
+
+        keys.add("jd_categoryUnion_activityId");
+        addWire("品类联合任务","jd_categoryUnion.js",keys);
+
+        keys.add("jd_lottery_activityUrl");
+        addWire("收藏大师-幸运抽奖","jd_txzj_lottery.js",keys);
+
+        keys.add("jd_wdzfd_activityId");
+        addWire("微定制瓜分福袋","jd_wdzfd.js",keys);
+
+        keys.add("jd_lzkj_loreal_invite_url");
+        addWire("邀请入会有礼（lzkj_loreal）","jd_lzkj_loreal_invite.js",keys);
+
+        keys.add("jd_showInviteJoin_activityUrl");
+        addWire("邀请入会赢好礼（京耕）","jd_jinggeng_showInviteJoin.js",keys);
+
+        keys.add("jd_shopDraw_activityUrl");
+        addWire("店铺左侧刮刮乐","jd_shopDraw.js",keys);
+
+        /*keys.add("M_WX_SHOP_GIFT_URL");
+        addWire("","",keys);
+
+        keys.add("M_WX_FOLLOW_DRAW_URL");
+        addWire("","",keys);*/
     }
 
 

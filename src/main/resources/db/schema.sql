@@ -12,16 +12,20 @@ create table if not exists systemParam (
 );
 create table if not exists user (
                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                           wxid varchar,
+                                           wxid varchar UNIQUE,
                                            wxName varchar,
                                            jd_pt_pin varchar,
                                            wxpusheruid varchar,
                                            city varchar,
                                            ip varchar,
                                            functionType INTEGER,
+                                           status INTEGER DEFAULT 0,
+                                           `level` INTEGER DEFAULT 0,
                                            created_time varchar DEFAULT (datetime('now', 'localtime')),
                                            updated_time varchar DEFAULT (datetime('now', 'localtime'))
 );
+ALTER TABLE `user` ADD COLUMN `status` INTEGER DEFAULT 0;
+ALTER TABLE `user` ADD COLUMN `level` INTEGER DEFAULT 0;
 create table if not exists `group` (
                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
                                        groupid varchar,
@@ -38,18 +42,22 @@ create table if not exists `ql` (
                                        tokenType varchar,
                                        token varchar,
                                        head varchar,
-                                       remark varchar,
+                                       remark varchar UNIQUE,
+                                       `type` INTEGER DEFAULT 0,
                                        created_time varchar DEFAULT (datetime('now', 'localtime')),
                                        updated_time varchar DEFAULT (datetime('now', 'localtime'))
 );
+alter TABLE  `ql` add `type` INTEGER DEFAULT 0;
 create table if not exists `wire` (
                                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                                     activity_name varchar,
                                     script varchar UNIQUE,
-                                    status varchar DEFAULT '未执行',
+                                    set_head INTEGER DEFAULT 0,
+                                    status INTEGER DEFAULT 0,
                                     created_time varchar DEFAULT (datetime('now', 'localtime')),
                                     updated_time varchar DEFAULT (datetime('now', 'localtime'))
 );
+alter TABLE  `wire` add set_head INTEGER DEFAULT 0;
 create table if not exists `wireKey` (
                                       id INTEGER PRIMARY KEY AUTOINCREMENT,
                                       wireId INTEGER,
@@ -60,7 +68,7 @@ create table if not exists `wireKey` (
 create table if not exists `wirelist` (
                                          id INTEGER PRIMARY KEY AUTOINCREMENT,
                                          script varchar,
-                                         content varchar UNIQUE,
+                                         content varchar,
                                          result varchar,
                                          created_time varchar DEFAULT (datetime('now', 'localtime')),
                                          updated_time varchar DEFAULT (datetime('now', 'localtime'))
@@ -73,14 +81,16 @@ create table if not exists `jdck` (
                                       `status` INTEGER DEFAULT '0',
                                       `level` INTEGER DEFAULT '2',
                                       `jd` INTEGER DEFAULT '0',
+                                      `ql_remark` varchar,
                                       `created_time` varchar DEFAULT (datetime('now', 'localtime')),
                                       `expiry_time` varchar,
                                       `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );
+alter TABLE  `jdck` add `ql_remark` varchar;
 create table if not exists `jdFruit` (
                            `id` INTEGER PRIMARY KEY AUTOINCREMENT,
                            `help_code` varchar,
-                           `ckid` INTEGER,
+                           `ckid` INTEGER UNIQUE,
                            `is_fruit_hei` INTEGER DEFAULT '0',
                            `help_status` INTEGER DEFAULT '0',
                            `to_help_status` INTEGER DEFAULT '1',
@@ -98,7 +108,7 @@ create table if not exists `jdjd` (
 create table if not exists `jdPet` (
                          `id` INTEGER PRIMARY KEY AUTOINCREMENT,
                          `help_code` varchar,
-                         `ckid` INTEGER,
+                         `ckid` INTEGER UNIQUE,
                          `is_pet_hei` INTEGER DEFAULT '0',
                          `help_status` INTEGER DEFAULT '0',
                          `to_help_status` INTEGER DEFAULT '1',
@@ -108,13 +118,26 @@ create table if not exists `jdPet` (
 create table if not exists `jdPlant` (
                            `id` INTEGER PRIMARY KEY AUTOINCREMENT,
                            `help_code` varchar,
-                           `ckid` INTEGER,
+                           `ckid` INTEGER UNIQUE,
                            `is_Plant_hei` INTEGER DEFAULT '0',
                            `help_status` INTEGER DEFAULT '0',
                            `to_help_status` INTEGER DEFAULT '1',
                            `created_time` varchar DEFAULT (datetime('now', 'localtime')),
                            `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );
+create table if not exists `jdZqdyj` (
+                           `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+                           `help_code` varchar,
+                           `ckid` INTEGER UNIQUE,
+                           `is_hei` INTEGER DEFAULT '0',
+                           `help_status` INTEGER DEFAULT '0',
+                           `to_help_status` INTEGER DEFAULT '1',
+                           `created_time` varchar DEFAULT (datetime('now', 'localtime')),
+                           `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
+);
+alter TABLE  `jdZqdyj` add `type` INTEGER DEFAULT 0;
+alter TABLE  `jdZqdyj` add `remark` varchar;
+alter TABLE  `jdZqdyj` add `start_help_time` varchar;
 create table if not exists `ylgy` (
                                          `id` INTEGER PRIMARY KEY AUTOINCREMENT,
                                          `uid` varchar,
@@ -141,4 +164,15 @@ create table if not exists `command` (
                                       `is_built_in` INTEGER DEFAULT 0,
                                       `created_time` varchar DEFAULT (datetime('now', 'localtime')),
                                       `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
+);
+create table if not exists `forward` (
+                                         `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+                                         `from` varchar ,
+                                         `fromname` varchar ,
+                                         `fromtype` INTEGER,
+                                         `to` varchar,
+                                         `toname` varchar ,
+                                         `totype` INTEGER,
+                                         `created_time` varchar DEFAULT (datetime('now', 'localtime')),
+                                         `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );

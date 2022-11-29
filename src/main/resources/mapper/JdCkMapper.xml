@@ -20,31 +20,45 @@
     </select>
 
     <select id="queryCks" parameterType="jdCkEntity" resultType="jdCkEntity">
-        select * from jdck where 1=1
+        select jc.*,
+               jf.help_status fruitHelp,jf.is_fruit_hei fruitStataus,
+               jp.help_status petHelp,jp.is_pet_hei petStataus,
+               jpl.help_status plantHelp,jpl.is_plant_hei plantStataus
+        from jdck jc
+        left join jdFruit jf on jc.id = jf.ckid
+        left join jdPet jp on jc.id = jp.ckid
+        left join jdPlant jpl on jc.id = jpl.ckid
+        where 1=1
         <if test="id != null">
-            AND id = #{id}
+            AND jc.id = #{id}
         </if>
         <if test="ck != null and ck != ''">
-            AND ck = #{ck}
+            AND jc.ck like ('%'||#{ck}||'%')
         </if>
         <if test="ptPin != null and ptPin != ''">
-            AND pt_pin = #{ptPin}
+            AND jc.pt_pin = #{ptPin}
         </if>
         <if test="level != null">
-            AND level = #{level}
+            AND jc.level = #{level}
         </if>
         <if test="status != null">
-            AND status = #{status}
+            AND jc.status = #{status}
+        </if>
+        <if test="remark !=null and remark !=''">
+            and jc.remark like ('%'||#{remark}||'%')
+        </if>
+        <if test="qlRemark != null and qlRemark != ''">
+            AND jc.ql_remark = #{qlRemark}
         </if>
         order by level
     </select>
 
     <select id="queryCksByLevels" resultType="jdCkEntity">
-        select * from jdck where 1=1 and level in (${levels}) and status = 0
+        select * from jdck where 1=1 and level in (${levels}) and status = 0 and jd = 0 order by level,created_time desc
     </select>
 
     <insert id="addCk" parameterType="jdCkEntity">
-        insert into jdck(ck,pt_pin,remark,level,expiry_time) values (#{ck},#{ptPin},#{remark},#{level},#{expiryTime});
+        insert into jdck(ck,pt_pin,remark,level,ql_remark,expiry_time) values (#{ck},#{ptPin},#{remark},#{level},#{qlRemark},#{expiryTime});
     </insert>
 
     <update id="updateCk" parameterType="jdCkEntity">
@@ -64,6 +78,9 @@
             </if>
             <if test="level != null">
                 level = #{level},
+            </if>
+            <if test="qlRemark != null and qlRemark != ''">
+                ql_remark = #{qlRemark},
             </if>
             <if test="jd != null">
                 jd = #{jd},
@@ -122,6 +139,33 @@
 
     <select id="queryCkCount" resultType="java.lang.Integer">
         select count(*) from jdck where 1 = 1 and level in (0,1,2,3) and status = 0
+    </select>
+
+    <select id="queryHasHelpFruitCk" resultType="jdCkEntity">
+        select * from jdck where 1 = 1 and id in (select ckid from jdFruit where help_status =1) order by level
+    </select>
+
+    <select id="queryHasHelpPetCk" resultType="jdCkEntity">
+        select * from jdck where 1 = 1 and id in (select ckid from jdPet where help_status =1) order by level
+    </select>
+
+    <select id="queryHasHelpPlantCk" resultType="jdCkEntity">
+        select * from jdck where 1 = 1 and id in (select ckid from jdPlant where help_status =1) order by level
+    </select>
+
+    <select id="queryByIdsCk" parameterType="list" resultType="jdCkEntity">
+        select * from jdck where 1=1 and id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getRecoveryQl" resultType="string">
+        select distinct ql_remark from jdck where 1 = 1 and ql_remark not in (select remark from `ql`)
+    </select>
+
+    <select id="queryMaxId" resultType="java.lang.Integer">
+        select max(id) from wire
     </select>
 
 </mapper>

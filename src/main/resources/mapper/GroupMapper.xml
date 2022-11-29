@@ -19,4 +19,18 @@
     <delete id="deleteGroupByGroupIdAndFunctionType">
         delete from `group` where groupid=#{groupid} and functionType=#{functionType}
     </delete>
+
+    <select id="queryGroupByGroupId" resultType="group">
+        select * from `group` where groupid=#{groupid}
+    </select>
+
+    <select id="queryDistinctGroup" resultType="group">
+        select DISTINCT groupid,groupName from `group` where 1 = 1
+        <if test="groupName!=null and groupName !=''">
+            and groupName like ('%'||#{groupName}||'%')
+        </if>
+        <if test="groupid!=null and groupid !=''">
+            and groupid =#{groupid}
+        </if>
+    </select>
 </mapper>

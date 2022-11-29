@@ -13,11 +13,6 @@ public interface JdService {
     void fruitShareHelp(List<JdCkEntity> cks,int zlcwaittime);
 
     /**
-     * 东东农场天天抽奖互助
-     */
-    void fruitLotteryShareHelp(List<JdCkEntity> cks,int zlcwaittime);
-
-    /**
      * 东东萌宠互助
      */
     void petShareHelp(List<JdCkEntity> cks,int zlcwaittime);
@@ -42,9 +37,15 @@ public interface JdService {
      */
     void countJd();
 
-    void updateFruitShareCode(List<JdCkEntity> cks);
+    void qlToZlc();
 
-    void updatePetShareCode(List<JdCkEntity> cks);
+    void addJdck(String ck,String remarks, Integer status,int count,String qlRemark);
 
-    void updatePlantShareCode(List<JdCkEntity> cks);
+    List getHelpList(String type);
+
+    void clear();
+
+    JSONObject getZlcInfo();
+
+    void resetHot(Integer type);
 }

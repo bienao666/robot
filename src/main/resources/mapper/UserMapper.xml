@@ -35,20 +35,35 @@
         </if>
     </select>
 
+    <select id="queryUsers" parameterType="user" resultType="user">
+        select * from user where 1=1
+        <if test="wxid != null and wxid != ''">
+            AND wxid = #{wxid}
+        </if>
+        <if test="wxName != null and wxName != ''">
+            AND wxName like ('%'||#{wxName}||'%')
+        </if>
+        <if test="jdPtPin != null and jdPtPin != ''">
+            AND jd_pt_pin like ('%'||#{jdPtPin}||'%')
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="level != null">
+            AND level = #{level}
+        </if>
+    </select>
+
     <update id="updateUser" parameterType="user">
         update user
         <set>
+            jd_pt_pin = #{jdPtPin},
+            wxpusheruid = #{wxpusheruid},
             <if test="wxid != null and wxid != ''">
                 wxid = #{wxid},
             </if>
             <if test="wxName != null and wxName != ''">
                 wxName = #{wxName},
-            </if>
-            <if test="jdPtPin != null and jdPtPin != ''">
-                jd_pt_pin = #{jdPtPin},
-            </if>
-            <if test="wxpusheruid != null and wxpusheruid != ''">
-                wxpusheruid = #{wxpusheruid},
             </if>
             <if test="city != null and city != ''">
                 city = #{city},
@@ -58,6 +73,12 @@
             </if>
             <if test="functionType != null and functionType != ''">
                 functionType = #{functionType},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="level != null">
+                `level` = #{level},
             </if>
         </set>
         where id=#{id};

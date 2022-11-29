@@ -27,14 +27,31 @@ public class QlEntity {
 
     private String token;
 
+    //当前首位
+    private String curFirst;
+
     //车头
     private String head;
 
     //备注
     private String remark;
 
+    //有效ck数
+    private Integer validCount;
+
+    //无效ck数
+    private Integer invalidCount;
+
+    //ck总数
+    private Integer count;
+
     //青龙状态
     private String status;
+
+    /**
+     * 0 普通容器 1聚合容器
+     */
+    private Integer type;
 
     //新增时间
     private String createdTime;

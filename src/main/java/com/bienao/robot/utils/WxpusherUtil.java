@@ -130,4 +130,11 @@ public class WxpusherUtil {
         uids.add(uid);
         return sendMessage(content,summary,1,null,uids,"");
     }
+
+    //发送京东红包通知
+    public boolean sendJdRedPacketNotify(String content,String summary,String uid){
+        ArrayList<String> uids = new ArrayList<>();
+        uids.add(uid);
+        return sendMessage(content,summary,1,null,uids,"");
+    }
 }

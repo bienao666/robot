@@ -3,6 +3,8 @@ package com.bienao.robot.mapper.jingdong;
 import com.bienao.robot.entity.jingdong.JdFruitEntity;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface JdFruitMapper {
 
@@ -11,6 +13,8 @@ public interface JdFruitMapper {
      * @return
      */
     int resetFruitStatus();
+
+    int resetHot();
 
     /**
      * 修改东东农场数据
@@ -37,4 +41,8 @@ public interface JdFruitMapper {
      * @return
      */
     int addJdFruit(JdFruitEntity jdFruitEntity);
+
+    void clear();
+
+    List<JdFruitEntity> getJdFruits();
 }

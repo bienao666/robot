@@ -2,27 +2,34 @@ package com.bienao.robot.service.impl.jingdong;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.PageUtil;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.entity.QlEntity;
+import com.bienao.robot.entity.QlEnv;
 import com.bienao.robot.entity.Result;
 import com.bienao.robot.entity.jingdong.JdCkEntity;
 import com.bienao.robot.enums.ErrorCodeConstant;
+import com.bienao.robot.mapper.QlMapper;
 import com.bienao.robot.mapper.jingdong.JdCkMapper;
 import com.bienao.robot.mapper.jingdong.JdFruitMapper;
 import com.bienao.robot.mapper.jingdong.JdPetMapper;
 import com.bienao.robot.mapper.jingdong.JdPlantMapper;
 import com.bienao.robot.service.jingdong.CkService;
+import com.bienao.robot.service.jingdong.JdDhService;
 import com.bienao.robot.utils.jingdong.GetUserAgentUtil;
+import com.bienao.robot.utils.jingdong.JDUtil;
+import com.bienao.robot.utils.ql.QlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.jdbc.Null;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -39,6 +46,15 @@ public class CkServiceImpl implements CkService {
 
     @Autowired
     private JdPlantMapper jdPlantMapper;
+
+    @Autowired
+    private JdDhService jdDhService;
+
+    @Autowired
+    private QlUtil qlUtil;
+
+    @Autowired
+    private QlMapper qlMapper;
 
     private Pattern jdPinPattern = Pattern.compile("pt_pin=(.+?);");
 
@@ -61,6 +77,11 @@ public class CkServiceImpl implements CkService {
                 .header("Accept-Encoding", "gzip, deflate, br")
                 .execute().body();
         log.info("查询当前ck结果：{}", result);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if (StringUtils.isEmpty(result)) {
             log.info("京东服务器返回空数据");
             throw new RuntimeException("京东服务器返回空数据");
@@ -95,13 +116,13 @@ public class CkServiceImpl implements CkService {
 
         //校验ck是否有效
         JSONObject jsonObject = queryDetail(jdCkEntity.getCk());
-        if (jsonObject==null){
+        if (jsonObject == null) {
             throw new RuntimeException("ck不存在或者ck已失效");
         }
 
         String ptPin = "";
         Matcher matcher = jdPinPattern.matcher(jdCkEntity.getCk());
-        if (matcher.find()){
+        if (matcher.find()) {
             ptPin = matcher.group(1);
         }
         jdCkEntity.setPtPin(ptPin);
@@ -117,11 +138,12 @@ public class CkServiceImpl implements CkService {
                 return true;
             }
             return false;
-        }else {
+        } else {
             //更新
             jdck.setCk(jdCkEntity.getCk());
             jdck.setUpdatedTime(DateUtil.formatDateTime(new Date()));
-            if (StringUtils.isNotEmpty(jdCkEntity.getRemark())){
+            jdck.setStatus(0);
+            if (StringUtils.isNotEmpty(jdCkEntity.getRemark())) {
                 jdck.setRemark(jdCkEntity.getRemark());
             }
             int i = jdCkMapper.updateCk(jdck);
@@ -142,23 +164,8 @@ public class CkServiceImpl implements CkService {
     public boolean addCkWithOutCheck(JdCkEntity jdCkEntity) {
         //判断ck是否已经添加
         JdCkEntity jdCkEntityQuery = new JdCkEntity();
-        jdCkEntityQuery.setCk(jdCkEntity.getCk());
+        jdCkEntityQuery.setPtPin(jdCkEntity.getPtPin());
         JdCkEntity jdck = jdCkMapper.queryCk(jdCkEntityQuery);
-        if (jdck != null) {
-            return true;
-        }
-
-        String ptPin = "";
-        Matcher matcher = jdPinPattern.matcher(jdCkEntity.getCk());
-        if (matcher.find()){
-            ptPin = matcher.group(1);
-        }
-        jdCkEntity.setPtPin(ptPin);
-
-        //判断pt_pin是否存在
-        jdCkEntityQuery = new JdCkEntity();
-        jdCkEntityQuery.setPtPin(ptPin);
-        jdck = jdCkMapper.queryCk(jdCkEntityQuery);
         if (jdck == null) {
             //添加
             int i = jdCkMapper.addCk(jdCkEntity);
@@ -166,11 +173,12 @@ public class CkServiceImpl implements CkService {
                 return true;
             }
             return false;
-        }else {
+        } else {
             //更新
             jdck.setCk(jdCkEntity.getCk());
             jdck.setUpdatedTime(DateUtil.formatDateTime(new Date()));
-            if (StringUtils.isNotEmpty(jdCkEntity.getRemark())){
+            jdck.setStatus(0);
+            if (StringUtils.isNotEmpty(jdCkEntity.getRemark())) {
                 jdck.setRemark(jdCkEntity.getRemark());
             }
             int i = jdCkMapper.updateCk(jdck);
@@ -198,22 +206,18 @@ public class CkServiceImpl implements CkService {
     }
 
     /**
-     * 检查ck是否过期
+     * 检查助力是否过期
      */
     @Override
-    public void checkCk() {
-        log.info("定时检查ck开始。。。");
+    public void checkZlc() {
+        log.info("定时检查助力是否过期开始。。。");
         JdCkEntity jdCkEntityQuery = new JdCkEntity();
         List<JdCkEntity> jdCkEntities = jdCkMapper.queryCks(jdCkEntityQuery);
         log.info("共查询{}个ck", jdCkEntities.size());
         for (JdCkEntity jdCkEntity : jdCkEntities) {
-            JSONObject jsonObject = queryDetail(jdCkEntity.getCk());
-            if (jsonObject == null) {
-                //清理过期ck
-                jdCkEntity.setStatus(1);
-                jdCkMapper.updateCk(jdCkEntity);
-            } else {
-                if (StringUtils.isEmpty(jdCkEntity.getRemark())){
+            if (StringUtils.isEmpty(jdCkEntity.getRemark())) {
+                JSONObject jsonObject = queryDetail(jdCkEntity.getCk());
+                if (jsonObject!=null){
                     JSONObject baseInfo = jsonObject.getJSONObject("baseInfo");
                     if (baseInfo != null) {
                         jdCkEntity.setRemark(baseInfo.getString("nickname"));
@@ -221,15 +225,15 @@ public class CkServiceImpl implements CkService {
                         jdCkMapper.updateCk(jdCkEntity);
                     }
                 }
-                //查看助力超级vip是否过期
-                if (jdCkEntity.getLevel()==1 && StringUtils.isNotEmpty(jdCkEntity.getExpiryTime())){
-                    DateTime expiryTime = DateUtil.parse(jdCkEntity.getExpiryTime());
-                    if (expiryTime.getTime() < DateUtil.date().getTime()){
-                        jdCkEntity.setLevel(2);
-                        jdCkEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
-                        jdCkEntity.setExpiryTime(null);
-                        jdCkMapper.updateCk(jdCkEntity);
-                    }
+            }
+            //查看助力超级vip是否过期
+            if (jdCkEntity.getLevel() == 1 && StringUtils.isNotEmpty(jdCkEntity.getExpiryTime())) {
+                DateTime expiryTime = DateUtil.parse(jdCkEntity.getExpiryTime());
+                if (expiryTime.getTime() < DateUtil.date().getTime()) {
+                    jdCkEntity.setLevel(2);
+                    jdCkEntity.setUpdatedTime(DateUtil.formatDateTime(new Date()));
+                    jdCkEntity.setExpiryTime(null);
+                    jdCkMapper.updateCk(jdCkEntity);
                 }
             }
             try {
@@ -239,36 +243,234 @@ public class CkServiceImpl implements CkService {
                 e.printStackTrace();
             }
         }
-        log.info("定时清理过期ck结束。。。");
+        log.info("定时检查助力是否过期结束。。。");
     }
 
     @Override
-    public List<JdCkEntity> getJdCks(String ck,String ptPin,Integer level,Integer status) {
+    public Result getJdCks(String ck, Integer level, Integer status,String remark, Integer pageNo, Integer pageSize) {
         JdCkEntity jdCkEntity = new JdCkEntity();
         jdCkEntity.setCk(ck);
-        jdCkEntity.setPtPin(ptPin);
         jdCkEntity.setLevel(level);
         jdCkEntity.setStatus(status);
-        return jdCkMapper.queryCks(jdCkEntity);
+        jdCkEntity.setRemark(remark);
+        List<JdCkEntity> jdCkEntities = jdCkMapper.queryCks(jdCkEntity);
+        int start = PageUtil.getStart(pageNo, pageSize) - pageSize;
+        int end = PageUtil.getEnd(pageNo, pageSize) - pageSize;
+        JSONObject result = new JSONObject();
+        result.put("total", jdCkEntities.size());
+        result.put("pageNo", pageNo);
+        result.put("pageSize", pageSize);
+        jdCkEntities = jdCkEntities.subList(start, Math.min(end, jdCkEntities.size()));
+        result.put("jdCkList", jdCkEntities);
+        return Result.success(result);
     }
 
     @Override
     public Result updateJdCk(JdCkEntity jdCkEntity) {
         int i = jdCkMapper.updateCk(jdCkEntity);
-        if (i==1){
+        if (i == 1) {
             return Result.success();
-        }else {
-            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"数据库操作异常");
+        } else {
+            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR, "数据库操作异常");
         }
     }
 
     @Override
     public Result deleteJdCks(List<Integer> ids) {
         int i = jdCkMapper.deleteCks(ids);
-        if (i>0){
+        if (i > 0) {
             return Result.success();
-        }else {
-            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR,"数据库操作异常");
+        } else {
+            return Result.error(ErrorCodeConstant.DATABASE_OPERATE_ERROR, "数据库操作异常");
         }
     }
+
+    @Override
+    public Result getJdCkList(String ck, String ptPin, Integer status, String qlName, Integer pageNo, Integer pageSize) {
+        List<JdCkEntity> jdCkEntities = new ArrayList<>();
+        //查询所有青龙
+        List<QlEntity> qlEntities = qlMapper.queryQls(null);
+        for (QlEntity qlEntity : qlEntities) {
+            if (StringUtils.isNotEmpty(qlName) && !qlEntity.getRemark().contains(qlName)) {
+                continue;
+            }
+            try {
+                List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
+                for (int i = 0; i < envs.size(); i++) {
+                    QlEnv env = envs.get(i);
+                    if ("JD_COOKIE".equals(env.getName())) {
+                        if (StringUtils.isNotEmpty(ck) && !env.getValue().contains(ck)) {
+                            continue;
+                        }
+                        if (StringUtils.isNotEmpty(ptPin) && !env.getValue().contains(ptPin)) {
+                            continue;
+                        }
+                        if (status != null && !status.equals(env.getStatus())) {
+                            continue;
+                        }
+                        JdCkEntity jdCkEntity = new JdCkEntity();
+                        jdCkEntity.setQlId(qlEntity.getId());
+                        jdCkEntity.setQlRemark(qlEntity.getRemark());
+                        jdCkEntity.setId(env.getId());
+                        jdCkEntity.setCk(env.getValue());
+                        jdCkEntity.setRemark(env.getRemarks());
+                        jdCkEntity.setStatus(env.getStatus());
+                        jdCkEntity.setQlindex(i+1);
+                        //查询前一天的收益
+                        JdCkEntity query = new JdCkEntity();
+                        query.setCk(env.getValue());
+                        JdCkEntity queryRes = jdCkMapper.queryCk(query);
+                        if (queryRes!=null){
+                            jdCkEntity.setJd(queryRes.getJd());
+                        }
+                        jdCkEntities.add(jdCkEntity);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+//        jdCkEntities = jdCkEntities.stream().sorted(Comparator.comparing(JdCkEntity::getJd).reversed()).collect(Collectors.toList());
+        int start = PageUtil.getStart(pageNo, pageSize) - pageSize;
+        int end = PageUtil.getEnd(pageNo, pageSize) - pageSize;
+        JSONObject result = new JSONObject();
+        result.put("total", jdCkEntities.size());
+        result.put("pageNo", pageNo);
+        result.put("pageSize", pageSize);
+        jdCkEntities = jdCkEntities.subList(start, Math.min(end, jdCkEntities.size()));
+        result.put("jdCkList", jdCkEntities);
+        return Result.success(result);
+    }
+
+    @Override
+    @Async("asyncServiceExecutor")
+    public void jkExchange(){
+        //查询所有青龙
+        List<QlEntity> qlEntities = qlMapper.queryQls(null);
+        for (QlEntity qlEntity : qlEntities) {
+            List<JdCkEntity> jdCkEntities = new ArrayList<>();
+            try {
+                List<QlEnv> envs = qlUtil.getEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken());
+                for (int i = 0; i < envs.size(); i++) {
+                    QlEnv env = envs.get(i);
+                    if ("JD_COOKIE".equals(env.getName())) {
+                        JdCkEntity jdCkEntity = new JdCkEntity();
+                        jdCkEntity.setQlId(qlEntity.getId());
+                        jdCkEntity.setQlRemark(qlEntity.getRemark());
+                        jdCkEntity.setId(env.getId());
+                        jdCkEntity.setCk(env.getValue());
+                        jdCkEntity.setRemark(env.getRemarks());
+                        jdCkEntity.setStatus(env.getStatus());
+                        jdCkEntity.setQlindex(i);
+                        jdCkEntities.add(jdCkEntity);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            //健康社区兑换京豆
+            jdDhService.jkExchange(jdCkEntities);
+        }
+    }
+
+    @Override
+    public Result enableJdCk(List<JSONObject> cks) {
+        HashMap<Integer, List<Integer>> map = new HashMap<>();
+        for (JSONObject ck : cks) {
+            Integer qlId = ck.getInteger("qlId");
+            Integer id = ck.getInteger("id");
+            List<Integer> list = map.get(qlId);
+            if (list == null) {
+                list = new ArrayList<>();
+                list.add(id);
+            } else {
+                list.add(id);
+            }
+            map.put(qlId,list);
+        }
+        for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {
+            Integer qlId = entry.getKey();
+            QlEntity query = new QlEntity();
+            query.setId(qlId);
+            QlEntity qlEntity = qlMapper.queryQl(query);
+            if (qlEntity != null) {
+                List<Integer> list = entry.getValue();
+                qlUtil.enableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), list);
+            }
+        }
+        return Result.success();
+    }
+
+    @Override
+    public Result disableJdCk(List<JSONObject> cks) {
+        HashMap<Integer, List<Integer>> map = new HashMap<>();
+        for (JSONObject ck : cks) {
+            Integer qlId = ck.getInteger("qlId");
+            Integer id = ck.getInteger("id");
+            List<Integer> list = map.get(qlId);
+            if (list == null) {
+                list = new ArrayList<>();
+                list.add(id);
+            } else {
+                list.add(id);
+            }
+            map.put(qlId,list);
+        }
+        for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {
+            Integer qlId = entry.getKey();
+            QlEntity query = new QlEntity();
+            query.setId(qlId);
+            QlEntity qlEntity = qlMapper.queryQl(query);
+            if (qlEntity != null) {
+                List<Integer> list = entry.getValue();
+                qlUtil.disableEnv(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), list);
+            }
+        }
+        return Result.success();
+    }
+
+    @Override
+    public Result deleteJdCk(List<JSONObject> cks) {
+        HashMap<Integer, List<Integer>> map = new HashMap<>();
+        for (JSONObject ck : cks) {
+            Integer qlId = ck.getInteger("qlId");
+            Integer id = ck.getInteger("id");
+            List<Integer> list = map.get(qlId);
+            if (list == null) {
+                list = new ArrayList<>();
+                list.add(id);
+            } else {
+                list.add(id);
+            }
+            map.put(qlId,list);
+        }
+        for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {
+            Integer qlId = entry.getKey();
+            QlEntity query = new QlEntity();
+            query.setId(qlId);
+            QlEntity qlEntity = qlMapper.queryQl(query);
+            if (qlEntity != null) {
+                List<Integer> list = entry.getValue();
+                qlUtil.deleteEnvs(qlEntity.getUrl(), qlEntity.getTokenType(), qlEntity.getToken(), list);
+            }
+        }
+        return Result.success();
+    }
+
+    /**
+     * 过期ck
+     */
+    @Override
+    public Result expireCk(List<String> cks) {
+        for (String ck : cks) {
+            JDUtil.expire(ck);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return Result.success();
+    }
+
 }

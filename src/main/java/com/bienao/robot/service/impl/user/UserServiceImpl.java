@@ -1,5 +1,6 @@
 package com.bienao.robot.service.impl.user;
 
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.SystemParam;
 import com.bienao.robot.entity.User;
@@ -12,6 +13,9 @@ import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -138,7 +142,13 @@ public class UserServiceImpl implements UserService {
             if (StringUtils.isNotEmpty(wxpusherUid) && wxpusherUid.equals(user.getWxpusheruid())) {
                 user.setWxpusheruid(wxpusherUid);
             }
+            user.setUpdatedTime(DateUtil.formatDateTime(new Date()));
             userMapper.updateUser(user);
         }
+    }
+
+    @Override
+    public List<User> queryUsers(User userQuery) {
+        return userMapper.queryUsers(userQuery);
     }
 }

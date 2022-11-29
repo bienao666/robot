@@ -52,6 +52,20 @@ public class AfterRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         //初始化tgbot
+        initializeTgBot();
+        //初始化线报活动
+        wireService.initializeWire();
+        //初始化命令
+        commandService.initializeCommand();
+        //启动成功通知
+        weChatUtil.sendTextMsgToMaster("robot已开启，微信对接成功。。。");
+        log.info("=================================================");
+        log.info("===================web页面地址=====================");
+        log.info("     http://127.0.0.1:8899/robot/index.html");
+        log.info("=================================================");
+    }
+
+    public void initializeTgBot(){
         try {
             DefaultBotOptions botOptions = new DefaultBotOptions();
             List<SystemParam> systemParams = systemParamUtil.querySystemParams("TGPROXY");
@@ -62,7 +76,6 @@ public class AfterRunner implements ApplicationRunner {
                 String proxyHost = split[0];
                 //端口根据实际情况填写，说明在上面，自己看
                 int proxyPort = Integer.parseInt(split[1]);
-
                 botOptions.setProxyHost(proxyHost);
                 botOptions.setProxyPort(proxyPort);
                 //注意一下这里，ProxyType是个枚举，看源码你就知道有NO_PROXY,HTTP,SOCKS4,SOCKS5;
@@ -98,19 +111,5 @@ public class AfterRunner implements ApplicationRunner {
         } catch (NumberFormatException e) {
             log.info("tgbot连接失败，请检查配置");
         }
-
-        //初始化线报活动
-        wireService.initializeWire();
-
-        //初始化命令
-        commandService.initializeCommand();
-
-        //启动成功通知
-        weChatUtil.sendTextMsgToMaster("robot已开启，微信对接成功。。。");
-
-        log.info("=================================================");
-        log.info("===================web页面地址=====================");
-        log.info("     http://127.0.0.1:8899/robot/index.html");
-        log.info("=================================================");
     }
 }
