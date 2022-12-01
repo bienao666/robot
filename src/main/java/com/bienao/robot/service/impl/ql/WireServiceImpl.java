@@ -620,6 +620,12 @@ public class WireServiceImpl implements WireService {
         keys.add("jd_shopDraw_activityUrl");
         addWire("店铺左侧刮刮乐","jd_shopDraw.js",keys);
 
+        keys.add("jd_teamAJ");
+        addWire("组队分豆-瓜分","jd_team_exchange.js",keys);
+
+        keys.add("jd_teamFLP");
+        addWire("组队分豆-瓜分","jd_team_exchange.js",keys);
+
         /*keys.add("M_WX_SHOP_GIFT_URL");
         addWire("","",keys);
 
