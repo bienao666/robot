@@ -894,16 +894,27 @@ public class WxServiceImpl implements WxService {
             log.info("京东登陆-readPhone:{}",msg);
             if (VerifyUtil.verifyPhone(msg)) {
                 redis.put(from_wxid + "phone", msg, 5 * 60 * 1000);
-                if (sendSMS(msg)) {
-                    weChatUtil.sendTextMsg("请在五分钟内输入验证码：(输入q退出当前操作)", content);
-                    redis.put(from_wxid + operate, "readIdentifyingCode", 5 * 60 * 1000);
+                JSONObject res = sendSMS(msg);
+                if (res == null) {
+                    redis.remove(from_wxid + "operate");
+                    weChatUtil.sendTextMsg("nark登陆异常，请联系管理员或稍后重试", content);
+                    return;
                 } else {
-                    redis.remove(from_wxid + operate);
-                    weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
+                    if (res.getBoolean("success")){
+                        weChatUtil.sendTextMsg("请在五分钟内输入验证码：(输入q退出当前操作)", content);
+                        redis.put(from_wxid + "operate", "readIdentifyingCode", 5 * 60 * 1000);
+                        return;
+                    }else {
+                        if (res.getJSONObject("data").getInteger("status") == 505) {
+                            redis.remove(from_wxid + "operate");
+                            weChatUtil.sendTextMsg(res.getString("message"), content);
+                            return;
+                        }
+                    }
                 }
             } else {
                 weChatUtil.sendTextMsg("非法手机号，请在一分钟内重新输入手机号：(输入q退出当前操作)", content);
-                redis.put(from_wxid + operate, "readPhone", 60 * 1000);
+                redis.put(from_wxid + "operate", "readPhone", 60 * 1000);
             }
             return;
         }
@@ -913,14 +924,14 @@ public class WxServiceImpl implements WxService {
             String phone = redis.get(from_wxid + "phone",false);
             JSONObject data = verifyCode(phone, msg);
             if (data == null){
-                redis.remove(from_wxid + operate);
+                redis.remove(from_wxid + "operate");
                 weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
                 return;
             }
             if (data.getBoolean("success")){
                 String ck = data.getJSONObject("data").getString("ck");
                 if (StringUtils.isEmpty(ck)) {
-                    redis.remove(from_wxid + operate);
+                    redis.remove(from_wxid + "operate");
                     weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
                     return;
                 }
@@ -933,18 +944,18 @@ public class WxServiceImpl implements WxService {
                     //需要验证
                     if ("USER_ID".equals(data.getJSONObject("data").getString("mode"))){
                         weChatUtil.sendTextMsg("你的账号需要验证才能登陆，请在一分钟内输入你京东账号绑定的身份证的前2位和后4位(若包含字母X,请输入大写字母)：(输入q退出当前操作)", content);
-                        redis.put(from_wxid + operate, "readIdentifyingCode", 5 * 60 * 1000);
-                        redis.put(from_wxid + operate, "verifyCardCode", 60 * 1000);
+                        redis.put(from_wxid + "operate", "readIdentifyingCode", 5 * 60 * 1000);
+                        redis.put(from_wxid + "operate", "verifyCardCode", 60 * 1000);
                     }else {
                         data = verifyCardCode(phone, "123456");
                         if (data == null){
-                            redis.remove(from_wxid + operate);
+                            redis.remove(from_wxid + "operate");
                             weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
                             return;
                         }
                         String ck = data.getString("ck");
                         if (StringUtils.isEmpty(ck)) {
-                            redis.remove(from_wxid + operate);
+                            redis.remove(from_wxid + "operate");
                             weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
                             return;
                         }
@@ -957,28 +968,28 @@ public class WxServiceImpl implements WxService {
                     String message = data.getString("message");
                     if (message.contains("验证码输入错误")){
                         weChatUtil.sendTextMsg("验证码输入错误，请重新输入验证码：(输入q退出当前操作)", content);
-                        redis.put(from_wxid + operate, "readIdentifyingCode", 5 * 60 * 1000);
+                        redis.put(from_wxid + "operate", "readIdentifyingCode", 5 * 60 * 1000);
                         return;
                     }
 
                     if (message.contains("验证码错误多次，请重新获取")){
                         weChatUtil.sendTextMsg("验证码错误多次，请重新登陆", content);
-                        redis.remove(from_wxid + operate);
+                        redis.remove(from_wxid + "operate");
                         return;
                     }
 
                     if (message.contains("Object reference not set to an instance of an object")){
                         weChatUtil.sendTextMsg("nark异常，请联系管理员", content);
-                        redis.remove(from_wxid + operate);
+                        redis.remove(from_wxid + "operate");
                         return;
                     }
 
-                    redis.remove(from_wxid + operate);
+                    redis.remove(from_wxid + "operate");
                     weChatUtil.sendTextMsg("nark返回：" + data.getString("message"), content);
                     return;
                 }
                 if (data.getJSONObject("data").getInteger("status") == 505){
-                    redis.remove(from_wxid + operate);
+                    redis.remove(from_wxid + "operate");
                     weChatUtil.sendTextMsg("nark返回：" + data.getString("message"), content);
                     return;
                 }
@@ -992,14 +1003,14 @@ public class WxServiceImpl implements WxService {
             JSONObject data = verifyCardCode(phone, msg);
 
             if (data == null){
-                redis.remove(from_wxid + operate);
+                redis.remove(from_wxid + "operate");
                 weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
                 return;
             }
 
             String ck = data.getString("ck");
             if (StringUtils.isEmpty(ck)) {
-                redis.remove(from_wxid + operate);
+                redis.remove(from_wxid + "operate");
                 weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
                 return;
             }
@@ -2148,7 +2159,7 @@ public class WxServiceImpl implements WxService {
      * @param phone
      * @return
      */
-    public boolean sendSMS(String phone) {
+    public JSONObject sendSMS(String phone) {
         String jdlonginurl = systemParamUtil.querySystemParam("JDLONGINURL").replace("login", "");
         if (!jdlonginurl.endsWith("/")) {
             jdlonginurl += "/";
@@ -2162,13 +2173,9 @@ public class WxServiceImpl implements WxService {
         log.info("nark发送手机号结果：{}",resultStr);
         if (StringUtils.isNotEmpty(resultStr)) {
             JSONObject res = JSONObject.parseObject(resultStr);
-            if (res.getBoolean("success")) {
-                return true;
-            } else {
-                return false;
-            }
+            return res;
         } else {
-            return false;
+            return null;
         }
     }
 
