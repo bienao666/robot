@@ -840,9 +840,9 @@ public class WxServiceImpl implements WxService {
         String msg = content.getString("msg");
         String token = msg.replace("羊t ", "");
         weChatUtil.sendTextMsg("请在10s内输入需要刷的次数：(输入q退出当前操作)", content);
-        redis.put(from_wxid + "ylgyUid", "", 15 * 1000);
+        /*redis.put(from_wxid + "ylgyUid", "", 15 * 1000);
         redis.put(from_wxid + "ylgyToken", token, 15 * 1000);
-        redis.put(from_wxid + "operate", "brushylgytimes", 11 * 1000);
+        redis.put(from_wxid + operate, "brushylgytimes", 11 * 1000);*/
     }
 
     /**
@@ -859,16 +859,16 @@ public class WxServiceImpl implements WxService {
             return;
         }
         String token = YlgyUtils.getYlgyToken(uid);
-        if (StringUtils.isNotEmpty(token)) {
+        /*if (StringUtils.isNotEmpty(token)) {
             weChatUtil.sendTextMsg("您的羊了个羊的token：", content);
             weChatUtil.sendTextMsg(token, content);
             redis.put(from_wxid + "ylgyUid", uid, 15 * 1000);
             redis.put(from_wxid + "ylgyToken", token, 15 * 1000);
-            redis.put(from_wxid + "operate", "brushylgy", 11 * 1000);
+            redis.put(from_wxid + operate, "brushylgy", 11 * 1000);
             weChatUtil.sendTextMsg("是否需要代刷，需要请在10s内输入: y", content);
         } else {
             weChatUtil.sendTextMsg("获取羊了个羊token失败，请重试获取联系管理员", content);
-        }
+        }*/
     }
 
     /**
@@ -891,36 +891,36 @@ public class WxServiceImpl implements WxService {
     private void handleOperate(JSONObject content, String operate, String msg, String from_wxid) {
         //京东登陆
         if ("readPhone".equals(operate)) {
-            log.info("京东登陆-readPhone");
+            log.info("京东登陆-readPhone:{}",msg);
             if (VerifyUtil.verifyPhone(msg)) {
                 redis.put(from_wxid + "phone", msg, 5 * 60 * 1000);
                 if (sendSMS(msg)) {
                     weChatUtil.sendTextMsg("请在五分钟内输入验证码：(输入q退出当前操作)", content);
-                    redis.put(from_wxid + "operate", "readIdentifyingCode", 5 * 60 * 1000);
+                    redis.put(from_wxid + operate, "readIdentifyingCode", 5 * 60 * 1000);
                 } else {
-                    redis.remove(from_wxid + "operate");
+                    redis.remove(from_wxid + operate);
                     weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
                 }
             } else {
                 weChatUtil.sendTextMsg("非法手机号，请在一分钟内重新输入手机号：(输入q退出当前操作)", content);
-                redis.put(from_wxid + "operate", "readPhone", 60 * 1000);
+                redis.put(from_wxid + operate, "readPhone", 60 * 1000);
             }
             return;
         }
         //京东登陆
         if ("readIdentifyingCode".equals(operate)) {
-            log.info("京东登陆-readIdentifyingCode");
+            log.info("京东登陆-readIdentifyingCode:{}",msg);
             String phone = redis.get(from_wxid + "phone",false);
             JSONObject data = verifyCode(phone, msg);
             if (data == null){
-                redis.remove(from_wxid + "operate");
+                redis.remove(from_wxid + operate);
                 weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
                 return;
             }
             if (data.getBoolean("success")){
                 String ck = data.getJSONObject("data").getString("ck");
                 if (StringUtils.isEmpty(ck)) {
-                    redis.remove(from_wxid + "operate");
+                    redis.remove(from_wxid + operate);
                     weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
                     return;
                 }
@@ -928,30 +928,62 @@ public class WxServiceImpl implements WxService {
                 addJdCk(ck,content);
                 return;
             }
-            if (data.getJSONObject("data").getInteger("status") == 555){
-                //需要验证
-                if ("USER_ID".equals(data.getJSONObject("data").getString("mode"))){
-                    weChatUtil.sendTextMsg("你的账号需要验证才能登陆，请在一分钟内输入你京东账号绑定的身份证的前2位和后4位(若包含字母X,请输入大写字母)：(输入q退出当前操作)", content);
-                    redis.put(from_wxid + "operate", "readIdentifyingCode", 5 * 60 * 1000);
-                    redis.put(from_wxid + "operate", "verifyCardCode", 60 * 1000);
-                }else {
-                    data = verifyCardCode(phone, "123456");
-                    if (data == null){
-                        redis.remove(from_wxid + "operate");
-                        weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
-                        return;
+            if (!data.getBoolean("success")){
+                if (data.getJSONObject("data").getInteger("status") == 555){
+                    //需要验证
+                    if ("USER_ID".equals(data.getJSONObject("data").getString("mode"))){
+                        weChatUtil.sendTextMsg("你的账号需要验证才能登陆，请在一分钟内输入你京东账号绑定的身份证的前2位和后4位(若包含字母X,请输入大写字母)：(输入q退出当前操作)", content);
+                        redis.put(from_wxid + operate, "readIdentifyingCode", 5 * 60 * 1000);
+                        redis.put(from_wxid + operate, "verifyCardCode", 60 * 1000);
+                    }else {
+                        data = verifyCardCode(phone, "123456");
+                        if (data == null){
+                            redis.remove(from_wxid + operate);
+                            weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
+                            return;
+                        }
+                        String ck = data.getString("ck");
+                        if (StringUtils.isEmpty(ck)) {
+                            redis.remove(from_wxid + operate);
+                            weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
+                            return;
+                        }
+
+                        addJdCk(ck,content);
                     }
-                    String ck = data.getString("ck");
-                    if (StringUtils.isEmpty(ck)) {
-                        redis.remove(from_wxid + "operate");
-                        weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
+                    return;
+                }
+                if (data.getJSONObject("data").getInteger("status") == 404){
+                    String message = data.getString("message");
+                    if (message.contains("验证码输入错误")){
+                        weChatUtil.sendTextMsg("验证码输入错误，请重新输入验证码：(输入q退出当前操作)", content);
+                        redis.put(from_wxid + operate, "readIdentifyingCode", 5 * 60 * 1000);
                         return;
                     }
 
-                    addJdCk(ck,content);
+                    if (message.contains("验证码错误多次，请重新获取")){
+                        weChatUtil.sendTextMsg("验证码错误多次，请重新登陆", content);
+                        redis.remove(from_wxid + operate);
+                        return;
+                    }
+
+                    if (message.contains("Object reference not set to an instance of an object")){
+                        weChatUtil.sendTextMsg("nark异常，请联系管理员", content);
+                        redis.remove(from_wxid + operate);
+                        return;
+                    }
+
+                    redis.remove(from_wxid + operate);
+                    weChatUtil.sendTextMsg("nark返回：" + data.getString("message"), content);
+                    return;
                 }
-                return;
+                if (data.getJSONObject("data").getInteger("status") == 505){
+                    redis.remove(from_wxid + operate);
+                    weChatUtil.sendTextMsg("nark返回：" + data.getString("message"), content);
+                    return;
+                }
             }
+
         }
 
         if ("verifyCardCode".equals(operate)){
@@ -960,14 +992,14 @@ public class WxServiceImpl implements WxService {
             JSONObject data = verifyCardCode(phone, msg);
 
             if (data == null){
-                redis.remove(from_wxid + "operate");
+                redis.remove(from_wxid + operate);
                 weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
                 return;
             }
 
             String ck = data.getString("ck");
             if (StringUtils.isEmpty(ck)) {
-                redis.remove(from_wxid + "operate");
+                redis.remove(from_wxid + operate);
                 weChatUtil.sendTextMsg("登陆异常，请联系管理员或稍后重试", content);
                 return;
             }
