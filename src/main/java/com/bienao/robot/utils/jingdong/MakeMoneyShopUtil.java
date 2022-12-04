@@ -1,12 +1,14 @@
 package com.bienao.robot.utils.jingdong;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.net.URLEncoder;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -137,8 +139,11 @@ public class MakeMoneyShopUtil {
      */
     public static JSONObject help(String shareid, String ck){
         String fn = "makemoneyshop/guesthelp";
-        String body = "activeId=63526d8f5fe613a6adb48f03&shareId=" + shareid + "&_stk=activeId,shareId&_ste=1";
-        JSONObject data = get(fn, body, ck);
+        JSONObject body = new JSONObject();
+        body.put("activeId","63526d8f5fe613a6adb48f03");
+        body.put("shareId",shareid);
+        body.put("operType",1);
+        JSONObject data = helpGet(body, ck);
         log.info("赚钱大赢家助力：{}",data.toJSONString());
         if (data == null){
             return null;
@@ -181,17 +186,38 @@ public class MakeMoneyShopUtil {
         String url = "https://wq.jd.com/" + fn + "?g_ty=h5&g_tk=&appCode=msc588d6d5&" + body + "&h5st=&sceneval=2&callback=__jsonp1667344808184";
         String str =  HttpRequest.get(url)
                 .header("Origin", "https://wq.jd.com")
-                .header("Referer", "https://wqs.jd.com/sns/202210/20/make-money-shop/index.html?activeId=63526d8f5fe613a6adb48f03")
+                .header("Referer", "https://wqs.jd.com/")
                 .header("User-Agent", GetUserAgentUtil.getUserAgent())
                 .header("Cookie", ck)
                 .execute().body();
         if (StringUtils.isEmpty(str)){
             return null;
         }
-        str = str.replace("try{","").replace(";} catch (e) {}","");
+        /*str = str.replace("try{","").replace(";} catch (e) {}","");
         int start = str.indexOf("(");
         int end = str.lastIndexOf(")");
         String substring = str.substring(start + 1, end);
-        return JSONObject.parseObject(substring);
+        return JSONObject.parseObject(substring);*/
+        return JSONObject.parseObject(str);
+    }
+
+    private static JSONObject helpGet(JSONObject body,String ck){
+        URLEncoder urlEncoder = new URLEncoder();
+        String url = "https://api.m.jd.com/api?g_ty=h5&g_tk=&appCode=msc588d6d5&body=" + urlEncoder.encode(body.toJSONString(), Charset.defaultCharset()) + "&appid=jdlt_h5&client=jxh5&functionId=makemoneyshop_guesthelp&clientVersion=1.2.5&h5st=&loginType=2&sceneval=2";
+        String str =  HttpRequest.get(url)
+                .header("Origin", "https://wq.jd.com")
+                .header("Referer", "https://wqs.jd.com/")
+                .header("User-Agent", GetUserAgentUtil.getUserAgent())
+                .header("Cookie", ck)
+                .execute().body();
+        if (StringUtils.isEmpty(str)){
+            return null;
+        }
+        /*str = str.replace("try{","").replace(";} catch (e) {}","");
+        int start = str.indexOf("(");
+        int end = str.lastIndexOf(")");
+        String substring = str.substring(start + 1, end);
+        return JSONObject.parseObject(substring);*/
+        return JSONObject.parseObject(str);
     }
 }
