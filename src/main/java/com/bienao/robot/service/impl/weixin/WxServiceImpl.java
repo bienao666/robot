@@ -989,6 +989,12 @@ public class WxServiceImpl implements WxService {
                     return;
                 }
                 if (data.getJSONObject("data").getInteger("status") == 505){
+                    String message = data.getString("message");
+                    if (message.contains("许可登陆已上限制")){
+                        redis.remove(from_wxid + "operate");
+                        weChatUtil.sendTextMsg("短信登陆次数已上限制，可直接CK登陆", content);
+                        return;
+                    }
                     redis.remove(from_wxid + "operate");
                     weChatUtil.sendTextMsg("nark返回：" + data.getString("message"), content);
                     return;

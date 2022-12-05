@@ -193,12 +193,12 @@ public class MakeMoneyShopUtil {
         if (StringUtils.isEmpty(str)){
             return null;
         }
-        /*str = str.replace("try{","").replace(";} catch (e) {}","");
+        str = str.replace("try{","").replace(";} catch (e) {}","");
         int start = str.indexOf("(");
         int end = str.lastIndexOf(")");
         String substring = str.substring(start + 1, end);
-        return JSONObject.parseObject(substring);*/
-        return JSONObject.parseObject(str);
+        return JSONObject.parseObject(substring);
+//        return JSONObject.parseObject(str);
     }
 
     private static JSONObject helpGet(JSONObject body,String ck){
