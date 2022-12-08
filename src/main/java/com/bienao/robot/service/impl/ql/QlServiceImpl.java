@@ -814,6 +814,11 @@ public class QlServiceImpl implements QlService {
         }
     }
 
+    public void updateEnv(QlEnv env){
+        QlEntity ql = qlMapper.queryQlById(env.getQlId());
+        qlUtil.updateEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), env.getName(), env.getValue(), env.getRemarks());
+    }
+
     @Override
     public void setSmallHead() {
         List<QlEntity> qlEntities = qlMapper.queryQls(null);
@@ -943,13 +948,20 @@ public class QlServiceImpl implements QlService {
                                         operateQlToQlEnvs(qlToQlEnvs, qlEnv.getQlId(), qlEnv, 0);
                                         //更新robot本地
                                         jdService.addJdck(qlEnv.getValue(),qlEnv.getRemarks(),qlEnv.getStatus(),0,qlEnv.getQlRemark());
+                                        if (!qlEnv.getRemarks().contains("@@UID_") && qlEnv1.getRemarks().contains("@@UID_")){
+                                            qlEnv.setRemarks(qlEnv1.getRemarks());
+                                            updateEnv(qlEnv);
+                                        }
                                     } else {
                                         //删除qlEnv
                                         deleteQlCk(qlEntity, qlEnv);
+                                        if (!qlEnv1.getRemarks().contains("@@UID_") && qlEnv.getRemarks().contains("@@UID_")){
+                                            qlEnv1.setRemarks(qlEnv.getRemarks());
+                                            updateEnv(qlEnv1);
+                                        }
                                         //更新robot本地
                                         jdService.addJdck(qlEnv1.getValue(),qlEnv1.getRemarks(),qlEnv1.getStatus(),0,qlEnv1.getQlRemark());
                                     }
-
                                 } else {
                                     //ck不相同，有一个无效，删一个无效的索引
                                     boolean isValid = JDUtil.isVaild(qlEnv.getValue());
@@ -959,6 +971,10 @@ public class QlServiceImpl implements QlService {
                                         if (DateUtil.parse(qlEnv.getCreatedAt()).getTime() < DateUtil.parse(qlEnv1.getCreatedAt()).getTime()) {
                                             //删除qlEnv
                                             deleteQlCk(qlEntity, qlEnv);
+                                            if (!qlEnv1.getRemarks().contains("@@UID_") && qlEnv.getRemarks().contains("@@UID_")){
+                                                qlEnv1.setRemarks(qlEnv.getRemarks());
+                                                updateEnv(qlEnv1);
+                                            }
                                             //更新robot本地
                                             jdService.addJdck(qlEnv1.getValue(),qlEnv1.getRemarks(),qlEnv1.getStatus(),0,qlEnv1.getQlRemark());
                                         } else {
@@ -976,6 +992,10 @@ public class QlServiceImpl implements QlService {
                                             operateQlToQlEnvs(qlToQlEnvs, qlEnv1.getQlId(), qlEnv1, 1);
                                             //qlEnv所在青龙加上
                                             operateQlToQlEnvs(qlToQlEnvs, qlEnv.getQlId(), qlEnv, 0);
+                                            if (!qlEnv.getRemarks().contains("@@UID_") && qlEnv1.getRemarks().contains("@@UID_")){
+                                                qlEnv.setRemarks(qlEnv1.getRemarks());
+                                                updateEnv(qlEnv);
+                                            }
                                             //更新robot本地
                                             jdService.addJdck(qlEnv.getValue(),qlEnv.getRemarks(),qlEnv.getStatus(),0,qlEnv.getQlRemark());
                                         }
@@ -985,6 +1005,10 @@ public class QlServiceImpl implements QlService {
                                             if (!isValid) {
                                                 //删除qlEnv
                                                 deleteQlCk(qlEntity, qlEnv);
+                                                if (!qlEnv1.getRemarks().contains("@@UID_") && qlEnv.getRemarks().contains("@@UID_")){
+                                                    qlEnv1.setRemarks(qlEnv.getRemarks());
+                                                    updateEnv(qlEnv1);
+                                                }
                                                 //更新robot本地
                                                 jdService.addJdck(qlEnv1.getValue(),qlEnv1.getRemarks(),qlEnv1.getStatus(),0,qlEnv1.getQlRemark());
                                             }
@@ -1003,12 +1027,20 @@ public class QlServiceImpl implements QlService {
                                                 operateQlToQlEnvs(qlToQlEnvs, qlEnv1.getQlId(), qlEnv1, 1);
                                                 //qlEnv所在青龙加上
                                                 operateQlToQlEnvs(qlToQlEnvs, qlEnv.getQlId(), qlEnv, 0);
+                                                if (!qlEnv.getRemarks().contains("@@UID_") && qlEnv1.getRemarks().contains("@@UID_")){
+                                                    qlEnv.setRemarks(qlEnv1.getRemarks());
+                                                    updateEnv(qlEnv);
+                                                }
                                                 //更新robot本地
                                                 jdService.addJdck(qlEnv.getValue(),qlEnv.getRemarks(),qlEnv.getStatus(),0,qlEnv.getQlRemark());
                                             }
                                         } else {
                                             //两个都无效，删除qlEnv
                                             deleteQlCk(qlEntity, qlEnv);
+                                            if (!qlEnv1.getRemarks().contains("@@UID_") && qlEnv.getRemarks().contains("@@UID_")){
+                                                qlEnv1.setRemarks(qlEnv.getRemarks());
+                                                updateEnv(qlEnv1);
+                                            }
                                             //更新robot本地
                                             jdService.addJdck(qlEnv1.getValue(),qlEnv1.getRemarks(),qlEnv1.getStatus(),0,qlEnv1.getQlRemark());
                                         }

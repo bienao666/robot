@@ -21,6 +21,10 @@
         </if>
     </select>
 
+    <select id="queryQlById" parameterType="qlEntity" resultType="qlEntity">
+        select * from ql where 1=1 AND id = #{id}
+    </select>
+
     <select id="queryQlByUrl" parameterType="string" resultType="qlEntity">
         select * from ql where url=#{url}
     </select>
