@@ -27,7 +27,7 @@ public class MakeMoneyShopUtil {
     public static JSONObject getInfo(String ck){
         String fn = "makemoneyshop/home";
         String body = "activeId=63526d8f5fe613a6adb48f03&_stk=activeId&_ste=1";
-        JSONObject data = get(fn, body, ck);
+        JSONObject data = getInfo(body, ck);
         log.info("赚钱大赢家获取个人信息：{}",data.toJSONString());
         if (data == null){
             return null;
@@ -139,11 +139,13 @@ public class MakeMoneyShopUtil {
      */
     public static JSONObject help(String shareid, String ck){
         String fn = "makemoneyshop/guesthelp";
-        JSONObject body = new JSONObject();
+        /*JSONObject body = new JSONObject();
         body.put("activeId","63526d8f5fe613a6adb48f03");
         body.put("shareId",shareid);
-        body.put("operType",1);
-        JSONObject data = helpGet(body, ck);
+        body.put("_stk","activeId,shareId");
+        body.put("_ste",1);*/
+        String body = "activeId=63526d8f5fe613a6adb48f03&shareId="+shareid+"&_stk=activeId,shareId&_ste=1";
+        JSONObject data = get(fn,body, ck);
         log.info("赚钱大赢家助力：{}",data.toJSONString());
         if (data == null){
             return null;
@@ -186,7 +188,7 @@ public class MakeMoneyShopUtil {
         String url = "https://wq.jd.com/" + fn + "?g_ty=h5&g_tk=&appCode=msc588d6d5&" + body + "&h5st=&sceneval=2&callback=__jsonp1667344808184";
         String str =  HttpRequest.get(url)
                 .header("Origin", "https://wq.jd.com")
-                .header("Referer", "https://wqs.jd.com/")
+                .header("Referer", "https://wqs.jd.com/sns/202210/20/make-money-shop/index.html?activeId=63526d8f5fe613a6adb48f03")
                 .header("User-Agent", GetUserAgentUtil.getUserAgent())
                 .header("Cookie", ck)
                 .execute().body();
@@ -201,9 +203,8 @@ public class MakeMoneyShopUtil {
 //        return JSONObject.parseObject(str);
     }
 
-    private static JSONObject helpGet(JSONObject body,String ck){
-        URLEncoder urlEncoder = new URLEncoder();
-        String url = "https://api.m.jd.com/api?g_ty=h5&g_tk=&appCode=msc588d6d5&body=" + urlEncoder.encode(body.toJSONString(), Charset.defaultCharset()) + "&appid=jdlt_h5&client=jxh5&functionId=makemoneyshop_guesthelp&clientVersion=1.2.5&h5st=&loginType=2&sceneval=2";
+    private static JSONObject getInfo(String body,String ck){
+        String url = "https://api.m.jd.com/api?g_ty=h5&g_tk=&appCode=msc588d6d5&body=%7B%22activeId%22%3A%2263526d8f5fe613a6adb48f03%22%2C%22isFirst%22%3A1%2C%22operType%22%3A1%7D&appid=jdlt_h5&client=jxh5&functionId=makemoneyshop_home&clientVersion=1.2.5&h5st=20221202224421183%3B5zi6yg6hy6dijtc6%3B638ee%3Btk02waef91cf118n77Hw3bHueBsVVy52Wbcx9h4HMPM7fpi9ntRoot7vaa118bRqqEnduYVLqW8kyzHpNsDp5PtrZ8tJ%3B8e13afd153316da1c4878705d9e1f17b27db283c%3B400%3B1669992261183%3Bf28308408a6bad45ead939c02e9cf1e489ad7a120db68c73bdee607bdb6db9daaf6fd9e2d4b87320f4ec869d11fb7fa97ea7bffc29059dfb373214547287d0a2f8d2de03200d84c4776d0464313a08e3488339db94ee9194cfb8237a7678d9020d0c6d9df83ea6c18193626f396ff6f9d41ff0a831b19868640ee15d264ac55bdd144f2a8323f8168cb761f298ab19b00bc20f917401a5f65df079011591dba83f9ee65e3fc211cbadb9211443680603&loginType=2&sceneval=2";
         String str =  HttpRequest.get(url)
                 .header("Origin", "https://wq.jd.com")
                 .header("Referer", "https://wqs.jd.com/")
