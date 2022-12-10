@@ -30,6 +30,7 @@ import com.bienao.robot.utils.jingdong.JdBeanChangeUtil;
 import com.bienao.robot.utils.ql.QlUtil;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import com.bienao.robot.utils.weixin.WeChatUtil;
+import com.github.plexpt.chatgpt.Chatbot;
 import com.google.common.collect.EvictingQueue;
 import com.nlf.calendar.Lunar;
 import lombok.extern.slf4j.Slf4j;
@@ -261,6 +262,38 @@ public class WxServiceImpl implements WxService {
             handleSetSysParam(content);
             return;
         }
+
+        //开启chatGpt
+        if ("开启chatGpt".equals(msg)) {
+            String chatgptToken = systemParamUtil.querySystemParam("CHATGPTTOKEN");
+            if (StringUtils.isEmpty(chatgptToken)) {
+                weChatUtil.sendTextMsg("尚未设置chatgptToken，请联系管理员", content);
+                return;
+            }
+            redis.put(from_wxid + "chatGpt", "starting");
+            weChatUtil.sendTextMsg("请问有什么可以帮您？", content);
+            return;
+        }
+
+        //关闭chatGpt
+        if ("关闭chatGpt".equals(msg)) {
+            redis.remove(from_wxid + "chatGpt");
+            weChatUtil.sendTextMsg("小垃圾，拜拜了你嘞", content);
+            return;
+        }
+
+        if (StringUtils.isNotEmpty(redis.get(from_wxid + "chatGpt"))){
+            String chatgptToken = systemParamUtil.querySystemParam("CHATGPTTOKEN");
+            if (StringUtils.isEmpty(chatgptToken)) {
+                weChatUtil.sendTextMsg("尚未设置chatgptToken，请联系管理员", content);
+                return;
+            }
+            Chatbot chatbot = new Chatbot(chatgptToken);
+            Map<String, Object> chatResponse = chatbot.getChatResponse(msg);
+            weChatUtil.sendTextMsg(chatResponse.get("message").toString(), content);
+            return;
+        }
+
         //扭一扭
         if ("扭".equals(msg) || "扭一扭".equals(msg)){
             handleNiuYiNiu(content);
