@@ -188,7 +188,7 @@ public class MakeMoneyShopUtil {
         String url = "https://wq.jd.com/" + fn + "?g_ty=h5&g_tk=&appCode=msc588d6d5&" + body + "&h5st=&sceneval=2&callback=__jsonp1667344808184";
         String str =  HttpRequest.get(url)
                 .header("Origin", "https://wq.jd.com")
-                .header("Referer", "https://wqs.jd.com/sns/202210/20/make-money-shop/index.html?activeId=63526d8f5fe613a6adb48f03")
+                .header("Referer", "https://wqs.jd.com/sns/202210/20/make-money-shop/index.html?activeId=63526d8f5fe613a6adb48f03&type=sign&shareId=&__navVer=1")
                 .header("User-Agent", GetUserAgentUtil.getUserAgent())
                 .header("Cookie", ck)
                 .execute().body();
