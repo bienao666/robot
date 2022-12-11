@@ -282,18 +282,6 @@ public class WxServiceImpl implements WxService {
             return;
         }
 
-        if (StringUtils.isNotEmpty(redis.get(from_wxid + "chatGpt"))){
-            String chatgptToken = systemParamUtil.querySystemParam("CHATGPTTOKEN");
-            if (StringUtils.isEmpty(chatgptToken)) {
-                weChatUtil.sendTextMsg("尚未设置chatgptToken，请联系管理员", content);
-                return;
-            }
-            Chatbot chatbot = new Chatbot(chatgptToken);
-            Map<String, Object> chatResponse = chatbot.getChatResponse(msg);
-            weChatUtil.sendTextMsg(chatResponse.get("message").toString(), content);
-            return;
-        }
-
         //扭一扭
         if ("扭".equals(msg) || "扭一扭".equals(msg)){
             handleNiuYiNiu(content);
@@ -502,6 +490,18 @@ public class WxServiceImpl implements WxService {
             if (num <= 50 && StringUtils.isNotEmpty(publicKey)) {
                 handleLast(content, num, publicKey);
             }
+        }
+
+        if (StringUtils.isNotEmpty(redis.get(from_wxid + "chatGpt"))){
+            String chatgptToken = systemParamUtil.querySystemParam("CHATGPTTOKEN");
+            if (StringUtils.isEmpty(chatgptToken)) {
+                weChatUtil.sendTextMsg("尚未设置chatgptToken，请联系管理员", content);
+                return;
+            }
+            Chatbot chatbot = new Chatbot(chatgptToken);
+            Map<String, Object> chatResponse = chatbot.getChatResponse(msg);
+            weChatUtil.sendTextMsg(chatResponse.get("message").toString(), content);
+            return;
         }
     }
 
