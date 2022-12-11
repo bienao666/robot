@@ -258,7 +258,7 @@ public class WxServiceImpl implements WxService {
         }
 
         //系统参数
-        if (msg.startsWith("设置") || msg.startsWith("关闭")) {
+        if (msg.startsWith("设置")) {
             handleSetSysParam(content);
             return;
         }
@@ -1435,7 +1435,7 @@ public class WxServiceImpl implements WxService {
      * @param content
      */
     private void handleSetSysParam(JSONObject content) {
-        String msg = content.getString("msg").replace("设置", "").replace("关闭", "").trim();
+        String msg = content.getString("msg").replace("设置", "").trim();
         String[] split = msg.split(" ");
         if (split.length >= 1) {
             if (StringUtils.isEmpty(systemParamUtil.querySystemParam("WXMASTERS")) && "微信管理员".equals(split[0])) {
