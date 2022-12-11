@@ -271,14 +271,14 @@ public class WxServiceImpl implements WxService {
                 return;
             }
             redis.put(from_wxid + "chatGpt", "starting");
-            weChatUtil.sendTextMsg("请问有什么可以帮您？", content);
+            weChatUtil.sendTextMsg("尊敬的robot用户"+content.getString("from_name")+",你好！这里是 Assistant。我是一个训练有素的大型语言模型，可以回答你的各种问题。有什么需要我帮忙的吗？", content);
             return;
         }
 
         //关闭chatGpt
         if ("关闭chatGpt".equals(msg)) {
             redis.remove(from_wxid + "chatGpt");
-            weChatUtil.sendTextMsg("小垃圾，拜拜了你嘞", content);
+            weChatUtil.sendTextMsg("那我就先走啦，有问题再喊我呦", content);
             return;
         }
 
@@ -500,7 +500,7 @@ public class WxServiceImpl implements WxService {
             }
             Chatbot chatbot = new Chatbot(chatgptToken);
             Map<String, Object> chatResponse = chatbot.getChatResponse(msg);
-            weChatUtil.sendTextMsg(chatResponse.get("message").toString(), content);
+            weChatUtil.sendTextMsg("@"+content.getString("from_name")+"\r\n"+chatResponse.get("message").toString(), content);
             return;
         }
     }
