@@ -621,10 +621,13 @@ public class WireServiceImpl implements WireService {
         addWire("店铺左侧刮刮乐","jd_shopDraw.js",keys);
 
         keys.add("jd_teamAJ");
-        addWire("组队分豆-瓜分","jd_team_exchange.js",keys);
+        addWire("AJ组队分豆-瓜分","jd_team_exchange.js",keys);
 
         keys.add("jd_teamFLP");
-        addWire("组队分豆-瓜分","jd_team_exchange.js",keys);
+        addWire("FLP组队分豆-瓜分","jd_team_exchange.js",keys);
+
+        keys.add("jd_car_play_exchangeid");
+        addWire("组队分豆-头文字J兑换","jd_car_play_exchange.js",keys);
 
         /*keys.add("M_WX_SHOP_GIFT_URL");
         addWire("","",keys);
