@@ -70,10 +70,6 @@ public class AsyncServiceImpl implements AsyncService {
                                 }
                             }
                             if (qlUtil.updateEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), env.getName(), env.getValue(), env.getRemarks())) {
-                                ArrayList<Integer> ids = new ArrayList<>();
-                                ids.add(env.getId());
-                                qlUtil.enableEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), ids);
-                                qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), 1000, 6);
                                 isUpdate = true;
                             }
                             break;
@@ -82,6 +78,5 @@ public class AsyncServiceImpl implements AsyncService {
                 }
             }
         }
-
     }
 }

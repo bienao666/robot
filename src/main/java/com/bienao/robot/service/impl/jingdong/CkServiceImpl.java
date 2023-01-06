@@ -516,7 +516,6 @@ public class CkServiceImpl implements CkService {
                             ArrayList<Integer> ids = new ArrayList<>();
                             ids.add(env.getId());
                             qlUtil.enableEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), ids);
-                            qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), 1000, 6);
                             isUpdate = true;
                         }
                         break;
@@ -532,7 +531,6 @@ public class CkServiceImpl implements CkService {
             QlEntity ql = qls.get(i);
             QlEnv env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), "JD_COOKIE", ck, ptPin + "@@" + System.currentTimeMillis() + "@@");
             if (env != null) {
-                qlUtil.moveEnv(ql.getUrl(),ql.getTokenType(),ql.getToken(),env.getId(),1000,6);
                 isAdd = true;
             }
         }
