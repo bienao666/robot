@@ -629,6 +629,15 @@ public class WireServiceImpl implements WireService {
         keys.add("jd_car_play_exchangeid");
         addWire("组队分豆-头文字J兑换","jd_car_play_exchange.js",keys);
 
+        keys.add("jd_lzkj_loreal_cart_url");
+        addWire("加购有礼（lzkj_loreal）","jd_lzkj_loreal_cart.js",keys);
+
+        keys.add("jd_lzkj_loreal_followShop_url");
+        addWire("关注有礼（lzkj_loreal）","jd_lzkj_loreal_followShop.js",keys);
+
+        keys.add("jd_lzkj_loreal_draw_url");
+        addWire("幸运抽奖（lzkj_loreal）","jd_lzkj_loreal_draw.js",keys);
+
         /*keys.add("M_WX_SHOP_GIFT_URL");
         addWire("","",keys);
 
