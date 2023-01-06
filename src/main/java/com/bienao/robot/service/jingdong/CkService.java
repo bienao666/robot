@@ -54,4 +54,6 @@ public interface CkService {
      * 过期ck
      */
     Result expireCk(List<String> ids);
+
+    Result addCkToQl(String ck, String ptPin);
 }

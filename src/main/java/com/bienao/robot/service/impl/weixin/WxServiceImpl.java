@@ -1101,7 +1101,7 @@ public class WxServiceImpl implements WxService {
         }
         String wxpusherUid = "";
         //生成wxpusher二维码
-        if (wxpusherUtil.getWxpusherCode(content)) {
+        if (wxpusherUtil.getWxpusherCode(content) != null) {
             try {
                 Thread.sleep(11 * 1000);
             } catch (InterruptedException e) {
@@ -1143,6 +1143,8 @@ public class WxServiceImpl implements WxService {
         userService.saveUser(content, content.getString("from_wxid"), ptPin, wxpusherUid);
         redis.remove(content.getString("from_wxid") + "operate");
     }
+
+
 
     /**
      * 博客

@@ -2,6 +2,7 @@ package com.bienao.robot.controller.jingdong;
 
 import cn.hutool.cache.Cache;
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.Constants.PatternConstant;
 import com.bienao.robot.annotation.LoginToken;
 import com.bienao.robot.annotation.PassToken;
 import com.bienao.robot.entity.Result;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.regex.Matcher;
 
 /**
  * 京东ck
@@ -175,5 +177,25 @@ public class CkController {
             return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "cks不能为空");
         }
         return ckService.expireCk(cks);
+    }
+
+    /**
+     * 青龙添加ck
+     *
+     * @param ck
+     * @return
+     */
+    @PassToken
+    @GetMapping("/addCkToQl")
+    public Result addCkToQl(@RequestParam(value = "ck") String ck) {
+        ck = ck.replace(" ","").trim();
+        log.info("青龙添加ck：{}", ck);
+        Matcher matcher = PatternConstant.ckPattern.matcher(ck);
+        if (matcher.find()){
+            String ptPin = matcher.group(1);
+            return ckService.addCkToQl(ck,ptPin);
+        }else {
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "ck格式有误，参照 pt_key=xxxx; pt_pin=yyyy;");
+        }
     }
 }
