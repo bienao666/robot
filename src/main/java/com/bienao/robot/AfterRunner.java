@@ -11,6 +11,7 @@ import com.bienao.robot.entity.WireKeyEntity;
 import com.bienao.robot.mapper.WireKeyMapper;
 import com.bienao.robot.mapper.WireMapper;
 import com.bienao.robot.service.command.CommandService;
+import com.bienao.robot.service.init.InitService;
 import com.bienao.robot.service.ql.WireService;
 import com.bienao.robot.service.weixin.WxService;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
@@ -49,14 +50,15 @@ public class AfterRunner implements ApplicationRunner {
     @Autowired
     private SystemParamUtil systemParamUtil;
 
+    @Autowired
+    private InitService initService;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         //初始化tgbot
         initializeTgBot();
-        //初始化线报活动
-        wireService.initializeWire();
-        //初始化命令
-        commandService.initializeCommand();
+
+        initService.init();
         //启动成功通知
         weChatUtil.sendTextMsgToMaster("robot已开启，微信对接成功。。。");
         log.info("=================================================");
