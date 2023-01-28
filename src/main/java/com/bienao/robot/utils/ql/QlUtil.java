@@ -30,7 +30,7 @@ public class QlUtil {
         }
         try {
             String resStr = HttpRequest.get(url + "open/auth/token?client_id=" + clientId +"&client_secret=" + clientSecret)
-                    .timeout(5000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙获取用户秘钥失败");
