@@ -62,7 +62,7 @@ public class QlUtil {
         try {
             String resStr = HttpRequest.get(url + "open/envs")
                     .header("Authorization",tokenType + " " + token)
-                    .timeout(10000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙获取所有环境变量详情失败");
@@ -105,7 +105,7 @@ public class QlUtil {
             String resStr = HttpRequest.post(url + "open/envs")
                     .header("Authorization",tokenType + " " + token)
                     .body(JSONObject.toJSONString(body))
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙添加环境变量失败");
@@ -152,7 +152,7 @@ public class QlUtil {
             String resStr = HttpRequest.put(url + "open/envs")
                     .header("Authorization",tokenType + " " + token)
                     .body(env.toString())
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙更新环境变量失败");
@@ -186,7 +186,7 @@ public class QlUtil {
             String resStr = HttpRequest.delete(url + "open/envs")
                     .header("Authorization",tokenType + " " + token)
                     .body(JSONObject.toJSONString(ids))
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙删除环境变量失败");
@@ -219,7 +219,7 @@ public class QlUtil {
         try {
             String resStr = HttpRequest.get(url + "open/envs/"+id)
                     .header("Authorization",tokenType + " " + token)
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙查询环境变量失败");
@@ -259,7 +259,7 @@ public class QlUtil {
             String resStr = HttpRequest.put(url + "open/envs/"+id+"/move")
                     .header("Authorization",tokenType + " " + token)
                     .body(body.toJSONString())
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙移动环境变量失败");
@@ -294,7 +294,7 @@ public class QlUtil {
             String resStr = HttpRequest.put(url + "open/envs/disable")
                     .header("Authorization",tokenType + " " + token)
                     .body(JSONObject.toJSONString(ids))
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙禁用环境变量失败");
@@ -328,7 +328,7 @@ public class QlUtil {
             String resStr = HttpRequest.put(url + "open/envs/enable")
                     .header("Authorization",tokenType + " " + token)
                     .body(JSONObject.toJSONString(ids))
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙启用环境变量失败");
@@ -360,7 +360,7 @@ public class QlUtil {
         try {
             String resStr = HttpRequest.get(url + "open/configs/files")
                     .header("Authorization",tokenType + " " + token)
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙获取配置文件列表失败");
@@ -394,7 +394,7 @@ public class QlUtil {
         try {
             String resStr = HttpRequest.get(url + "open/configs/"+file)
                     .header("Authorization",tokenType + " " + token)
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙获取配置文件内容失败");
@@ -432,7 +432,7 @@ public class QlUtil {
             String resStr = HttpRequest.post(url + "open/configs/save")
                     .header("Authorization",tokenType + " " + token)
                     .body(body.toJSONString())
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙保存配置文件失败");
@@ -464,7 +464,7 @@ public class QlUtil {
         try {
             String resStr = HttpRequest.get(url + "open/logs")
                     .header("Authorization",tokenType + " " + token)
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙获取所有日志列表失败");
@@ -499,7 +499,7 @@ public class QlUtil {
         try {
             String resStr = HttpRequest.get(url + "open/logs/"+dir+"/"+file)
                     .header("Authorization",tokenType + " " + token)
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙获取任务日志列表失败");
@@ -533,7 +533,7 @@ public class QlUtil {
         try {
             String resStr = HttpRequest.get(url + "open/logs/"+file)
                     .header("Authorization",tokenType + " " + token)
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙获取任务日志列表失败");
@@ -566,7 +566,7 @@ public class QlUtil {
         try {
             String resStr = HttpRequest.get(url + "open/crons")
                     .header("Authorization",tokenType + " " + token)
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙获取所有任务详情失败");
@@ -609,7 +609,7 @@ public class QlUtil {
             String resStr = HttpRequest.post(url + "open/crons")
                     .header("Authorization",tokenType + " " + token)
                     .body(body.toJSONString())
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙添加任务失败");
@@ -653,7 +653,7 @@ public class QlUtil {
             String resStr = HttpRequest.put(url + "open/crons")
                     .header("Authorization",tokenType + " " + token)
                     .body(body.toJSONString())
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙更新任务失败");
@@ -687,7 +687,7 @@ public class QlUtil {
             String resStr = HttpRequest.delete(url + "open/crons")
                     .header("Authorization",tokenType + " " + token)
                     .body(JSONObject.toJSONString(ids))
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙删除任务失败");
@@ -720,7 +720,7 @@ public class QlUtil {
         try {
             String resStr = HttpRequest.delete(url + "open/crons/"+id)
                     .header("Authorization",tokenType + " " + token)
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙根据id获取定时任务详情失败");
@@ -755,7 +755,7 @@ public class QlUtil {
             String resStr = HttpRequest.put(url + "open/crons/run")
                     .header("Authorization",tokenType + " " + token)
                     .body(JSONObject.toJSONString(ids))
-                    .timeout(10000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙根据id运行任务失败");
@@ -789,7 +789,7 @@ public class QlUtil {
             String resStr = HttpRequest.put(url + "open/crons/stop")
                     .header("Authorization",tokenType + " " + token)
                     .body(JSONObject.toJSONString(ids))
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙根据id停止任务失败");
@@ -827,7 +827,7 @@ public class QlUtil {
             String resStr = HttpRequest.post(url + "open/crons/labels")
                     .header("Authorization",tokenType + " " + token)
                     .body(body.toJSONString())
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙根据id添加标签失败");
@@ -865,7 +865,7 @@ public class QlUtil {
             String resStr = HttpRequest.delete(url + "open/crons/labels")
                     .header("Authorization",tokenType + " " + token)
                     .body(body.toJSONString())
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙根据id删除标签失败");
@@ -899,7 +899,7 @@ public class QlUtil {
             String resStr = HttpRequest.put(url + "open/crons/disable")
                     .header("Authorization",tokenType + " " + token)
                     .body(JSONObject.toJSONString(ids))
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙根据id禁用定时任务失败");
@@ -933,7 +933,7 @@ public class QlUtil {
             String resStr = HttpRequest.put(url + "open/crons/enable")
                     .header("Authorization",tokenType + " " + token)
                     .body(JSONObject.toJSONString(ids))
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙根据id启用定时任务失败");
@@ -967,7 +967,7 @@ public class QlUtil {
             String resStr = HttpRequest.put(url + "open/crons/pin")
                     .header("Authorization",tokenType + " " + token)
                     .body(JSONObject.toJSONString(ids))
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙根据id置顶定时任务失败");
@@ -1001,7 +1001,7 @@ public class QlUtil {
             String resStr = HttpRequest.put(url + "open/crons/unpin")
                     .header("Authorization",tokenType + " " + token)
                     .body(JSONObject.toJSONString(ids))
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙根据id取消置顶定时任务失败");
@@ -1033,7 +1033,7 @@ public class QlUtil {
         try {
             String resStr = HttpRequest.get(url + "open/scripts/files")
                     .header("Authorization",tokenType + " " + token)
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙获取所有脚本列表失败");
@@ -1076,7 +1076,7 @@ public class QlUtil {
             String resStr = HttpRequest.post(url + "open/scripts")
                     .header("Authorization",tokenType + " " + token)
                     .body(body.toJSONString())
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙添加脚本失败");
@@ -1116,7 +1116,7 @@ public class QlUtil {
             String resStr = HttpRequest.put(url + "open/scripts")
                     .header("Authorization",tokenType + " " + token)
                     .body(body.toJSONString())
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙更新脚本失败");
@@ -1154,7 +1154,7 @@ public class QlUtil {
             String resStr = HttpRequest.delete(url + "open/scripts")
                     .header("Authorization",tokenType + " " + token)
                     .body(body.toJSONString())
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙删除脚本失败");
@@ -1190,7 +1190,7 @@ public class QlUtil {
             String resStr = HttpRequest.post(url + "open/scripts/download")
                     .header("Authorization",tokenType + " " + token)
                     .body(body.toJSONString())
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙下载脚本失败");
@@ -1228,7 +1228,7 @@ public class QlUtil {
             String resStr = HttpRequest.put(url + "open/scripts/run")
                     .header("Authorization",tokenType + " " + token)
                     .body(body.toJSONString())
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙运行脚本失败");
@@ -1266,7 +1266,7 @@ public class QlUtil {
             String resStr = HttpRequest.put(url + "open/scripts/stop")
                     .header("Authorization",tokenType + " " + token)
                     .body(body.toJSONString())
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙停止运行脚本失败");
@@ -1298,7 +1298,7 @@ public class QlUtil {
         try {
             String resStr = HttpRequest.get(url + "open/dependencies")
                     .header("Authorization",tokenType + " " + token)
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙获取已安装的依赖失败");
@@ -1341,7 +1341,7 @@ public class QlUtil {
             String resStr = HttpRequest.post(url + "open/dependencies")
                     .header("Authorization",tokenType + " " + token)
                     .body(JSONObject.toJSONString(body))
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙添加依赖失败");
@@ -1375,7 +1375,7 @@ public class QlUtil {
             String resStr = HttpRequest.post(url + "open/dependencies")
                     .header("Authorization",tokenType + " " + token)
                     .body(JSONObject.toJSONString(ids))
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙删除依赖失败");
@@ -1409,7 +1409,7 @@ public class QlUtil {
             String resStr = HttpRequest.post(url + "open/dependencies/force")
                     .header("Authorization",tokenType + " " + token)
                     .body(JSONObject.toJSONString(ids))
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙暴力删除依赖失败");
@@ -1443,7 +1443,7 @@ public class QlUtil {
             String resStr = HttpRequest.post(url + "open/dependencies/reinstall")
                     .header("Authorization",tokenType + " " + token)
                     .body(JSONObject.toJSONString(ids))
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙重装依赖失败");
@@ -1475,7 +1475,7 @@ public class QlUtil {
         try {
             String resStr = HttpRequest.get(url + "open/system/log/remove")
                     .header("Authorization",tokenType + " " + token)
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙查询日志删除频率失败");
@@ -1512,7 +1512,7 @@ public class QlUtil {
             String resStr = HttpRequest.put(url + "open/system/log/remove")
                     .header("Authorization",tokenType + " " + token)
                     .body(body.toJSONString())
-                    .timeout(2000)
+                    .timeout(20000)
                     .execute().body();
             if (StringUtils.isEmpty(resStr)){
                 log.info("青龙修改日志删除频率失败");
