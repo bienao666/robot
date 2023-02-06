@@ -160,6 +160,36 @@
             <artifactId>chatgpt</artifactId>
             <version>1.0.1</version>
         </dependency>
+<!--        微信小程序-->
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-miniapp</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+<!--        微信支付-->
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-pay</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+<!--        微信开放平台-->
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-open</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+<!--        公众号（包括订阅号和服务号）-->
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-mp</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+<!--        企业号/企业微信-->
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-cp</artifactId>
+            <version>4.2.0</version>
+        </dependency>
 
     </dependencies>
 
