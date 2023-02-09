@@ -34,7 +34,6 @@ import com.github.plexpt.chatgpt.Chatbot;
 import com.google.common.collect.EvictingQueue;
 import com.nlf.calendar.Lunar;
 import lombok.extern.slf4j.Slf4j;
-import me.chanjar.weixin.mp.api.WxMpInMemoryConfigStorage;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
@@ -2145,7 +2144,7 @@ public class WxServiceImpl implements WxService {
     /**
      * 早上好
      */
-    public void goodMorning() {
+    /*public void goodMorning() {
         //1，配置
         WxMpInMemoryConfigStorage wxStorage = new WxMpInMemoryConfigStorage();
         wxStorage.setAppId("");
@@ -2192,7 +2191,7 @@ public class WxServiceImpl implements WxService {
             System.out.println("推送失败：" + e.getMessage());
             e.printStackTrace();
         }
-    }
+    }*/
 
     /**
      * nark发送手机号
