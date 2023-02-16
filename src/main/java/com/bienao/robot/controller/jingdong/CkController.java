@@ -191,11 +191,16 @@ public class CkController {
         ck = ck.replace(" ","").trim();
         log.info("青龙添加ck：{}", ck);
         Matcher matcher = PatternConstant.ckPattern.matcher(ck);
+        Matcher matcher2 = PatternConstant.ckPattern2.matcher(ck);
         if (matcher.find()){
-            String ptPin = matcher.group(1);
+            String ptPin = matcher.group(2);
             return ckService.addCkToQl(ck,ptPin);
+        }else if (matcher2.find()){
+            String ptKey = matcher.group(2);
+            String ptPin = matcher.group(3);
+            return ckService.addCkToQl("pt_key="+ptKey+";pt_pin="+ptPin+";",ptPin);
         }else {
-            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "ck格式有误，参照 pt_key=xxxx; pt_pin=yyyy;");
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "ck格式有误，参照 pt_key=xxxx;pt_pin=yyyy;");
         }
     }
 }
