@@ -1,20 +1,13 @@
 package com.bienao.robot.utils.weixin;
 
-import cn.zhouyafeng.itchat4j.api.MessageTools;
-import cn.zhouyafeng.itchat4j.api.WechatTools;
-import cn.zhouyafeng.itchat4j.beans.BaseMsg;
-import cn.zhouyafeng.itchat4j.beans.RecommendInfo;
-import cn.zhouyafeng.itchat4j.core.Core;
-import cn.zhouyafeng.itchat4j.face.IMsgHandlerFace;
-import cn.zhouyafeng.itchat4j.utils.enums.MsgTypeEnum;
-import cn.zhouyafeng.itchat4j.utils.tools.DownloadTools;
+
 import com.bienao.robot.utils.SystemUtil;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ItChat4jUtil implements IMsgHandlerFace {
+/*public class ItChat4jUtil implements IMsgHandlerFace {
     @Override
     public String textMsgHandle(BaseMsg baseMsg) {
         // String docFilePath = "D:/itchat4j/pic/1.jpg"; // 这里是需要发送的文件的路径
@@ -83,4 +76,4 @@ public class ItChat4jUtil implements IMsgHandlerFace {
     public String mediaMsgHandle(BaseMsg baseMsg) {
         return null;
     }
-}
+}*/
