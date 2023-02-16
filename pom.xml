@@ -190,11 +190,11 @@
             <artifactId>weixin-java-cp</artifactId>
             <version>4.2.0</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>com.weixin</groupId>
             <artifactId>itchat4j</artifactId>
             <version>1.1.0</version>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>com.vdurmont</groupId>
