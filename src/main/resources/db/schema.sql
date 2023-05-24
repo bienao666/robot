@@ -176,3 +176,10 @@ create table if not exists `forward` (
                                          `created_time` varchar DEFAULT (datetime('now', 'localtime')),
                                          `updated_time` varchar DEFAULT (datetime('now', 'localtime'))
 );
+create table if not exists `JetBrains` (
+                                   "id" INTEGER NOT NULL,
+                                   "url" text,
+                                   `created_time` varchar DEFAULT (datetime('now', 'localtime')),
+                                   `updated_time` varchar DEFAULT (datetime('now', 'localtime')),
+                                   PRIMARY KEY ("id")
+);

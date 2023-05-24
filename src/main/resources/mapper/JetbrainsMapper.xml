@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bienao.robot.mapper.JetbrainsMapper">
+
+    <resultMap id="BaseResultMap" type="com.bienao.robot.entity.JetbrainsEntity" >
+        <result column="id" property="id" />
+        <result column="url" property="url" />
+        <result column="created_time" property="createdTime" />
+        <result column="updated_time" property="updatedTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,
+                url,
+                created_time,
+                updated_time
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="id" parameterType="com.bienao.robot.entity.JetbrainsEntity">
+        INSERT INTO jetbrains
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="null != url and '' != url">
+                url,
+            </if>
+            <if test="null != createdTime and '' != createdTime">
+                created_time,
+            </if>
+            <if test="null != updatedTime and '' != updatedTime">
+                updated_time
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="null != url and '' != url">
+                #{url},
+            </if>
+            <if test="null != createdTime and '' != createdTime">
+                #{createdTime},
+            </if>
+            <if test="null != updatedTime and '' != updatedTime">
+                #{updatedTime}
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="delete" >
+        DELETE FROM jetbrains
+        WHERE id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.bienao.robot.entity.JetbrainsEntity">
+        UPDATE jetbrains
+        <set>
+            <if test="null != url and '' != url">url = #{url},</if>
+            <if test="null != createdTime and '' != createdTime">created_time = #{createdTime},</if>
+            <if test="null != updatedTime and '' != updatedTime">updated_time = #{updatedTime}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+
+    <select id="load" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM jetbrains
+        WHERE id = #{id}
+    </select>
+
+    <select id="pageList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM jetbrains
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="queryAllUrl" resultType="java.lang.String">
+        SELECT url
+        FROM jetbrains
+    </select>
+
+    <select id="pageListCount" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM jetbrains
+    </select>
+
+</mapper>

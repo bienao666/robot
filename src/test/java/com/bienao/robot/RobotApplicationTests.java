@@ -1,25 +1,15 @@
 package com.bienao.robot;
 
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.net.URLEncoder;
-import cn.hutool.http.HttpRequest;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.XML;
-import com.bienao.robot.entity.QlEnv;
+import com.bienao.robot.mapper.JetbrainsMapper;
 import com.bienao.robot.service.ql.QlService;
 import com.bienao.robot.service.weixin.WxService;
+import com.bienao.robot.utils.ActivateJetBrainsUtil;
 import com.bienao.robot.utils.ql.QlUtil;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import com.bienao.robot.utils.weixin.WeChatUtil;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.nio.charset.Charset;
-import java.util.HashSet;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @SpringBootTest
 class RobotApplicationTests {
@@ -38,6 +28,9 @@ class RobotApplicationTests {
 
     @Autowired
     private QlService qlService;
+
+    @Autowired
+    private JetbrainsMapper jetbrainsMapper;
 
     /*@Test
     public void test1() {
@@ -74,45 +67,7 @@ class RobotApplicationTests {
         }
     }*/
     public static void main(String[] args) {
-        String host = "http://jetbrains-lic.novx.org";
-        try {
-            /*Pattern pattern = Pattern.compile("http[s]?://");
-            Matcher matcher = pattern.matcher(host);
-            String protocol = "";
-            if (matcher.find()) {
-                protocol = matcher.group();
-            }
-            String hostWithoutProtocol = host.replace(protocol, "");*/
-
-            String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:107.0) Gecko/20100101 Firefox/107.0";
-            String aliveUrl = "/rpc/ping.action?salt=1669702326321";
-            String activeUrl = "/rpc/obtainTicket.action?" +
-                    "machineId=cc696c3f-d41e-45b6-9d12-59e6d2250171&" +
-                    "productCode=49c202d4-ac56-452b-bb84-735056242fb3&" +
-                    "salt=1669702326321&" +
-                    "userName=FuckYou&" +
-                    "hostName=DESKTOP-FuckYou";
-
-            String res = HttpRequest.get(host + aliveUrl)
-                    .header("user-agent", userAgent)
-                    .timeout(5000)
-                    .execute().body();
-            JSONObject jsonObject = XML.toJSONObject(res).getJSONObject("PingResponse");
-            if (jsonObject.getStr("responseCode").equals("OK")){
-                res = HttpRequest.get(host + activeUrl)
-                        .header("user-agent", userAgent)
-                        .timeout(5000)
-                        .execute().body();
-                jsonObject = XML.toJSONObject(res).getJSONObject("ObtainTicketResponse");
-                if (jsonObject.getStr("responseCode").equals("OK")){
-                    System.out.println(jsonObject.getStr("ticketProperties"));
-                }else {
-                    System.out.println(jsonObject.getStr("message"));
-                }
-            }
-        } catch (Exception error) {
-            System.out.printf("[x]%s --- %s%n", host, error.getMessage());
-        }
+        ActivateJetBrainsUtil.checkServer("http://jetbrains-lic.novx.org");
     }
 
 
