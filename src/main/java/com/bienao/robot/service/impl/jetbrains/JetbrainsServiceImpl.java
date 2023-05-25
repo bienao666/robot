@@ -1,6 +1,7 @@
 package com.bienao.robot.service.impl.jetbrains;
 
 import cn.hutool.core.thread.ThreadUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.entity.JetbrainsEntity;
 import com.bienao.robot.mapper.JetbrainsMapper;
 import com.bienao.robot.service.jetbrains.JetbrainsService;
@@ -77,7 +78,8 @@ public class JetbrainsServiceImpl implements JetbrainsService {
      * 筛选有效的激活服务器地址
      * @return
      */
-    public List<String> getValidUrls(){
+    public JSONObject getValidUrls(){
+        JSONObject data = new JSONObject();
         CopyOnWriteArrayList<String> validAddresses = new CopyOnWriteArrayList<>();
         List<String> addresses = jetbrainsMapper.queryAllUrl();
 
@@ -111,7 +113,10 @@ public class JetbrainsServiceImpl implements JetbrainsService {
             e.printStackTrace();
         }
 
-        return validAddresses;
+        data.put("服务器总数",addresses.size());
+        data.put("可激活服务器个数",validAddresses.size());
+        data.put("激活服务器列表",validAddresses);
+        return data;
     }
 
     @Override

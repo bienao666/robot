@@ -1,5 +1,6 @@
 package com.bienao.robot.controller.Jetbrains;
 
+import com.alibaba.fastjson.JSONObject;
 import com.bienao.robot.annotation.PassToken;
 import com.bienao.robot.entity.Result;
 import com.bienao.robot.service.jetbrains.JetbrainsService;
@@ -25,8 +26,8 @@ public class JetbrainsController {
     @PassToken
     @GetMapping("/getValidUrls")
     public Result getValidUrls() {
-        List<String> validUrl = jetbrainsService.getValidUrls();
-        return Result.success(validUrl);
+        JSONObject data = jetbrainsService.getValidUrls();
+        return Result.success(data);
     }
 
     /**
