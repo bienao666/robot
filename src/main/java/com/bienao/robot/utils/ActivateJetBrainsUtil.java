@@ -31,10 +31,11 @@ public class ActivateJetBrainsUtil {
                         .execute().body();
                 jsonObject = XML.toJSONObject(res).getJSONObject("ObtainTicketResponse");
                 if (jsonObject.getStr("responseCode").equals("OK") && jsonObject.getStr("ticketProperties").contains("metadata=")){
+                    log.info("激活成功返回详情：{}",jsonObject);
                     return true;
                 }else {
                     log.info("激活失败返回message：{}",jsonObject.getStr("message"));
-                    log.info("激活失败返回详情：{}",jsonObject.toString());
+                    log.info("激活失败返回详情：{}",jsonObject);
                 }
             }
         } catch (Exception error) {
