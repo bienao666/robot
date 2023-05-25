@@ -28,4 +28,15 @@ public class JetbrainsController {
         List<String> validUrl = jetbrainsService.getValidUrls();
         return Result.success(validUrl);
     }
+
+    /**
+     *
+     * @return
+     */
+    @PassToken
+    @PostMapping("/addUrls")
+    public Result addUrls(@RequestBody String urls) {
+        jetbrainsService.addUrls(urls);
+        return Result.success();
+    }
 }

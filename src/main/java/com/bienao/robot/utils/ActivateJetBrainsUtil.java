@@ -3,7 +3,9 @@ package com.bienao.robot.utils;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.XML;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ActivateJetBrainsUtil {
 
     public static boolean checkServer(String host){
@@ -19,24 +21,24 @@ public class ActivateJetBrainsUtil {
 
             String res = HttpRequest.get(host + aliveUrl)
                     .header("user-agent", userAgent)
-                    .timeout(5000)
+                    .timeout(3000)
                     .execute().body();
             JSONObject jsonObject = XML.toJSONObject(res).getJSONObject("PingResponse");
             if (jsonObject.getStr("responseCode").equals("OK")){
                 res = HttpRequest.get(host + activeUrl)
                         .header("user-agent", userAgent)
-                        .timeout(5000)
+                        .timeout(3000)
                         .execute().body();
                 jsonObject = XML.toJSONObject(res).getJSONObject("ObtainTicketResponse");
-                if (jsonObject.getStr("responseCode").equals("OK") && jsonObject.getStr("ticketProperties").contains("tmetadata=")){
-                    System.out.println(jsonObject.getStr("ticketProperties"));
+                if (jsonObject.getStr("responseCode").equals("OK") && jsonObject.getStr("ticketProperties").contains("metadata=")){
                     return true;
                 }else {
-                    System.out.println(jsonObject.getStr("message"));
+                    log.info("激活失败返回message：{}",jsonObject.getStr("message"));
+                    log.info("激活失败返回详情：{}",jsonObject.toString());
                 }
             }
         } catch (Exception error) {
-            System.out.printf("[x]%s --- %s%n", host, error.getMessage());
+            log.info(error.getMessage());
         }
         return false;
     }

@@ -8,14 +8,17 @@ import com.fooock.shodan.ShodanRestApi;
 import com.fooock.shodan.model.banner.Banner;
 import com.fooock.shodan.model.host.HostReport;
 import io.reactivex.observers.DisposableObserver;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
+@Slf4j
 public class JetbrainsServiceImpl implements JetbrainsService {
 
     @Autowired
@@ -73,11 +76,27 @@ public class JetbrainsServiceImpl implements JetbrainsService {
     public List<String> getValidUrls(){
         ArrayList<String> validAddresses = new ArrayList<>();
         List<String> addresses = jetbrainsMapper.queryAllUrl();
-        for (String address : addresses) {
+        for (int i = 0; i < addresses.size(); i++) {
+            String address = addresses.get(i);
+            log.info("共{}个激活服务器，当前正在测试第{}个，激活地址{}",addresses.size(),i+1,address);
             if (ActivateJetBrainsUtil.checkServer(address)){
                 validAddresses.add(address);
             }
         }
         return validAddresses;
+    }
+
+    @Override
+    public void addUrls(String urls) {
+        List<String> addresses = jetbrainsMapper.queryAllUrl();
+        String[] split = urls.split(" ");
+        List<String> list = Arrays.asList(split);
+        for (String url : list) {
+            if (!addresses.contains(url)){
+                JetbrainsEntity jetbrainsEntity = new JetbrainsEntity();
+                jetbrainsEntity.setUrl(url);
+                jetbrainsMapper.insert(jetbrainsEntity);
+            }
+        }
     }
 }

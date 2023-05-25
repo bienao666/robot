@@ -6,4 +6,6 @@ public interface JetbrainsService {
     void reptile();
 
     List<String> getValidUrls();
+
+    void addUrls(String urls);
 }
