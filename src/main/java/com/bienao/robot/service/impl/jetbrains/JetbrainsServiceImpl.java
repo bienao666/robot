@@ -1,5 +1,6 @@
 package com.bienao.robot.service.impl.jetbrains;
 
+import cn.hutool.core.thread.ThreadUtil;
 import com.bienao.robot.entity.JetbrainsEntity;
 import com.bienao.robot.mapper.JetbrainsMapper;
 import com.bienao.robot.service.jetbrains.JetbrainsService;
@@ -16,6 +17,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
@@ -74,15 +78,39 @@ public class JetbrainsServiceImpl implements JetbrainsService {
      * @return
      */
     public List<String> getValidUrls(){
-        ArrayList<String> validAddresses = new ArrayList<>();
+        CopyOnWriteArrayList<String> validAddresses = new CopyOnWriteArrayList<>();
         List<String> addresses = jetbrainsMapper.queryAllUrl();
+
+        final int[] size = {10};
+        CountDownLatch latch = ThreadUtil.newCountDownLatch(size[0]);
+
         for (int i = 0; i < addresses.size(); i++) {
-            String address = addresses.get(i);
-            log.info("共{}个激活服务器，当前正在测试第{}个，激活地址{}",addresses.size(),i+1,address);
-            if (ActivateJetBrainsUtil.checkServer(address)){
-                validAddresses.add(address);
+            if (size[0] >0){
+                int finalI = i;
+                ThreadUtil.execAsync(new Runnable() {
+                    @Override
+                    public void run() {
+                        size[0]--;
+                        String address = addresses.get(finalI);
+                        if (ActivateJetBrainsUtil.checkServer(address)){
+                            validAddresses.add(address);
+                        }
+                        latch.countDown();
+                        size[0]++;
+                    }
+                });
+            }else {
+                i--;
             }
         }
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         return validAddresses;
     }
 

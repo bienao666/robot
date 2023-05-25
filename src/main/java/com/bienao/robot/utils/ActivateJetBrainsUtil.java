@@ -31,11 +31,11 @@ public class ActivateJetBrainsUtil {
                         .execute().body();
                 jsonObject = XML.toJSONObject(res).getJSONObject("ObtainTicketResponse");
                 if (jsonObject.getStr("responseCode").equals("OK") && jsonObject.getStr("ticketProperties").contains("metadata=")){
-                    log.info("激活成功返回详情：{}",jsonObject);
+                    log.info("线程:{}，激活服务器地址：{}，激活成功返回详情：{}",Thread.currentThread().getName(),host,jsonObject);
                     return true;
                 }else {
-                    log.info("激活失败返回message：{}",jsonObject.getStr("message"));
-                    log.info("激活失败返回详情：{}",jsonObject);
+                    log.info("线程:{}，激活服务器地址：{}，激活失败返回message：{}",Thread.currentThread().getName(),host,jsonObject.getStr("message"));
+                    log.info("线程:{}，激活服务器地址：{}，激活失败返回详情：{}",Thread.currentThread().getName(),host,jsonObject);
                 }
             }
         } catch (Exception error) {
