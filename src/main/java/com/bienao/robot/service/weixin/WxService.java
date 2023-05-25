@@ -1,7 +1,10 @@
 package com.bienao.robot.service.weixin;
 
 import com.alibaba.fastjson.JSONObject;
+import com.bienao.robot.entity.QlEntity;
 import com.bienao.robot.entity.Result;
+
+import java.util.List;
 
 public interface WxService {
 

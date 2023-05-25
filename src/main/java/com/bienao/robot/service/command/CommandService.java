@@ -8,11 +8,6 @@ import java.util.List;
 public interface CommandService {
 
     /**
-     * 初始化命令
-     */
-    void initializeCommand();
-
-    /**
      * 添加命令
      * @param commandEntity
      * @return

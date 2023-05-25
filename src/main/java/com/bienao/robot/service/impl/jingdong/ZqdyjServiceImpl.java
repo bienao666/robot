@@ -177,7 +177,7 @@ public class ZqdyjServiceImpl implements ZqdyjService {
         Redis.redis.put("ZQDYJHELP", "true", 10L * 60 * 1000);
 
         try {
-            Integer MaxTime = 10;
+            Integer MaxTime = 20;
             Integer helpCount = 0;
 
             //开始助力

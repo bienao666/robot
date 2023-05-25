@@ -31,34 +31,36 @@ public class WxpusherUtil {
      * @param content
      * @return
      */
-    public boolean getWxpusherCode(JSONObject content){
+    public JSONObject getWxpusherCode(JSONObject content){
         String wxpusherToken = systemParamUtil.querySystemParam("WXPUSHERTOKEN");
         if (StringUtils.isEmpty(wxpusherToken)){
-            return false;
+            return null;
         }
         JSONObject body = new JSONObject();
         body.put("appToken",wxpusherToken);
         body.put("extra","bienao");
-        body.put("validTime",40);
+        body.put("validTime",60);
         String resStr = HttpRequest.post("http://wxpusher.zjiecode.com/api/fun/create/qrcode")
                 .body(body.toJSONString())
                 .execute().body();
         if (StringUtils.isEmpty(resStr)){
-            return false;
+            return null;
         }
         JSONObject res = JSONObject.parseObject(resStr);
         if (res.getInteger("code")==1000 && "处理成功".equals(res.getString("msg"))){
             JSONObject data = res.getJSONObject("data");
             String code = data.getString("code");
             String url = data.getString("url");
-            weChatUtil.sendTextMsg("请在30s内扫描下方二维码：",content);
-            weChatUtil.sendImageMsg(url,content);
-            //发送人
-            String from_wxid = content.getString("from_wxid");
-            redis.put(from_wxid+"code",code,40 * 1000);
-            return true;
+            if (content != null){
+                weChatUtil.sendTextMsg("请在30s内扫描下方二维码：",content);
+                weChatUtil.sendImageMsg(url,content);
+                //发送人
+                String from_wxid = content.getString("from_wxid");
+                redis.put(from_wxid+"code",code,40 * 1000);
+            }
+            return data;
         }else {
-            return false;
+            return null;
         }
     }
 
@@ -71,6 +73,27 @@ public class WxpusherUtil {
         //发送人
         String from_wxid = content.getString("from_wxid");
         String code = redis.get(from_wxid + "code");
+        String resStr = HttpRequest.get("https://wxpusher.zjiecode.com/api/fun/scan-qrcode-uid?code="+code)
+                .timeout(3000)
+                .execute().body();
+        log.info("获取wxpusheruid接口返回：{}",resStr);
+        if (StringUtils.isEmpty(resStr)){
+            return null;
+        }
+        JSONObject res = JSONObject.parseObject(resStr);
+        if (res.getInteger("code")==1000 && "处理成功".equals(res.getString("msg"))){
+            return res.getString("data");
+        }else {
+            return null;
+        }
+    }
+
+    /**
+     * 获取wxpusheruid
+     * @param code
+     * @return
+     */
+    public String getWxpusherUid(String code){
         String resStr = HttpRequest.get("https://wxpusher.zjiecode.com/api/fun/scan-qrcode-uid?code="+code)
                 .timeout(3000)
                 .execute().body();

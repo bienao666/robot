@@ -11,8 +11,10 @@ import com.bienao.robot.entity.WireKeyEntity;
 import com.bienao.robot.mapper.WireKeyMapper;
 import com.bienao.robot.mapper.WireMapper;
 import com.bienao.robot.service.command.CommandService;
+import com.bienao.robot.service.init.InitService;
 import com.bienao.robot.service.ql.WireService;
 import com.bienao.robot.service.weixin.WxService;
+import com.bienao.robot.utils.SystemUtil;
 import com.bienao.robot.utils.systemParam.SystemParamUtil;
 import com.bienao.robot.utils.weixin.WeChatUtil;
 import com.google.common.collect.EvictingQueue;
@@ -49,14 +51,17 @@ public class AfterRunner implements ApplicationRunner {
     @Autowired
     private SystemParamUtil systemParamUtil;
 
+    @Autowired
+    private InitService initService;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        //登陆微信
+//        initWeiXin();
         //初始化tgbot
         initializeTgBot();
-        //初始化线报活动
-        wireService.initializeWire();
-        //初始化命令
-        commandService.initializeCommand();
+        //初始化京东线报和命令
+        initService.init();
         //启动成功通知
         weChatUtil.sendTextMsgToMaster("robot已开启，微信对接成功。。。");
         log.info("=================================================");
@@ -64,6 +69,13 @@ public class AfterRunner implements ApplicationRunner {
         log.info("     http://127.0.0.1:8899/robot/index.html");
         log.info("=================================================");
     }
+
+   /* private void initWeiXin() {
+        String qrPath = SystemUtil.getProjectPath()+"//itchat4j//login"; // 保存登陆二维码图片的路径，这里需要在本地新建目录
+        ItChat4jUtil msgHandler = new ItChat4jUtil(); // 实现IMsgHandlerFace接口的类
+        Wechat wechat = new Wechat(msgHandler, qrPath); // 【注入】
+        wechat.start(); // 启动服务，会在qrPath下生成一张二维码图片，扫描即可登陆，注意，二维码图片如果超过一定时间未扫描会过期，过期时会自动更新，所以你可能需要重新打开图片
+    }*/
 
     public void initializeTgBot(){
         try {

@@ -89,7 +89,7 @@ public class jdTask {
             jdService.fruitShareHelp(cks,zlcwaittime);
 
             //东东萌宠
-            jdService.petShareHelp(cks, zlcwaittime);
+//            jdService.petShareHelp(cks, zlcwaittime);
 
             //种豆得豆
             jdService.plantShareHelp(cks,zlcwaittime);
@@ -119,7 +119,7 @@ public class jdTask {
             jdService.fruitShareHelp(cks,zlcwaittime);
 
             //东东萌宠
-            jdService.petShareHelp(cks, zlcwaittime);
+//            jdService.petShareHelp(cks, zlcwaittime);
 
             //种豆得豆
             jdService.plantShareHelp(cks,zlcwaittime);
@@ -212,7 +212,7 @@ public class jdTask {
     /**
      * 大赢家定时助力
      */
-    @Scheduled(cron = "45 0-30/5 0 * * ?")
+    /*@Scheduled(cron = "45 0-30/5 0 * * ?")
     public void helpZqdyj(){
         String zqdyjhelp = Redis.redis.get("ZQDYJHELP");
         if (StringUtils.isNotEmpty(zqdyjhelp)){
@@ -252,7 +252,7 @@ public class jdTask {
                 e.printStackTrace();
             }
         }
-    }
+    }*/
 
     /**
      * 清理无效的数据
@@ -265,8 +265,8 @@ public class jdTask {
     /**
      * 重置赚钱大赢家
      */
-    @Scheduled(cron = "0 59 23 * * ?")
+    /*@Scheduled(cron = "0 59 23 * * ?")
     public void zqdyjReset(){
         zqdyjService.reset();
-    }
+    }*/
 }

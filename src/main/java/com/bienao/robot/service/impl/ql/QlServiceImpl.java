@@ -788,7 +788,7 @@ public class QlServiceImpl implements QlService {
                             ArrayList<Integer> ids = new ArrayList<>();
                             ids.add(env.getId());
                             qlUtil.enableEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), ids);
-                            qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), 1000, 6);
+//                            qlUtil.moveEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), 1000, 6);
                         } else {
                             weChatUtil.sendTextMsg("更新失败，请联系管理员", content);
                         }
@@ -807,11 +807,16 @@ public class QlServiceImpl implements QlService {
             QlEnv env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), "JD_COOKIE", ck, ptPin + "@@" + System.currentTimeMillis() + "@@" + wxPusherUid);
             if (env != null) {
                 sendMessage(content, ptPin, wxPusherUid, ql, "添加");
-                qlUtil.moveEnv(ql.getUrl(),ql.getTokenType(),ql.getToken(),env.getId(),1000,6);
+//                qlUtil.moveEnv(ql.getUrl(),ql.getTokenType(),ql.getToken(),env.getId(),1000,6);
             } else {
                 weChatUtil.sendTextMsg("添加失败，请联系管理员", content);
             }
         }
+    }
+
+    public void updateEnv(QlEnv env){
+        QlEntity ql = qlMapper.queryQlById(env.getQlId());
+        qlUtil.updateEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), env.getName(), env.getValue(), env.getRemarks());
     }
 
     @Override
@@ -863,7 +868,7 @@ public class QlServiceImpl implements QlService {
                 }
                 count++;
                 if (count <= limit) {
-                    index = i;
+                    index = i+1;
                     continue;
                 }
                 env.setQlIndex(i);
@@ -943,13 +948,20 @@ public class QlServiceImpl implements QlService {
                                         operateQlToQlEnvs(qlToQlEnvs, qlEnv.getQlId(), qlEnv, 0);
                                         //更新robot本地
                                         jdService.addJdck(qlEnv.getValue(),qlEnv.getRemarks(),qlEnv.getStatus(),0,qlEnv.getQlRemark());
+                                        if (!qlEnv.getRemarks().contains("@@UID_") && qlEnv1.getRemarks().contains("@@UID_")){
+                                            qlEnv.setRemarks(qlEnv1.getRemarks());
+                                            updateEnv(qlEnv);
+                                        }
                                     } else {
                                         //删除qlEnv
                                         deleteQlCk(qlEntity, qlEnv);
+                                        if (!qlEnv1.getRemarks().contains("@@UID_") && qlEnv.getRemarks().contains("@@UID_")){
+                                            qlEnv1.setRemarks(qlEnv.getRemarks());
+                                            updateEnv(qlEnv1);
+                                        }
                                         //更新robot本地
                                         jdService.addJdck(qlEnv1.getValue(),qlEnv1.getRemarks(),qlEnv1.getStatus(),0,qlEnv1.getQlRemark());
                                     }
-
                                 } else {
                                     //ck不相同，有一个无效，删一个无效的索引
                                     boolean isValid = JDUtil.isVaild(qlEnv.getValue());
@@ -959,6 +971,10 @@ public class QlServiceImpl implements QlService {
                                         if (DateUtil.parse(qlEnv.getCreatedAt()).getTime() < DateUtil.parse(qlEnv1.getCreatedAt()).getTime()) {
                                             //删除qlEnv
                                             deleteQlCk(qlEntity, qlEnv);
+                                            if (!qlEnv1.getRemarks().contains("@@UID_") && qlEnv.getRemarks().contains("@@UID_")){
+                                                qlEnv1.setRemarks(qlEnv.getRemarks());
+                                                updateEnv(qlEnv1);
+                                            }
                                             //更新robot本地
                                             jdService.addJdck(qlEnv1.getValue(),qlEnv1.getRemarks(),qlEnv1.getStatus(),0,qlEnv1.getQlRemark());
                                         } else {
@@ -976,6 +992,10 @@ public class QlServiceImpl implements QlService {
                                             operateQlToQlEnvs(qlToQlEnvs, qlEnv1.getQlId(), qlEnv1, 1);
                                             //qlEnv所在青龙加上
                                             operateQlToQlEnvs(qlToQlEnvs, qlEnv.getQlId(), qlEnv, 0);
+                                            if (!qlEnv.getRemarks().contains("@@UID_") && qlEnv1.getRemarks().contains("@@UID_")){
+                                                qlEnv.setRemarks(qlEnv1.getRemarks());
+                                                updateEnv(qlEnv);
+                                            }
                                             //更新robot本地
                                             jdService.addJdck(qlEnv.getValue(),qlEnv.getRemarks(),qlEnv.getStatus(),0,qlEnv.getQlRemark());
                                         }
@@ -985,6 +1005,10 @@ public class QlServiceImpl implements QlService {
                                             if (!isValid) {
                                                 //删除qlEnv
                                                 deleteQlCk(qlEntity, qlEnv);
+                                                if (!qlEnv1.getRemarks().contains("@@UID_") && qlEnv.getRemarks().contains("@@UID_")){
+                                                    qlEnv1.setRemarks(qlEnv.getRemarks());
+                                                    updateEnv(qlEnv1);
+                                                }
                                                 //更新robot本地
                                                 jdService.addJdck(qlEnv1.getValue(),qlEnv1.getRemarks(),qlEnv1.getStatus(),0,qlEnv1.getQlRemark());
                                             }
@@ -1003,12 +1027,20 @@ public class QlServiceImpl implements QlService {
                                                 operateQlToQlEnvs(qlToQlEnvs, qlEnv1.getQlId(), qlEnv1, 1);
                                                 //qlEnv所在青龙加上
                                                 operateQlToQlEnvs(qlToQlEnvs, qlEnv.getQlId(), qlEnv, 0);
+                                                if (!qlEnv.getRemarks().contains("@@UID_") && qlEnv1.getRemarks().contains("@@UID_")){
+                                                    qlEnv.setRemarks(qlEnv1.getRemarks());
+                                                    updateEnv(qlEnv);
+                                                }
                                                 //更新robot本地
                                                 jdService.addJdck(qlEnv.getValue(),qlEnv.getRemarks(),qlEnv.getStatus(),0,qlEnv.getQlRemark());
                                             }
                                         } else {
                                             //两个都无效，删除qlEnv
                                             deleteQlCk(qlEntity, qlEnv);
+                                            if (!qlEnv1.getRemarks().contains("@@UID_") && qlEnv.getRemarks().contains("@@UID_")){
+                                                qlEnv1.setRemarks(qlEnv.getRemarks());
+                                                updateEnv(qlEnv1);
+                                            }
                                             //更新robot本地
                                             jdService.addJdck(qlEnv1.getValue(),qlEnv1.getRemarks(),qlEnv1.getStatus(),0,qlEnv1.getQlRemark());
                                         }

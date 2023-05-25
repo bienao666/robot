@@ -26,6 +26,8 @@ public interface QlMapper {
 
     QlEntity queryQl(QlEntity qlEntity);
 
+    QlEntity queryQlById(Integer id);
+
     /**
      * 查询青龙
      * @return

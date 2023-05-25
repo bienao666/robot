@@ -15,8 +15,11 @@ import com.bienao.robot.mapper.jingdong.JdCkMapper;
 import com.bienao.robot.mapper.jingdong.JdFruitMapper;
 import com.bienao.robot.mapper.jingdong.JdPetMapper;
 import com.bienao.robot.mapper.jingdong.JdPlantMapper;
+import com.bienao.robot.service.async.AsyncService;
 import com.bienao.robot.service.jingdong.CkService;
 import com.bienao.robot.service.jingdong.JdDhService;
+import com.bienao.robot.service.weixin.WxService;
+import com.bienao.robot.utils.WxpusherUtil;
 import com.bienao.robot.utils.jingdong.GetUserAgentUtil;
 import com.bienao.robot.utils.jingdong.JDUtil;
 import com.bienao.robot.utils.ql.QlUtil;
@@ -55,6 +58,12 @@ public class CkServiceImpl implements CkService {
 
     @Autowired
     private QlMapper qlMapper;
+
+    @Autowired
+    private WxpusherUtil wxpusherUtil;
+
+    @Autowired
+    private AsyncService asyncService;
 
     private Pattern jdPinPattern = Pattern.compile("pt_pin=(.+?);");
 
@@ -471,6 +480,80 @@ public class CkServiceImpl implements CkService {
             }
         }
         return Result.success();
+    }
+
+    @Override
+    public Result addCkToQl(String ck, String ptPin) {
+        //校验ck是否有效
+        JSONObject jsonObject = queryDetail(ck);
+        if (jsonObject == null) {
+            return Result.error(ErrorCodeConstant.PARAMETER_ERROR, "ck不存在或者ck已失效");
+        }
+
+        //青龙ck数
+        ArrayList<Integer> qlCkCountList = new ArrayList<>();
+        //查询所有青龙
+        List<QlEntity> qls = qlMapper.queryQls(null);
+
+        boolean isContain = false;
+        boolean isUpdate = false;
+        boolean isAdd = false;
+
+        for (QlEntity ql : qls) {
+            if (isUpdate) {
+                break;
+            }
+            Integer ckCount = 0;
+            List<QlEnv> envs = qlUtil.getEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken());
+            for (QlEnv env : envs) {
+                if ("JD_COOKIE".equals(env.getName())) {
+                    ckCount++;
+                    if (env.getValue().contains(ptPin)) {
+                        isContain = true;
+                        //更新ck
+                        env.setValue(ck);
+                        if (qlUtil.updateEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), env.getId(), env.getName(), env.getValue(), env.getRemarks())) {
+                            ArrayList<Integer> ids = new ArrayList<>();
+                            ids.add(env.getId());
+                            qlUtil.enableEnv(ql.getUrl(), ql.getTokenType(), ql.getToken(), ids);
+                            isUpdate = true;
+                        }
+                        break;
+                    }
+                }
+            }
+            qlCkCountList.add(ckCount);
+        }
+        if (!isContain) {
+            //新增
+            Integer min = Collections.min(qlCkCountList);
+            int i = qlCkCountList.indexOf(min);
+            QlEntity ql = qls.get(i);
+            QlEnv env = qlUtil.addEnvs(ql.getUrl(), ql.getTokenType(), ql.getToken(), "JD_COOKIE", ck, ptPin + "@@" + System.currentTimeMillis() + "@@");
+            if (env != null) {
+                isAdd = true;
+            }
+        }
+
+        if (isUpdate || isAdd){
+            //添加成功
+            JSONObject data = wxpusherUtil.getWxpusherCode(null);
+            String wxPusherUrl = data.getString("url");
+            JSONObject res = new JSONObject();
+            if (StringUtils.isNotEmpty(wxPusherUrl)){
+                res.put("message","请在30s内扫描推送二维码，过期扫码无效");
+                res.put("wxPusherUrl",wxPusherUrl);
+            }
+
+            //异步查询用户是否扫wxpusher
+            String code = data.getString("code");
+            asyncService.updateWxpusherUid(qls,ptPin,code);
+
+            return Result.success(res);
+        }else {
+            //添加失败
+            return Result.error(ErrorCodeConstant.SERVICE_ERROR, "添加失败，请联系管理员");
+        }
     }
 
 }
