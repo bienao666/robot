@@ -83,27 +83,20 @@ public class JetbrainsServiceImpl implements JetbrainsService {
         CopyOnWriteArrayList<String> validAddresses = new CopyOnWriteArrayList<>();
         List<String> addresses = jetbrainsMapper.queryAllUrl();
 
-        final int[] size = {10};
-        CountDownLatch latch = ThreadUtil.newCountDownLatch(size[0]);
+        CountDownLatch latch = ThreadUtil.newCountDownLatch(addresses.size());
 
         for (int i = 0; i < addresses.size(); i++) {
-            if (size[0] >0){
-                int finalI = i;
-                ThreadUtil.execAsync(new Runnable() {
-                    @Override
-                    public void run() {
-                        size[0]--;
-                        String address = addresses.get(finalI);
-                        if (ActivateJetBrainsUtil.checkServer(address)){
-                            validAddresses.add(address);
-                        }
-                        latch.countDown();
-                        size[0]++;
+            int finalI = i;
+            ThreadUtil.execAsync(new Runnable() {
+                @Override
+                public void run() {
+                    String address = addresses.get(finalI);
+                    if (ActivateJetBrainsUtil.checkServer(address)){
+                        validAddresses.add(address);
                     }
-                });
-            }else {
-                i--;
-            }
+                    latch.countDown();
+                }
+            });
         }
 
         try {
