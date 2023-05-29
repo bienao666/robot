@@ -19,7 +19,7 @@ public class jkTask {
     /**
      * 设么值得买监控洋河
      */
-    @Scheduled(cron = "0 0/5 * * * ? ")
+//    @Scheduled(cron = "0 0/5 * * * ? ")
     public void timeJiankongSmzdmyh() {
         jiankong.jiankongsmzdmyh();
         jiankong.jiankongsmzdmmt();
@@ -28,7 +28,7 @@ public class jkTask {
     /**
      * 重置推送列表
      */
-    @Scheduled(cron = "0 0 0 * * ?")
+//    @Scheduled(cron = "0 0 0 * * ?")
     public void resetSendList() {
         jiankong.resetSendList();
     }

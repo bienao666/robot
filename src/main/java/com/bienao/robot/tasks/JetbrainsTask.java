@@ -17,7 +17,7 @@ public class JetbrainsTask {
     /**
      * 定时爬取Jetbrains激活服务器
      */
-    @Scheduled(cron = "0 0/5 * * * ? ")
+    @Scheduled(cron = "0 0 9 * * ? ")
     public void reptile(){
         jetbrainsService.reptile();
     }

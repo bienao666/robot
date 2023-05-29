@@ -69,7 +69,7 @@ public class jdTask {
     /**
      * 助力池互助
      */
-    @Scheduled(cron = "30 0 0 * * ?")
+//    @Scheduled(cron = "30 0 0 * * ?")
     public void shareHelp(){
         if (shareHelp){
             //重置助力
@@ -101,7 +101,7 @@ public class jdTask {
     /**
      * 助力池互助
      */
-    @Scheduled(cron = "0 */30 1-23 * * ?")
+//    @Scheduled(cron = "0 */30 1-23 * * ?")
     public void shareHelpNoReset(){
         if (shareHelp){
             //接口调用等待时间
@@ -131,7 +131,7 @@ public class jdTask {
     /**
      * 检查助力池是否过期
      */
-    @Scheduled(cron = "0 0 13 * * ?")
+//    @Scheduled(cron = "0 0 13 * * ?")
     public void checkZlc(){
         if (checkZlc){
             ckService.checkZlc();
@@ -161,7 +161,7 @@ public class jdTask {
     /**
      * 统计京豆收益
      */
-    @Scheduled(cron = "0 30 */3 * * ?")
+//    @Scheduled(cron = "0 30 */3 * * ?")
     public void countJd(){
         if (countJd){
             jdService.countJd();
@@ -174,7 +174,7 @@ public class jdTask {
      * 青龙同步助力池
      * 每隔十分钟同步一次
      */
-    @Scheduled(cron = "30 */5 * * * ?")
+//    @Scheduled(cron = "30 */5 * * * ?")
     public void qlToZlc(){
         String qltozlc = systemParamUtil.querySystemParam("QLTOZLC");
         if ("是".equals(qltozlc)){
@@ -185,7 +185,7 @@ public class jdTask {
     /**
      * 清空京东查询次数限制
      */
-    @Scheduled(cron = "0 59 23 * * ?")
+//    @Scheduled(cron = "0 59 23 * * ?")
     public void clearJdQueryTimes(){
         ArrayList<String> clear = new ArrayList<>();
         Iterator<CacheObj<String, String>> iterator = redis.cacheObjIterator();
@@ -204,7 +204,7 @@ public class jdTask {
     /**
      * 京东定时任务
      */
-    @Scheduled(cron = "0 0 0 * * ?")
+//    @Scheduled(cron = "0 0 0 * * ?")
     public void jdTimeTask(){
         ckService.jkExchange();
     }
@@ -257,7 +257,7 @@ public class jdTask {
     /**
      * 清理无效的数据
      */
-    @Scheduled(cron = "0 0 23 * * ?")
+//    @Scheduled(cron = "0 0 23 * * ?")
     public void clear(){
         jdService.clear();
     }

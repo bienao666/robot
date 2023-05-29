@@ -33,7 +33,7 @@ public class QlTask {
     /**
      * 执行线报
      */
-    @Scheduled(cron = "30 * * * * ?")
+//    @Scheduled(cron = "30 * * * * ?")
     public void handleWire() {
         //查询近十条未执行的线报
         List<WireActivityEntity> wireActivityEntities = wirelistMapper.queryToBeExecutedActivity();
@@ -45,7 +45,7 @@ public class QlTask {
     /**
      * 清理无效数据
      */
-    @Scheduled(cron = "0 0 4 * * ?")
+//    @Scheduled(cron = "0 0 4 * * ?")
     public void clear(){
         wirelistMapper.clear();
     }
@@ -54,7 +54,7 @@ public class QlTask {
      * 设置小车头
      * 10分钟设置一次
      */
-    @Scheduled(cron = "30 */10 * * * ?")
+//    @Scheduled(cron = "30 */10 * * * ?")
     public void setSmallHead(){
         qlService.setSmallHead();
     }
@@ -62,7 +62,7 @@ public class QlTask {
     /**
      * 韭菜友好设置
      */
-    @Scheduled(cron = "0 0 8,12,16,20 * * ?")
+//    @Scheduled(cron = "0 0 8,12,16,20 * * ?")
     public void leekFriendly(){
         String leekFriendly = systemParamUtil.querySystemParam("LEEKFRIENDLY");
         if ("是".equals(leekFriendly)){
@@ -73,7 +73,7 @@ public class QlTask {
     /**
      * 青龙检测
      */
-    @Scheduled(cron = "40 */30 * * * ?")
+//    @Scheduled(cron = "40 */30 * * * ?")
     public void checkQl(){
         qlService.checkQl();
     }
@@ -81,7 +81,7 @@ public class QlTask {
     /**
      * ck检测
      */
-    @Scheduled(cron = "0 30 0,8,12,16,20 * * ?")
+//    @Scheduled(cron = "0 30 0,8,12,16,20 * * ?")
     public void checkck(){
         qlService.checkCk();
     }
@@ -89,7 +89,7 @@ public class QlTask {
     /**
      * 多青龙 ck分布优化
      */
-    @Scheduled(cron = "0 30 */3 * * ?")
+//    @Scheduled(cron = "0 30 */3 * * ?")
     public void autoAdjust(){
         String leekFriendly = systemParamUtil.querySystemParam("QLCKAUTOADJUST");
         if ("是".equals(leekFriendly)){
@@ -100,7 +100,7 @@ public class QlTask {
     /**
      * 京东红包领取通知
      */
-    @Scheduled(cron = "0 0 10 * * ?")
+//    @Scheduled(cron = "0 0 10 * * ?")
     public void notifyRedPacket(){
         String notifyRedPacket = systemParamUtil.querySystemParam("NOTIFYREDPACKET");
         if ("是".equals(notifyRedPacket)){
